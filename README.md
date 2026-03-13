@@ -1,6 +1,6 @@
-# 🧵 UMKM Batik Bondowoso
+# 🧵 Mobile D'Kost
 
-Selamat datang di project **UMKM Batik Bondowoso**!  
+Selamat datang di project **Mobile D'Kost**!  
 Aplikasi ini bertujuan untuk membantu mendigitalisasi UMKM Batik yang ada di Kabupaten Bondowoso.
 
 ---
