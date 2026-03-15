@@ -1,1 +1,0 @@
-{"user_id":12,"product_id":1}

@@ -1,0 +1,293 @@
+// ============================================================
+// FRONTEND LAYER — lapor_keluhan_page.dart
+// Sesuai Figma: AppBar hijau "Lapor Keluhan", form dengan
+// Nomor Kamar (auto-fill), Tanggal Lapor (date picker),
+// Deskripsi, Foto Bukti (pick file), tombol "Laporkan",
+// dialog konfirmasi "Lanjutkan pengisian?".
+// ============================================================
+
+import 'package:flutter/material.dart';
+import 'keluhan_controller.dart';
+
+class LaporKeluhanPage extends StatefulWidget {
+  const LaporKeluhanPage({super.key});
+
+  @override
+  State<LaporKeluhanPage> createState() => _LaporKeluhanPageState();
+}
+
+class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
+  late final KeluhanController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = KeluhanController(
+      onStateChanged: () {
+        if (mounted) setState(() {});
+      },
+    );
+    _controller.initForm();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
+      appBar: _buildAppBar(),
+      body: _buildBody(),
+    );
+  }
+
+  // ── AppBar ────────────────────────────────────────────────
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      backgroundColor: const Color(0xFF2ECC71),
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new,
+            color: Colors.white, size: 18),
+        onPressed: () => _controller.goBack(context),
+      ),
+      centerTitle: true,
+      title: const Text(
+        'Lapor Keluhan',
+        style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+
+  // ── Body ──────────────────────────────────────────────────
+  Widget _buildBody() {
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Nomor Kamar (read-only, auto-fill)
+                _buildLabel('Nomor Kamar'),
+                const SizedBox(height: 8),
+                _buildReadOnlyField(_controller.nomorKamarController),
+
+                const SizedBox(height: 16),
+
+                // Tanggal Lapor (date picker)
+                _buildLabel('Tanggal Lapor'),
+                const SizedBox(height: 8),
+                _buildDateField(),
+
+                const SizedBox(height: 16),
+
+                // Deskripsi Keluhan
+                _buildLabel('Deskripsi Keluhan'),
+                const SizedBox(height: 8),
+                _buildDeskripsiField(),
+
+                const SizedBox(height: 16),
+
+                // Foto Bukti
+                _buildLabel('Foto Bukti'),
+                const SizedBox(height: 8),
+                _buildFotoBuktiField(),
+
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ),
+
+        // ── Tombol Laporkan (sticky bawah) ─────────────────
+        Container(
+          color: Colors.white,
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 12,
+            bottom: MediaQuery.of(context).padding.bottom + 12,
+          ),
+          child: SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton(
+              onPressed: _controller.isSubmitting
+                  ? null
+                  : () => _controller.laporkan(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2ECC71),
+                disabledBackgroundColor:
+                    const Color(0xFF2ECC71).withOpacity(0.5),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
+              child: _controller.isSubmitting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2),
+                    )
+                  : const Text('Laporkan',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600)),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ── Field: Nomor Kamar (read-only) ────────────────────────
+  Widget _buildReadOnlyField(TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      readOnly: true,
+      style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
+      decoration: _inputDecoration().copyWith(
+        fillColor: const Color(0xFFF5F5F5),
+      ),
+    );
+  }
+
+  // ── Field: Tanggal Lapor ──────────────────────────────────
+  Widget _buildDateField() {
+    return TextField(
+      controller: _controller.tanggalController,
+      readOnly: true,
+      onTap: () => _controller.pickDate(context),
+      style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
+      decoration: _inputDecoration().copyWith(
+        suffixIcon: const Icon(Icons.calendar_month_outlined,
+            color: Color(0xFF9E9E9E), size: 20),
+      ),
+    );
+  }
+
+  // ── Field: Deskripsi ──────────────────────────────────────
+  Widget _buildDeskripsiField() {
+    return TextField(
+      controller: _controller.deskripsiController,
+      maxLines: 5,
+      style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
+      decoration: _inputDecoration().copyWith(
+        hintText: 'Jelaskan keluhan Anda...',
+        alignLabelWithHint: true,
+      ),
+    );
+  }
+
+  // ── Field: Foto Bukti ─────────────────────────────────────
+  Widget _buildFotoBuktiField() {
+    if (_controller.fotoBuktiNama != null) {
+      // Sudah ada foto dipilih
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: const Color(0xFFE0E0E0)),
+        ),
+        child: Row(
+          children: [
+            // Preview foto
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.file(
+                _controller.fotoBukti!,
+                width: 36,
+                height: 36,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 10),
+            // Nama file
+            Expanded(
+              child: Text(
+                _controller.fotoBuktiNama!,
+                style: const TextStyle(
+                    fontSize: 13, color: Color(0xFF1A1A2E)),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            // Hapus foto
+            GestureDetector(
+              onTap: _controller.removeFoto,
+              child: const Icon(Icons.close,
+                  size: 18, color: Color(0xFF9E9E9E)),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Belum ada foto → tampil tombol pilih
+    return GestureDetector(
+      onTap: () => _controller.pickFoto(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: const Color(0xFFE0E0E0)),
+        ),
+        child: const Row(
+          children: [
+            Icon(Icons.attach_file_outlined,
+                color: Color(0xFF9E9E9E), size: 20),
+            SizedBox(width: 8),
+            Text('Pilih foto bukti',
+                style:
+                    TextStyle(fontSize: 13, color: Color(0xFFB0B0C3))),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Helpers ───────────────────────────────────────────────
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+        color: Color(0xFF1A1A2E),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration() {
+    return InputDecoration(
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide:
+            const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
+      ),
+    );
+  }
+}

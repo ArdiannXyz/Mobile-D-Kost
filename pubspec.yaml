@@ -1,7 +1,7 @@
-name: umkm_batik
-description: "A new Flutter project."
+name: dkost
+description: "Aplikasi D'Kost - Pencarian dan manajemen kost untuk penyewa."
 publish_to: 'none'
-version: 0.1.0
+version: 1.0.0+1
 
 environment:
   sdk: ^3.6.1
@@ -9,51 +9,69 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  # ── Networking ───────────────────────────────────────────────
   http: ^1.3.0
-  google_fonts: ^4.0.4
+
+  # ── Local Storage ───────────────────────────────────────────
+  shared_preferences: ^2.2.0
   sqflite: ^2.2.8+4
   path_provider: ^2.0.5
-  shared_preferences: ^2.2.0
+
+  # ── Image ───────────────────────────────────────────────────
   cached_network_image: ^3.2.0
-  flutter_native_splash: ^2.3.1
-  awesome_dialog: ^3.2.1
+  flutter_cache_manager: ^3.3.0
   flutter_svg: ^2.0.7
-  flutter_cache_manager: ^3.3.0  
-  shimmer: ^2.0.0  
-  flutter_launcher_icons: ^0.13.1  
+
+  # ── UI / UX ─────────────────────────────────────────────────
+  shimmer: ^3.0.0
+  awesome_dialog: ^3.2.1
+  flutter_native_splash: ^2.3.1
+  image_picker: ^1.2.1
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
+# ── Flutter Config ──────────────────────────────────────────────
 flutter:
   uses-material-design: true
-  assets:
-    - assets/images/ado.jpg
-    - assets/images/ado2.jpg
-    - assets/images/griyabatik_bru.png
-    - assets/images/griyabatik_hitam.png
-    - assets/images/griyabatik_putih.png
-    - assets/images/Asset5.png
-    - assets/images/profil_orang.png
-    - assets/images/batikpng.jpg
-    - assets/images/home_agreement.png
-    - assets/images/brokenimage.png
-    - assets/images/pattern_s.svg
-    - assets/images/splash_2.png
-    - assets/images/banner.png
-    - assets/images/splashscreen.png
-    - assets/images/iconbatik.png
-    - assets/images/robot.svg
 
+  assets:
+    # ── Gambar lama yang masih dipakai ─────────────────────────
+
+    # ── Asset baru D'Kost (dari screenshot assets/images) ───────
+    - assets/images/dkos 1.png              # Logo D'Kost
+    - assets/images/home green (2).png      # Bottom nav: Dashboard aktif
+    - assets/images/home black (2).png      # Bottom nav: Dashboard nonaktif
+    - assets/images/Keluhan green.png       # Bottom nav: Keluhan aktif
+    - assets/images/Keluhan black.png       # Bottom nav: Keluhan nonaktif
+    - assets/images/kamarku green.png       # Bottom nav: Riwayat Kos aktif
+    - assets/images/kamarku black.png       # Bottom nav: Riwayat Kos nonaktif
+    - assets/images/setting green.png       # Bottom nav: Setting aktif
+    - assets/images/setting black.png       # Bottom nav: Setting nonaktif
+    - assets/images/person 1.png            # Avatar profil default
+    - assets/images/person 2.png            # Avatar profil alternatif
+    - assets/images/picture.png      
+    - assets/images/robot.png           # Placeholder foto kamar
+    - assets/images/calendar 1.png          # Icon kalender (booking)
+    - assets/images/attach_file.png         # Icon lampiran (keluhan)
+    - assets/images/detail informasi akun.png # Icon info akun
+    - assets/images/change-password-icon (1).png # Icon ganti password
+    - assets/images/logout (2).png          # Icon logout
+
+# ── Splash Screen ───────────────────────────────────────────────
 flutter_native_splash:
-  color: "#2596be"
+  color: "#2ECC71"                    # Hijau D'Kost (ganti dari biru lama)
   image: assets/images/splash_2.png
   android: true
   ios: true
 
+# ── Launcher Icon ───────────────────────────────────────────────
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/images/iconbatik.png"
+  image_path: "assets/images/dkos 1.png"   # Ganti ke logo D'Kost
