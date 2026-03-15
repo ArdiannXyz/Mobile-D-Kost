@@ -10,7 +10,8 @@ class ApiConstants {
   // ── Base URL ───────────────────────────────────────────────
   // Ganti ke IP lokal saat testing di device fisik
   // Ganti ke domain production saat deploy
-  static const String baseUrl = 'http://localhost:8000/api/';
+// lib/data/helper/api_constants.dart
+static const String baseUrl = 'http://127.0.0.1:8000/api/';
   // static const String baseUrl = 'https://dkost.example.com/api/';
 
   // ── Auth Endpoints ─────────────────────────────────────────
