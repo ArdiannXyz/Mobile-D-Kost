@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
         Image.asset(
-          'assets/images/dkos 1.png',
+          'assets/images/dkos_1.png',
           width: 64,
           height: 64,
           errorBuilder: (_, __, ___) => Container(

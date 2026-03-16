@@ -50,18 +50,23 @@ class _SettingPageState extends State<SettingPage> {
                   const SizedBox(height: 16),
                   _buildMenuGroup([
                     _MenuItem(
-                      assetIcon: 'assets/images/detail informasi akun.png',
+                      assetIcon: 'assets/images/kamarku_green.png',
+                      label: 'Kamarku',
+                      onTap: () => _controller.goToKamarku(context),
+                    ),
+                    _MenuItem(
+                      assetIcon: 'assets/images/detail_informasi_akun.png',
                       label: 'Detail Informasi Akun',
                       onTap: () => _controller.goToDetailAkun(context),
                     ),
                     _MenuItem(
-                      assetIcon: 'assets/images/person 1.png',
+                      assetIcon: 'assets/images/keluhan_black.png',
                       label: 'Panduan',
                       onTap: () => _controller.goToPanduan(context),
                     ),
                     _MenuItem(
                       assetIcon:
-                          'assets/images/change-password-icon (1).png',
+                          'assets/images/change-password-icon.png',
                       label: 'Lupa Password',
                       onTap: () =>
                           _controller.goToLupaPassword(context),
@@ -70,7 +75,7 @@ class _SettingPageState extends State<SettingPage> {
                   const SizedBox(height: 12),
                   _buildMenuGroup([
                     _MenuItem(
-                      assetIcon: 'assets/images/logout (2).png',
+                      assetIcon: 'assets/images/logout.png',
                       label: 'Logout',
                       isDestructive: true,
                       onTap: () => _controller.confirmLogout(context),
@@ -130,7 +135,7 @@ class _SettingPageState extends State<SettingPage> {
             ),
             child: ClipOval(
               child: Image.asset(
-                'assets/images/person 1.png',
+                'assets/images/person_1.png',
                 width: 90,
                 height: 90,
                 fit: BoxFit.cover,

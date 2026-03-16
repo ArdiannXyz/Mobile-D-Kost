@@ -1,12 +1,5 @@
 // ============================================================
 // BACKEND LAYER — kamar_detail_controller.dart
-// Bertanggung jawab atas: load detail kamar, galeri foto,
-// fasilitas, furnitur, review, dan booking dengan furnitur.
-//
-// Yang DIHAPUS dari versi lama (detail_produk_page):
-// - base64 image, CartService, ProductItem, CheckoutModel
-// - toggleFavorite, auto-refresh Timer
-// - stok & berat produk
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -34,8 +27,9 @@ class KamarDetailController {
   bool showAllReviews = false;
   static const int maxDisplayedReviews = 3;
 
-  // Data booking
-  int durasiSewa = 1; // bulan
+  // ── Data Booking ───────────────────────────────────────────
+  int durasiSewa = 1;
+  DateTime? tglMulaiSewa;       // dipilih user via date picker
   final int kamarId;
 
   // Furnitur yang dipilih: Map<id_furnitur, jumlah>
@@ -49,6 +43,32 @@ class KamarDetailController {
     required this.onStateChanged,
   });
 
+  // ── Tanggal Akhir Sewa (otomatis) ─────────────────────────
+  DateTime? get tglAkhirSewa {
+    if (tglMulaiSewa == null) return null;
+    return DateTime(
+      tglMulaiSewa!.year,
+      tglMulaiSewa!.month + durasiSewa,
+      tglMulaiSewa!.day,
+    );
+  }
+
+  // ── Set Tanggal Mulai ──────────────────────────────────────
+  void setTglMulai(DateTime date) {
+    tglMulaiSewa = date;
+    onStateChanged();
+  }
+
+  // ── Format Tanggal ─────────────────────────────────────────
+  String formatTanggal(DateTime? date) {
+    if (date == null) return 'Pilih tanggal';
+    const bulan = [
+      '', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+      'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+    ];
+    return '${date.day} ${bulan[date.month]} ${date.year}';
+  }
+
   // ── Init ───────────────────────────────────────────────────
   Future<void> init() async {
     isLoading = true;
@@ -59,7 +79,7 @@ class KamarDetailController {
         _loadKamarDetail(),
         _loadFurnitur(),
       ]);
-      _loadReviews(); // Load review tidak perlu await
+      _loadReviews();
     } on ApiException catch (e) {
       errorMessage = e.message;
     } catch (_) {
@@ -72,7 +92,9 @@ class KamarDetailController {
 
   Future<void> _loadKamarDetail() async {
     kamar = await KamarService.getKamarDetail(kamarId);
-    if (kamar == null) throw ApiException(message: 'Kamar tidak ditemukan.', statusCode: 404);
+    if (kamar == null) {
+      throw ApiException(message: 'Kamar tidak ditemukan.', statusCode: 404);
+    }
   }
 
   Future<void> _loadFurnitur() async {
@@ -134,7 +156,12 @@ class KamarDetailController {
     for (final entry in selectedFurnitur.entries) {
       final furnitur = furniturList.firstWhere(
         (f) => f.idFurnitur == entry.key,
-        orElse: () => FurniturModel(idFurnitur: 0, namaFurnitur: '', jumlah: 0, hargaSewaTambahan: 0),
+        orElse: () => FurniturModel(
+          idFurnitur: 0,
+          namaFurnitur: '',
+          jumlah: 0,
+          hargaSewaTambahan: 0,
+        ),
       );
       total += furnitur.hargaSewaTambahan * entry.value * durasiSewa;
     }
@@ -143,16 +170,25 @@ class KamarDetailController {
 
   double get totalBiaya => totalBiayaKamar + totalBiayaFurnitur;
 
+  // ── Validasi sebelum booking ───────────────────────────────
+  /// Mengembalikan null jika valid, atau pesan error jika tidak
+  String? validateBooking() {
+    if (tglMulaiSewa == null) return 'Pilih tanggal mulai sewa terlebih dahulu.';
+    return null;
+  }
+
   // ── Navigasi ───────────────────────────────────────────────
   void goToBookingForm(BuildContext context) {
     Navigator.pushNamed(
       context,
       '/booking-form',
       arguments: {
-        'kamar_id': kamarId,
-        'durasi': durasiSewa,
-        'furnitur': selectedFurnitur,
-        'total': totalBiaya,
+        'kamar_id'   : kamarId,
+        'durasi'     : durasiSewa,
+        'tgl_mulai'  : tglMulaiSewa?.toIso8601String(),
+        'tgl_akhir'  : tglAkhirSewa?.toIso8601String(),
+        'furnitur'   : selectedFurnitur,
+        'total'      : totalBiaya,
       },
     );
   }

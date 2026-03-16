@@ -1,9 +1,3 @@
-// ============================================================
-// FRONTEND LAYER — lupa_password_page.dart
-// Bertanggung jawab atas: tampilan UI saja.
-// Semua logic (validasi, API call, navigasi) ada di controller.
-// ============================================================
-
 import 'package:flutter/material.dart';
 import 'lupa_password_controller.dart';
 
@@ -36,190 +30,223 @@ class _LupaPasswordPageState extends State<LupaPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              _buildBackButton(),
-              const Spacer(flex: 1),
-              _buildHeader(),
-              const SizedBox(height: 32),
-              _buildEmailField(),
-              const SizedBox(height: 12),
-              _buildInfoText(),
-              const SizedBox(height: 32),
-              _buildSubmitButton(),
-              const Spacer(flex: 2),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── Widget Builders (UI only) ──────────────────────────────
-
-  Widget _buildBackButton() {
-    return GestureDetector(
-      onTap: () => _controller.goBack(context),
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: const Color(0xFF2A2A4A),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Icon(
-          Icons.arrow_back_ios_new,
-          color: Colors.white,
-          size: 18,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Icon kunci
-        Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: const Color(0xFF2ECC71).withOpacity(0.15),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(
-            Icons.lock_reset_rounded,
-            color: Color(0xFF2ECC71),
-            size: 32,
-          ),
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Lupa Password?',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Masukkan email yang terdaftar,\nkami akan kirimkan kode OTP.',
-          style: TextStyle(
-            fontSize: 14,
-            color: Color(0xFFB0B0C3),
-            height: 1.5,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEmailField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Email',
-          style: TextStyle(color: Colors.white70, fontSize: 14),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _controller.emailController,
-          keyboardType: TextInputType.emailAddress,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            hintText: 'Masukkan email anda',
-            hintStyle: const TextStyle(color: Colors.white38),
-            filled: true,
-            fillColor: const Color(0xFF2A2A4A),
-            prefixIcon: const Icon(
-              Icons.email_outlined,
-              color: Colors.white38,
-              size: 20,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                color: Color(0xFF2ECC71),
-                width: 1.5,
-              ),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoText() {
-    return Row(
-      children: [
-        const Icon(
-          Icons.info_outline,
-          color: Color(0xFFB0B0C3),
-          size: 14,
-        ),
-        const SizedBox(width: 6),
-        const Text(
-          'Kode OTP akan dikirim ke email Anda.',
-          style: TextStyle(
-            color: Color(0xFFB0B0C3),
-            fontSize: 12,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _controller.isLoading
-            ? null
-            : () => _controller.submitReset(context),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2ECC71),
-          disabledBackgroundColor: const Color(0xFF2ECC71).withOpacity(0.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          elevation: 0,
-        ),
-        child: _controller.isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : const Text(
-                'Kirim Kode OTP',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Back button pojok atas kiri
+            Padding(
+              padding: const EdgeInsets.only(left: 24, top: 16),
+              child: GestureDetector(
+                onTap: () => _controller.goBack(context),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F7FA),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE8E8E8)),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Color(0xFF1A1A2E),
+                    size: 16,
+                  ),
                 ),
               ),
+            ),
+
+            // Konten tengah
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Lupa Password?',
+                                  style: TextStyle(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1A1A2E),
+                                  ),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  'Masukkan email terdaftar untuk mendapat kode OTP.',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF9E9E9E),
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE8F5E9),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Icon(
+                              Icons.lock_reset_rounded,
+                              color: Color(0xFF2ECC71),
+                              size: 30,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 36),
+
+                      // Email field
+                      const Text(
+                        'Email',
+                        style: TextStyle(
+                          color: Color(0xFF1A1A2E),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _controller.emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        style: const TextStyle(
+                            color: Color(0xFF1A1A2E), fontSize: 14),
+                        decoration: _inputDecoration(
+                          'Masukkan email anda',
+                          prefixIcon: Icons.email_outlined,
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      // Info text
+                      const Row(
+                        children: [
+                          Icon(Icons.info_outline,
+                              color: Color(0xFFB0B0C3), size: 13),
+                          SizedBox(width: 6),
+                          Text(
+                            'Kode OTP akan dikirim ke email Anda.',
+                            style: TextStyle(
+                                color: Color(0xFFB0B0C3), fontSize: 12),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      // Submit button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _controller.isLoading
+                              ? null
+                              : () => _controller.submitReset(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF2ECC71),
+                            disabledBackgroundColor: const Color(0xFF2ECC71)
+                                .withValues(alpha: 0.5),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 16),
+                            elevation: 0,
+                          ),
+                          child: _controller.isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                      color: Colors.white, strokeWidth: 2),
+                                )
+                              : const Text(
+                                  'Kirim Kode OTP',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Link kembali ke login
+                      Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Ingat password? ',
+                              style: TextStyle(
+                                  color: Color(0xFF9E9E9E), fontSize: 13),
+                            ),
+                            GestureDetector(
+                              onTap: () => _controller.goBack(context),
+                              child: const Text(
+                                'Masuk sekarang!',
+                                style: TextStyle(
+                                  color: Color(0xFF2ECC71),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint, {IconData? prefixIcon}) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFFB0B0C3), fontSize: 14),
+      filled: true,
+      fillColor: const Color(0xFFF5F7FA),
+      prefixIcon: prefixIcon != null
+          ? Icon(prefixIcon, color: const Color(0xFFB0B0C3), size: 20)
+          : null,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Color(0xFFE8E8E8)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
+      ),
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 }

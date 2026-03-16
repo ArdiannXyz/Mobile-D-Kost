@@ -1,9 +1,5 @@
 // ============================================================
 // FRONTEND LAYER — lapor_keluhan_page.dart
-// Sesuai Figma: AppBar hijau "Lapor Keluhan", form dengan
-// Nomor Kamar (auto-fill), Tanggal Lapor (date picker),
-// Deskripsi, Foto Bukti (pick file), tombol "Laporkan",
-// dialog konfirmasi "Lanjutkan pengisian?".
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -76,28 +72,24 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Nomor Kamar (read-only, auto-fill)
                 _buildLabel('Nomor Kamar'),
                 const SizedBox(height: 8),
                 _buildReadOnlyField(_controller.nomorKamarController),
 
                 const SizedBox(height: 16),
 
-                // Tanggal Lapor (date picker)
                 _buildLabel('Tanggal Lapor'),
                 const SizedBox(height: 8),
                 _buildDateField(),
 
                 const SizedBox(height: 16),
 
-                // Deskripsi Keluhan
                 _buildLabel('Deskripsi Keluhan'),
                 const SizedBox(height: 8),
                 _buildDeskripsiField(),
 
                 const SizedBox(height: 16),
 
-                // Foto Bukti
                 _buildLabel('Foto Bukti'),
                 const SizedBox(height: 8),
                 _buildFotoBuktiField(),
@@ -191,8 +183,8 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
 
   // ── Field: Foto Bukti ─────────────────────────────────────
   Widget _buildFotoBuktiField() {
-    if (_controller.fotoBuktiNama != null) {
-      // Sudah ada foto dipilih
+    // Sudah ada foto dipilih
+    if (_controller.fotoBuktiBytes != null) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
@@ -202,21 +194,28 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
         ),
         child: Row(
           children: [
-            // Preview foto
+            // Preview foto — Image.memory (support Web & Mobile)
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
-              child: Image.file(
-                _controller.fotoBukti!,
+              child: Image.memory(
+                _controller.fotoBuktiBytes!,  // ← bytes, bukan File
                 width: 36,
                 height: 36,
                 fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  width: 36,
+                  height: 36,
+                  color: const Color(0xFFE8F5E9),
+                  child: const Icon(Icons.image_outlined,
+                      color: Color(0xFF2ECC71), size: 20),
+                ),
               ),
             ),
             const SizedBox(width: 10),
             // Nama file
             Expanded(
               child: Text(
-                _controller.fotoBuktiNama!,
+                _controller.fotoBuktiNama ?? 'foto_bukti',
                 style: const TextStyle(
                     fontSize: 13, color: Color(0xFF1A1A2E)),
                 overflow: TextOverflow.ellipsis,
@@ -249,8 +248,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
                 color: Color(0xFF9E9E9E), size: 20),
             SizedBox(width: 8),
             Text('Pilih foto bukti',
-                style:
-                    TextStyle(fontSize: 13, color: Color(0xFFB0B0C3))),
+                style: TextStyle(fontSize: 13, color: Color(0xFFB0B0C3))),
           ],
         ),
       ),

@@ -10,8 +10,8 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import '../../../data/services/user_service.dart';
-import '../../../data/helper/api_helper.dart';
+import 'package:dkost/data/services/user_service.dart';
+import 'package:dkost/data/helper/api_helper.dart';
 
 class SettingController {
   // ── State ──────────────────────────────────────────────────
@@ -158,6 +158,10 @@ class SettingController {
   }
 
   // ── Navigasi ───────────────────────────────────────────────
+  void goToKamarku(BuildContext context) {
+    Navigator.pushNamed(context, '/kamarku');
+  }
+
   void goToDetailAkun(BuildContext context) {
     Navigator.pushNamed(context, '/detail-akun');
   }

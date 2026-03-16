@@ -1,10 +1,11 @@
 // ============================================================
 // BACKEND LAYER — keluhan_service.dart
 // Sesuai ERD tabel `keluhan` D'Kost.
+// Update: fotoBukti File? → XFile? agar support Flutter Web & Mobile
 // ============================================================
 
-import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart'; // XFile
 import '../models/keluhan_models.dart';
 import '../helper/api_constants.dart';
 import '../helper/api_helper.dart';
@@ -39,11 +40,11 @@ class KeluhanService {
   static Future<bool> createKeluhan({
     required int idKamar,
     required String deskripsiMasalah,
-    File? fotoBukti,
+    XFile? fotoBuktiXFile,              // ← ganti dari File? ke XFile?
   }) async {
     try {
       final userId = await ApiHelper.getUserId();
-      final token = await ApiHelper.getToken();
+      final token  = await ApiHelper.getToken();
 
       final request = http.MultipartRequest(
         'POST',
@@ -59,11 +60,16 @@ class KeluhanService {
       request.fields['id_kamar']          = idKamar.toString();
       request.fields['deskripsi_masalah'] = deskripsiMasalah;
 
-      if (fotoBukti != null) {
-        request.files.add(await http.MultipartFile.fromPath(
-          'foto_bukti',
-          fotoBukti.path,
-        ));
+      // Upload foto — fromBytes agar kompatibel Web & Mobile
+      if (fotoBuktiXFile != null) {
+        final bytes = await fotoBuktiXFile.readAsBytes();
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'foto_bukti',
+            bytes,
+            filename: fotoBuktiXFile.name,
+          ),
+        );
       }
 
       final streamedResponse = await request.send();

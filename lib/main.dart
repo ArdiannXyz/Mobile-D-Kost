@@ -1,9 +1,10 @@
 import 'package:dkost/presentation/pages/home/detail_kamar_page.dart';
 import 'presentation/pages/home/search_page.dart';
 import 'package:dkost/presentation/pages/review_keluhan/lapor_keluhan_page.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter/material.dart';
 import '../../../data/helper/api_helper.dart';
-
+import 'presentation/pages/kamar/kamarku_page.dart';
 // ── Auth ───────────────────────────────────────────────────────
 import '../presentation/pages/auth/welcome_screen.dart';
 import '../presentation/pages/auth/login_page.dart';
@@ -33,16 +34,18 @@ import 'presentation/pages/profil_setting/edit_akun_page.dart';
 import 'presentation/pages/profil_setting/panduan_page.dart' ;
 // ── Model ──────────────────────────────────────────────────────
 import '../../../data/models/kamar_models.dart';
-import 'package:dkost/data/models/kamar_models.dart';
 import '../../../data/models/furnitur_models.dart';
 import '../../../data/models/review_models.dart';
 import '../../../data/models/user_models.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  // Cek status login dari session
   final isLoggedIn = await ApiHelper.isLoggedIn();
+
+  // Hapus splash native setelah selesai init
+  FlutterNativeSplash.remove();
 
   runApp(DKostApp(isLoggedIn: isLoggedIn));
 }
@@ -112,6 +115,7 @@ class DKostApp extends StatelessWidget {
       '/setting':        (_) => const SettingPage(),
       '/detail-akun':    (_) => const DetailAkunPage(),
       '/panduan':        (_) => const PanduanPage(),
+      '/kamarku':        (_) => const KamarkuPage(),
     };
   }
 

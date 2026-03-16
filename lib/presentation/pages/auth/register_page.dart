@@ -30,63 +30,71 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                const SizedBox(height: 28),
-                _buildInputField(
-                  label: 'Nama Lengkap',
-                  hint: 'Masukkan nama lengkap',
-                  controller: _controller.nameController,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Konten scroll
+            Expanded(
+              child: GestureDetector(
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(),
+                      const SizedBox(height: 24),
+                      _buildInputField(
+                        label: 'Nama Lengkap',
+                        hint: 'Masukkan nama lengkap',
+                        controller: _controller.nameController,
+                      ),
+                      const SizedBox(height: 14),
+                      _buildInputField(
+                        label: 'Email',
+                        hint: 'Masukkan email anda',
+                        controller: _controller.emailController,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 14),
+                      _buildInputField(
+                        label: 'No. HP',
+                        hint: 'Masukkan nomor handphone anda',
+                        controller: _controller.phoneController,
+                        keyboardType: TextInputType.phone,
+                      ),
+                      const SizedBox(height: 14),
+                      _buildInputField(
+                        label: 'Alamat',
+                        hint: 'Masukkan alamat anda',
+                        controller: _controller.alamatController,
+                        maxLines: 2,
+                      ),
+                      const SizedBox(height: 14),
+                      _buildPasswordField(
+                        label: 'Password',
+                        hint: 'Masukkan password anda',
+                        controller: _controller.passwordController,
+                        isObscure: _controller.obscurePassword,
+                        onToggle: _controller.toggleObscurePassword,
+                      ),
+                      const SizedBox(height: 24),
+                      _buildRegisterButton(),
+                      const SizedBox(height: 16),
+                      _buildLoginLink(),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 14),
-                _buildInputField(
-                  label: 'Email',
-                  hint: 'Masukkan email anda',
-                  controller: _controller.emailController,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 14),
-                _buildInputField(
-                  label: 'No. HP',
-                  hint: 'Masukkan nomor handphone anda',
-                  controller: _controller.phoneController,
-                  keyboardType: TextInputType.phone,
-                ),
-                const SizedBox(height: 14),
-                _buildPasswordField(
-                  label: 'Password',
-                  hint: 'Masukkan password anda',
-                  controller: _controller.passwordController,
-                  isObscure: _controller.obscurePassword,
-                  onToggle: _controller.toggleObscurePassword,
-                ),
-                const SizedBox(height: 14),
-                _buildPasswordField(
-                  label: 'Konfirmasi Password',
-                  hint: 'Ulangi password anda',
-                  controller: _controller.confirmPasswordController,
-                  isObscure: _controller.obscureConfirmPassword,
-                  onToggle: _controller.toggleObscureConfirmPassword,
-                ),
-                const SizedBox(height: 28),
-                _buildRegisterButton(),
-                const SizedBox(height: 20),
-                _buildLoginLink(),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
-  // ── Header ────────────────────────────────────────────────
   Widget _buildHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -102,9 +110,8 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
         ),
-        // Logo dari asset — konsisten dengan login
         Image.asset(
-          'assets/images/dkos 1.png',
+          'assets/images/dkos_1.png',
           width: 64,
           height: 64,
           errorBuilder: (_, __, ___) => Container(
@@ -115,14 +122,9 @@ class _RegisterPageState extends State<RegisterPage> {
               shape: BoxShape.circle,
             ),
             child: const Center(
-              child: Text(
-                'DK',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
+              child: Text('DK',
+                  style: TextStyle(color: Colors.white,
+                      fontWeight: FontWeight.bold, fontSize: 20)),
             ),
           ),
         ),
@@ -130,28 +132,26 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // ── Input Field ───────────────────────────────────────────
   Widget _buildInputField({
     required String label,
     required String hint,
     required TextEditingController controller,
     TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFF1A1A2E),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        Text(label,
+            style: const TextStyle(
+                color: Color(0xFF1A1A2E),
+                fontSize: 14,
+                fontWeight: FontWeight.w500)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           keyboardType: keyboardType,
+          maxLines: maxLines,
           style: const TextStyle(color: Color(0xFF1A1A2E), fontSize: 14),
           decoration: _inputDecoration(hint),
         ),
@@ -159,7 +159,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // ── Password Field ────────────────────────────────────────
   Widget _buildPasswordField({
     required String label,
     required String hint,
@@ -170,14 +169,11 @@ class _RegisterPageState extends State<RegisterPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFF1A1A2E),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        Text(label,
+            style: const TextStyle(
+                color: Color(0xFF1A1A2E),
+                fontSize: 14,
+                fontWeight: FontWeight.w500)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -200,7 +196,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // ── Tombol Daftar ─────────────────────────────────────────
   Widget _buildRegisterButton() {
     return SizedBox(
       width: double.infinity,
@@ -210,11 +205,11 @@ class _RegisterPageState extends State<RegisterPage> {
             : () => _controller.registerUser(context),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF2ECC71),
-          disabledBackgroundColor: const Color(0xFF2ECC71).withValues(alpha: 0.5),
+          disabledBackgroundColor:
+              const Color(0xFF2ECC71).withValues(alpha: 0.5),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+              borderRadius: BorderRadius.circular(12)),
           padding: const EdgeInsets.symmetric(vertical: 16),
           elevation: 0,
         ),
@@ -223,46 +218,34 @@ class _RegisterPageState extends State<RegisterPage> {
                 height: 20,
                 width: 20,
                 child: CircularProgressIndicator(
-                    color: Colors.white, strokeWidth: 2),
-              )
-            : const Text(
-                'Daftar',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+                    color: Colors.white, strokeWidth: 2))
+            : const Text('Daftar',
+                style:
+                    TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
       ),
     );
   }
 
-  // ── Link Login ────────────────────────────────────────────
   Widget _buildLoginLink() {
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            'Sudah punya akun? ',
-            style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13),
-          ),
+          const Text('Sudah punya akun? ',
+              style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13)),
           GestureDetector(
             onTap: () => _controller.goToLogin(context),
-            child: const Text(
-              'Masuk sekarang!',
-              style: TextStyle(
-                color: Color(0xFF2ECC71),
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-              ),
-            ),
+            child: const Text('Masuk sekarang!',
+                style: TextStyle(
+                    color: Color(0xFF2ECC71),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13)),
           ),
         ],
       ),
     );
   }
 
-  // ── Input Decoration ──────────────────────────────────────
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
@@ -270,18 +253,17 @@ class _RegisterPageState extends State<RegisterPage> {
       filled: true,
       fillColor: const Color(0xFFF5F7FA),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide.none,
-      ),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Color(0xFFE8E8E8)),
-      ),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFE8E8E8))),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          borderRadius: BorderRadius.circular(10),
+          borderSide:
+              const BorderSide(color: Color(0xFF2ECC71), width: 1.5)),
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 }

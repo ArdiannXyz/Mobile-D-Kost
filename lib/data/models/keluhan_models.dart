@@ -1,21 +1,22 @@
 // ============================================================
-// BACKEND LAYER — keluhan_model.dart
+// BACKEND LAYER — keluhan_models.dart
 // Model sesuai ERD tabel `keluhan`
+// Fix: id_user nullable karena tidak selalu ada di response
 // ============================================================
 
 class KeluhanModel {
   final int idKeluhan;
-  final int idUser;
+  final int? idUser;      // ← nullable, tidak selalu ada di response
   final int idKamar;
   final String deskripsiMasalah;
   final String? fotoBukti;
   final String tglLapor;
-  final String statusKeluhan; // pending | diproses | selesai
-  final String? nomorKamar;   // join dari tabel kamar
+  final String statusKeluhan;
+  final String? nomorKamar;
 
   const KeluhanModel({
     required this.idKeluhan,
-    required this.idUser,
+    this.idUser,
     required this.idKamar,
     required this.deskripsiMasalah,
     this.fotoBukti,
@@ -26,14 +27,14 @@ class KeluhanModel {
 
   factory KeluhanModel.fromJson(Map<String, dynamic> json) {
     return KeluhanModel(
-      idKeluhan: json['id_keluhan'],
-      idUser: json['id_user'],
-      idKamar: json['id_kamar'],
-      deskripsiMasalah: json['deskripsi_masalah'] ?? '',
-      fotoBukti: json['foto_bukti'],
-      tglLapor: json['tgl_lapor'] ?? '',
-      statusKeluhan: json['status_keluhan'] ?? 'pending',
-      nomorKamar: json['nomor_kamar'],
+      idKeluhan        : json['id_keluhan'] as int,
+      idUser           : json['id_user'] as int?,       // ← nullable
+      idKamar          : json['id_kamar'] as int,
+      deskripsiMasalah : json['deskripsi_masalah'] ?? '',
+      fotoBukti        : json['foto_bukti'],
+      tglLapor         : json['tgl_lapor'] ?? '',
+      statusKeluhan    : json['status_keluhan'] ?? 'pending',
+      nomorKamar       : json['nomor_kamar'],
     );
   }
 }

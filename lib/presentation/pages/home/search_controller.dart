@@ -125,37 +125,44 @@ class SearchController {
     }
 
     // Generate saran dari data kamar
-    final suggestions = allKamar
-        .where((k) =>
-            k.nomorKamar.toLowerCase().contains(query.toLowerCase()) ||
-            k.tipeKamar.toLowerCase().contains(query.toLowerCase()) ||
-            k.deskripsi.toLowerCase().contains(query.toLowerCase()))
-        .map((k) => 'Kos ${_cap(k.tipeKamar)} ${k.nomorKamar}')
-        .toSet()
-        .take(5)
-        .toList();
+final suggestions = allKamar
+    .where((k) {
+      final namaLengkap = 'kos ${k.tipeKamar} ${k.nomorKamar}'.toLowerCase();
+      return namaLengkap.contains(query.toLowerCase()) ||
+          k.nomorKamar.toLowerCase().contains(query.toLowerCase()) ||
+          k.tipeKamar.toLowerCase().contains(query.toLowerCase());
+    })
+    .map((k) => 'Kos ${_cap(k.tipeKamar)} ${k.nomorKamar}')
+    .toSet()
+    .take(5)
+    .toList();
 
     searchSuggestions = suggestions;
     onStateChanged();
   }
 
   // ── Eksekusi Pencarian ─────────────────────────────────────
-  void performSearch(String query) {
-    currentQuery = query.trim();
-    if (currentQuery.isEmpty) return;
+void performSearch(String query) {
+  currentQuery = query.trim();
+  if (currentQuery.isEmpty) return;
 
-    _saveToHistory(currentQuery);
+  _saveToHistory(currentQuery);
 
-    searchResults = allKamar.where((k) {
-      return k.nomorKamar.toLowerCase().contains(currentQuery.toLowerCase()) ||
-          k.tipeKamar.toLowerCase().contains(currentQuery.toLowerCase()) ||
-          k.deskripsi.toLowerCase().contains(currentQuery.toLowerCase());
-    }).toList();
+  final q = currentQuery.toLowerCase();
 
-    currentMode = SearchMode.results;
-    searchSuggestions = [];
-    onStateChanged();
-  }
+  searchResults = allKamar.where((k) {
+    final namaLengkap = 'kos ${k.tipeKamar} ${k.nomorKamar}'.toLowerCase();
+    return namaLengkap.contains(q) ||
+        k.nomorKamar.toLowerCase().contains(q) ||
+        k.tipeKamar.toLowerCase().contains(q) ||
+        k.deskripsi.toLowerCase().contains(q) ||
+        'kos ${k.tipeKamar}'.toLowerCase().contains(q);
+  }).toList();
+
+  currentMode = SearchMode.results;
+  searchSuggestions = [];
+  onStateChanged();
+}
 
   void useSuggestion(String suggestion) {
     searchTextController.text = suggestion;

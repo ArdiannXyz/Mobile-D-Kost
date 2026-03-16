@@ -1,10 +1,8 @@
 // ============================================================
 // FRONTEND LAYER — keluhan_list_page.dart
-// Sesuai Figma (layar kanan): header hijau "Keluhan",
-// tombol "Lapor keluhan", daftar kartu keluhan dengan
-// foto, judul, tanggal, dan status badge.
 // ============================================================
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'keluhan_controller.dart';
 
@@ -48,59 +46,86 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
     );
   }
 
-  // ── Header hijau ──────────────────────────────────────────
   Widget _buildHeader() {
-    return Container(
-      color: const Color(0xFF2ECC71),
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 12,
-        left: 16,
-        right: 16,
-        bottom: 16,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Keluhan',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+    return Column(
+      children: [
+        // ── Bagian hijau: hanya title "Keluhan" ──────────
+        Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            color: Color(0xFF2ECC71),
+            boxShadow: [
+              BoxShadow(
+                color: Color(0x222ECC71),
+                blurRadius: 10,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 12,
+            left: 16,
+            right: 16,
+            bottom: 20,
+          ),
+          child: const Center(
+            child: Text(
+              'Keluhan',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-          // Tombol Lapor Keluhan
-          GestureDetector(
-            onTap: () => _controller.goToLaporKeluhan(context),
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text(
-                'Lapor keluhan',
+        ),
+
+        // ── Bagian putih: "Daftar Keluhan" + tombol ──────
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                'Daftar Keluhan',
                 style: TextStyle(
-                  color: Color(0xFF2ECC71),
-                  fontSize: 12,
+                  color: Color(0xFF1A1A2E),
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
+              GestureDetector(
+                onTap: () => _controller.goToLaporKeluhan(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2ECC71),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    'Lapor keluhan',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 12),
+      ],
     );
   }
 
-  // ── Konten ────────────────────────────────────────────────
   Widget _buildContent() {
     if (_controller.isLoadingList) {
-      return const Center(
-          child: CircularProgressIndicator(color: Color(0xFF2ECC71)));
+      return const Center(child: CircularProgressIndicator(color: Color(0xFF2ECC71)));
     }
-
     if (_controller.errorList != null) {
       return Center(
         child: Padding(
@@ -108,19 +133,16 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.wifi_off_rounded,
-                  size: 56, color: Color(0xFFB0B0C3)),
+              const Icon(Icons.wifi_off_rounded, size: 56, color: Color(0xFFB0B0C3)),
               const SizedBox(height: 12),
-              Text(_controller.errorList!,
-                  style: const TextStyle(color: Color(0xFF9E9E9E))),
+              Text(_controller.errorList!, style: const TextStyle(color: Color(0xFF9E9E9E))),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _controller.loadKeluhanList,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2ECC71),
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
                 child: const Text('Coba Lagi'),
               ),
@@ -129,45 +151,32 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
         ),
       );
     }
-
     if (_controller.keluhanList.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.report_problem_outlined,
-                size: 64, color: Color(0xFFB0B0C3)),
+            const Icon(Icons.report_problem_outlined, size: 64, color: Color(0xFFB0B0C3)),
             const SizedBox(height: 14),
-            const Text('Belum ada keluhan',
-                style:
-                    TextStyle(color: Color(0xFF9E9E9E), fontSize: 14)),
+            const Text('Belum ada keluhan', style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 14)),
             const SizedBox(height: 16),
             GestureDetector(
               onTap: () => _controller.goToLaporKeluhan(context),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2ECC71),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text('Lapor Sekarang',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600)),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(color: const Color(0xFF2ECC71), borderRadius: BorderRadius.circular(20)),
+                child: const Text('Lapor Sekarang', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
               ),
             ),
           ],
         ),
       );
     }
-
     return RefreshIndicator(
       color: const Color(0xFF2ECC71),
       onRefresh: _controller.loadKeluhanList,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
         itemCount: _controller.keluhanList.length,
         itemBuilder: (context, index) {
           final keluhan = _controller.keluhanList[index];
@@ -182,9 +191,8 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
   }
 }
 
-// ── Keluhan Card ──────────────────────────────────────────────
 class _KeluhanCard extends StatelessWidget {
-  final keluhan;
+  final dynamic keluhan;
   final String statusLabel;
   final Color statusColor;
 
@@ -201,70 +209,37 @@ class _KeluhanCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-              color: Color(0x0A000000),
-              blurRadius: 6,
-              offset: Offset(0, 2)),
-        ],
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 8, offset: Offset(0, 2))],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Foto bukti / placeholder
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: keluhan.fotoBukti != null && keluhan.fotoBukti!.isNotEmpty
-                ? Image.network(
-                    keluhan.fotoBukti!,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _placeholder(),
-                  )
-                : _placeholder(),
+            borderRadius: BorderRadius.circular(10),
+            child: _buildFoto(),
           ),
           const SizedBox(width: 12),
-
-          // Info keluhan
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Deskripsi (diambil 1 baris)
                 Text(
                   keluhan.deskripsiMasalah,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A2E),
-                  ),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E)),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                // Tanggal
                 Text(
-                  keluhan.tglLapor,
-                  style: const TextStyle(
-                      fontSize: 11, color: Color(0xFF9E9E9E)),
+                  'Tanggal Lapor : ${_formatTanggal(keluhan.tglLapor)}',
+                  style: const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
                 ),
-                const SizedBox(height: 6),
-                // Status badge
+                const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Text('Status : ',
-                        style: TextStyle(
-                            fontSize: 12, color: Color(0xFF555555))),
-                    Text(
-                      statusLabel,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: statusColor,
-                      ),
-                    ),
+                    const Text('Status : ', style: TextStyle(fontSize: 12, color: Color(0xFF555555), fontWeight: FontWeight.w500)),
+                    Text(statusLabel, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: statusColor)),
                   ],
                 ),
               ],
@@ -275,13 +250,40 @@ class _KeluhanCard extends StatelessWidget {
     );
   }
 
+  Widget _buildFoto() {
+    final foto = keluhan.fotoBukti;
+    if (foto == null || foto.isEmpty) return _placeholder();
+
+    if (foto.startsWith('data:image')) {
+      try {
+        final base64Str = foto.split(',').last;
+        final bytes = base64Decode(base64Str);
+        return Image.memory(bytes, width: 80, height: 80, fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _placeholder());
+      } catch (_) {
+        return _placeholder();
+      }
+    }
+
+    return Image.network(foto, width: 80, height: 80, fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _placeholder());
+  }
+
   Widget _placeholder() {
     return Container(
-      width: 60,
-      height: 60,
+      width: 80,
+      height: 80,
       color: const Color(0xFFE8F5E9),
-      child: const Icon(Icons.image_outlined,
-          color: Color(0xFF2ECC71), size: 24),
+      child: const Icon(Icons.image_outlined, color: Color(0xFF2ECC71), size: 28),
     );
+  }
+
+  String _formatTanggal(String raw) {
+    try {
+      final dt = DateTime.parse(raw.replaceAll(' ', 'T'));
+      return '${dt.day.toString().padLeft(2,'0')} - ${dt.month.toString().padLeft(2,'0')} - ${dt.year}';
+    } catch (_) {
+      return raw;
+    }
   }
 }

@@ -65,9 +65,10 @@ class HomeController {
       final kamarList = await KamarService.getKamarList();
       semuaKamar = kamarList;
       filteredKamar = kamarList;
-    } catch (e) {
-      errorMessage = 'Gagal memuat data. Tarik untuk refresh.';
-    } finally {
+} catch (e) {
+  errorMessage = 'Gagal memuat data. Tarik untuk refresh.';
+  print('HOME ERROR: $e'); // ← tambah ini
+} finally {
       isLoading = false;
       onStateChanged();
     }

@@ -1,15 +1,18 @@
 // ============================================================
 // BACKEND LAYER — keluhan_controller.dart
-// Bertanggung jawab atas: load daftar keluhan, form lapor
-// keluhan (validasi, upload foto, submit), dialog konfirmasi.
+// Fix: debug + safe null handling + bypass KeluhanService
 // ============================================================
 
-import 'dart:io';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import '../../../data/services/keluhan_service.dart';
 import '../../../data/services/kamar_service.dart';
 import '../../../data/helper/api_helper.dart';
+import '../../../data/helper/api_constants.dart';
 import '../../../data/helper/api_exception.dart';
 import '../../../data/models/keluhan_models.dart';
 import '../../../data/models/kamar_models.dart';
@@ -23,14 +26,18 @@ class KeluhanController {
 
   // ── State form lapor ───────────────────────────────────────
   bool isSubmitting = false;
-  KamarModel? kamarAktif; // kamar yang sedang disewa user
+  KamarModel? kamarAktif;
 
   final TextEditingController nomorKamarController = TextEditingController();
-  final TextEditingController tanggalController = TextEditingController();
+  final TextEditingController tanggalController   = TextEditingController();
   final TextEditingController deskripsiController = TextEditingController();
 
-  File? fotoBukti;
-  String? fotoBuktiNama;
+  // ── Foto Bukti ─────────────────────────────────────────────
+  // Gunakan XFile agar kompatibel Web & Mobile
+  XFile?      fotoBuktiXFile;   // raw XFile dari picker
+  Uint8List?  fotoBuktiBytes;   // bytes untuk preview (Image.memory)
+  String?     fotoBuktiNama;
+
   DateTime selectedDate = DateTime.now();
 
   final VoidCallback onStateChanged;
@@ -51,15 +58,53 @@ class KeluhanController {
     onStateChanged();
 
     try {
+      // 1. Ambil userId
       final userId = await ApiHelper.getUserId();
+      debugPrint('=== [Keluhan] userId: $userId');
+
       if (userId == null) {
-        errorList = 'Sesi tidak ditemukan.';
+        errorList = 'Sesi tidak ditemukan. Silakan login ulang.';
         return;
       }
-      keluhanList = await KeluhanService.getKeluhanList(userId);
-    } on ApiException catch (e) {
-      errorList = e.message;
-    } catch (_) {
+
+      // 2. Ambil token
+      final token = await ApiHelper.getToken();
+      debugPrint('=== [Keluhan] token: ${token != null ? 'ada' : 'null'}');
+
+      // 3. Hit API langsung dengan http.get
+      final url = ApiConstants.keluhanList(userId);
+      debugPrint('=== [Keluhan] url: $url');
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      );
+
+      debugPrint('=== [Keluhan] status: ${response.statusCode}');
+      debugPrint('=== [Keluhan] body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          final List list = data['data'] ?? [];
+          keluhanList = list
+              .map((e) => KeluhanModel.fromJson(e as Map<String, dynamic>))
+              .toList();
+          debugPrint('=== [Keluhan] jumlah: ${keluhanList.length}');
+        } else {
+          errorList = data['message'] ?? 'Gagal memuat keluhan.';
+        }
+      } else {
+        errorList = 'Server error: ${response.statusCode}';
+      }
+
+    } catch (e, stack) {
+      debugPrint('=== [Keluhan] ERROR: $e');
+      debugPrint('=== [Keluhan] STACK: $stack');
       errorList = 'Gagal memuat daftar keluhan.';
     } finally {
       isLoadingList = false;
@@ -69,15 +114,12 @@ class KeluhanController {
 
   // ── Init form lapor ────────────────────────────────────────
   Future<void> initForm() async {
-    // Set tanggal hari ini
     tanggalController.text = DateFormat('dd/MM/yyyy').format(selectedDate);
 
-    // Coba ambil kamar aktif user dari booking
     try {
       final userId = await ApiHelper.getUserId();
       if (userId != null) {
         final kamarList = await KamarService.getKamarList();
-        // Ambil kamar pertama sebagai default (idealnya dari booking aktif)
         if (kamarList.isNotEmpty) {
           kamarAktif = kamarList.first;
           nomorKamarController.text = kamarAktif!.nomorKamar;
@@ -114,20 +156,35 @@ class KeluhanController {
   // ── Pilih Foto Bukti ───────────────────────────────────────
   Future<void> pickFoto(BuildContext context) async {
     final picker = ImagePicker();
-    final source = await _showImageSourceDialog(context);
+
+    ImageSource? source;
+
+    // Di web tidak ada kamera native lewat ImageSource.camera yang reliable
+    // tampilkan dialog hanya jika bukan web
+    if (kIsWeb) {
+      source = ImageSource.gallery;
+    } else {
+      source = await _showImageSourceDialog(context);
+    }
+
     if (source == null) return;
 
     final picked = await picker.pickImage(source: source, imageQuality: 80);
-    if (picked != null) {
-      fotoBukti = File(picked.path);
-      fotoBuktiNama = picked.name;
-      onStateChanged();
-    }
+    if (picked == null) return;
+
+    // Baca sebagai bytes — kompatibel Web & Mobile
+    final bytes = await picked.readAsBytes();
+
+    fotoBuktiXFile  = picked;
+    fotoBuktiBytes  = bytes;
+    fotoBuktiNama   = picked.name;
+    onStateChanged();
   }
 
   void removeFoto() {
-    fotoBukti = null;
-    fotoBuktiNama = null;
+    fotoBuktiXFile  = null;
+    fotoBuktiBytes  = null;
+    fotoBuktiNama   = null;
     onStateChanged();
   }
 
@@ -135,7 +192,8 @@ class KeluhanController {
     return showDialog<ImageSource>(
       context: context,
       builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text('Pilih Sumber Foto',
             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
         actions: [
@@ -172,7 +230,7 @@ class KeluhanController {
     return null;
   }
 
-  // ── Dialog Konfirmasi "Lanjutkan Pengisian?" ───────────────
+  // ── Dialog Konfirmasi ──────────────────────────────────────
   Future<bool> showKonfirmasiDialog(BuildContext context) async {
     final result = await showDialog<bool>(
       context: context,
@@ -195,7 +253,6 @@ class KeluhanController {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Batalkan
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context, false),
                     style: ElevatedButton.styleFrom(
@@ -211,7 +268,6 @@ class KeluhanController {
                         style: TextStyle(fontSize: 13)),
                   ),
                   const SizedBox(width: 12),
-                  // Lanjut
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context, true),
                     style: ElevatedButton.styleFrom(
@@ -244,7 +300,6 @@ class KeluhanController {
       return;
     }
 
-    // Tampilkan dialog konfirmasi
     final lanjut = await showKonfirmasiDialog(context);
     if (!lanjut) return;
 
@@ -252,17 +307,19 @@ class KeluhanController {
     onStateChanged();
 
     try {
+      // Kirim XFile ke service (multipart upload)
+      // Service perlu di-update untuk terima XFile, bukan File
       final success = await KeluhanService.createKeluhan(
-        idKamar: kamarAktif?.idKamar ?? 0,
+        idKamar         : kamarAktif?.idKamar ?? 0,
         deskripsiMasalah: deskripsiController.text.trim(),
-        fotoBukti: fotoBukti,
+        fotoBuktiXFile  : fotoBuktiXFile,   // ← kirim XFile
       );
 
       if (!context.mounted) return;
 
       if (success) {
         _showSuccessSnackbar(context, 'Keluhan berhasil dilaporkan.');
-        Navigator.pop(context, true); // kembali ke daftar, refresh
+        Navigator.pop(context, true);
       } else {
         _showErrorSnackbar(context, 'Gagal mengirim keluhan.');
       }
@@ -290,19 +347,19 @@ class KeluhanController {
   // ── Status Label & Color ───────────────────────────────────
   String statusLabel(String status) {
     switch (status) {
-      case 'pending':    return 'Menunggu';
-      case 'diproses':   return 'Diproses';
-      case 'selesai':    return 'Selesai';
-      default:           return status;
+      case 'pending':  return 'Menunggu';
+      case 'diproses': return 'Diproses';
+      case 'selesai':  return 'Selesai';
+      default:         return status;
     }
   }
 
   Color statusColor(String status) {
     switch (status) {
-      case 'pending':    return const Color(0xFFF39C12);
-      case 'diproses':   return const Color(0xFF3498DB);
-      case 'selesai':    return const Color(0xFF2ECC71);
-      default:           return const Color(0xFF9E9E9E);
+      case 'pending':  return const Color(0xFFF39C12);
+      case 'diproses': return const Color(0xFF3498DB);
+      case 'selesai':  return const Color(0xFF2ECC71);
+      default:         return const Color(0xFF9E9E9E);
     }
   }
 

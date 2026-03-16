@@ -1,86 +1,53 @@
-// ============================================================
-// BACKEND LAYER — register_controller.dart
-// Bertanggung jawab atas: validasi input, pemanggilan service,
-// navigasi, dan state management.
-// Tidak boleh ada Widget/UI di sini.
-// ============================================================
-
 import 'package:flutter/material.dart';
 import '../../../data/services/user_service.dart';
 import 'login_page.dart';
 
 class RegisterController {
-  // ── State ──────────────────────────────────────────────────
   bool isLoading = false;
   bool obscurePassword = true;
-  bool obscureConfirmPassword = true;
 
-  // ── Text Controllers ───────────────────────────────────────
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController alamatController = TextEditingController();
 
-  // Callback untuk trigger setState di View
   final VoidCallback onStateChanged;
-
   RegisterController({required this.onStateChanged});
 
-  // ── Dispose ────────────────────────────────────────────────
   void dispose() {
     nameController.dispose();
     emailController.dispose();
     phoneController.dispose();
     passwordController.dispose();
-    confirmPasswordController.dispose();
+    alamatController.dispose();
   }
 
-  // ── Toggle Password Visibility ─────────────────────────────
   void toggleObscurePassword() {
     obscurePassword = !obscurePassword;
     onStateChanged();
   }
 
-  void toggleObscureConfirmPassword() {
-    obscureConfirmPassword = !obscureConfirmPassword;
-    onStateChanged();
-  }
-
-  // ── Validasi Input ─────────────────────────────────────────
   String? validate() {
     if (nameController.text.isEmpty ||
         emailController.text.isEmpty ||
         phoneController.text.isEmpty ||
-        passwordController.text.isEmpty ||
-        confirmPasswordController.text.isEmpty) {
+        passwordController.text.isEmpty) {
       return 'Semua kolom harus diisi!';
     }
-
     if (!RegExp(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
         .hasMatch(emailController.text)) {
       return 'Masukkan email yang valid!';
     }
-
     if (passwordController.text.length < 6) {
       return 'Password harus minimal 6 karakter!';
     }
-
-    if (passwordController.text != confirmPasswordController.text) {
-      return 'Password dan konfirmasi password tidak cocok!';
-    }
-
-    return null; // null = valid, tidak ada error
+    return null;
   }
 
-  // ── Register User (memanggil UserService) ──────────────────
   Future<void> registerUser(BuildContext context) async {
-    // Jalankan validasi dulu
     final errorMsg = validate();
-    if (errorMsg != null) {
-      _showSnackbar(context, errorMsg);
-      return;
-    }
+    if (errorMsg != null) { _showErrorSnackbar(context, errorMsg); return; }
 
     isLoading = true;
     onStateChanged();
@@ -91,60 +58,100 @@ class RegisterController {
         email: emailController.text.trim(),
         noHp: phoneController.text.trim(),
         password: passwordController.text,
+        alamat: alamatController.text.trim(),
       );
-
       if (!context.mounted) return;
-
       if (data['error'] == false) {
         _showSuccessDialog(context);
       } else {
-        _showSnackbar(context, 'Registrasi gagal: ${data['message']}');
+        _showErrorSnackbar(context, 'Registrasi gagal: ${data['message']}');
       }
-    } catch (e) {
-      if (context.mounted) {
-        _showSnackbar(context, 'Terjadi kesalahan. Coba lagi nanti.');
-      }
+    } catch (_) {
+      if (context.mounted) _showErrorSnackbar(context, 'Terjadi kesalahan. Coba lagi nanti.');
     } finally {
       isLoading = false;
       onStateChanged();
     }
   }
 
-  // ── Navigasi ke Login ──────────────────────────────────────
-  void goToLogin(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginPage()),
-    );
+  void goToLogin(BuildContext context) =>
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginPage()));
+
+  void _showErrorSnackbar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Row(children: [
+        const Icon(Icons.error_outline, color: Colors.white, size: 20),
+        const SizedBox(width: 10),
+        Expanded(child: Text(message)),
+      ]),
+      backgroundColor: Colors.red.shade600,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.all(16),
+    ));
   }
 
-  // ── Helper: Snackbar ───────────────────────────────────────
-  void _showSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
-  // ── Helper: Dialog Sukses ──────────────────────────────────
   void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        title: const Text('Registrasi Berhasil!'),
-        content: const Text('Akun Anda telah berhasil dibuat. Silakan login.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-              );
-            },
-            child: const Text('OK'),
-          ),
-        ],
+      builder: (_) => _RegisterSuccessDialog(
+        onContinue: () {
+          Navigator.of(context).pop();
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => const LoginPage()));
+        },
+      ),
+    );
+  }
+}
+
+class _RegisterSuccessDialog extends StatelessWidget {
+  final VoidCallback onContinue;
+  const _RegisterSuccessDialog({required this.onContinue});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      backgroundColor: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 72, height: 72,
+              decoration: const BoxDecoration(
+                  color: Color(0xFF2ECC71), shape: BoxShape.circle),
+              child: const Icon(Icons.check, color: Colors.white, size: 40),
+            ),
+            const SizedBox(height: 20),
+            const Text('Registrasi Berhasil!',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1A2E))),
+            const SizedBox(height: 10),
+            const Text('Akun Anda telah berhasil dibuat.\nSilakan login untuk melanjutkan.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Color(0xFF9E9E9E))),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: onContinue,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2ECC71),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  elevation: 0,
+                ),
+                child: const Text('Login Sekarang',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

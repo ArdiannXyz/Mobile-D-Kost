@@ -1,14 +1,11 @@
-// ============================================================
-// FRONTEND LAYER — home_page.dart
-// Sesuai screenshot: search bar hijau, banner biru-hijau
-// dengan awan & matahari, rekomendasi horizontal (dengan tombol),
-// filter chips, grid 2 kolom (tanpa tombol).
-// Bottom nav: 4 icon PNG dari assets, tanpa label.
-// ============================================================
-
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'home_controller.dart';
 import 'package:dkost/presentation/widgets/kamar_card.dart';
+import 'package:dkost/presentation/pages/review_keluhan/keluhan_page.dart';
+import 'package:dkost/presentation/pages/tagihan/tagihan_page.dart';
+import 'package:dkost/presentation/pages/profil_setting/setting_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,6 +17,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final HomeController _controller;
   int _currentNavIndex = 0;
+
+  // Track tab mana yang sudah pernah dibuka
+  final Set<int> _visitedTabs = {0}; // Tab 0 langsung load
 
   @override
   void initState() {
@@ -36,17 +36,150 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
-      body: _buildBody(),
+      body: IndexedStack(
+        index: _currentNavIndex,
+        children: [
+          // Tab 0: Dashboard — selalu load
+          _DashboardTab(controller: _controller),
+
+          // Tab 1: Keluhan — lazy load
+          _visitedTabs.contains(1)
+              ? const KeluhanListPage()
+              : const SizedBox.shrink(),
+
+          // Tab 2: Tagihan — lazy load
+          _visitedTabs.contains(2)
+              ? const TagihanPage()
+              : const SizedBox.shrink(),
+
+          // Tab 3: Setting — lazy load
+          _visitedTabs.contains(3)
+              ? const SettingPage()
+              : const SizedBox.shrink(),
+        ],
+      ),
       bottomNavigationBar: _buildBottomNav(),
     );
   }
 
-  Widget _buildBody() {
-    if (_controller.isLoading) {
+  Widget _buildBottomNav() {
+    const items = [
+      ['assets/images/home_green.png', 'assets/images/home_black.png'],
+      ['assets/images/keluhan_green.png', 'assets/images/keluhan_black.png'],
+      ['assets/images/kamarku_green.png', 'assets/images/kamarku_black.png'],
+      ['assets/images/setting_green.png', 'assets/images/setting_black.png'],
+    ];
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 12,
+            offset: Offset(0, -3),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 58,
+          child: Row(
+            children: List.generate(4, (index) {
+              final isActive = _currentNavIndex == index;
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _currentNavIndex = index;
+                      _visitedTabs.add(index);
+                    });
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Center(
+                    child: Image.asset(
+                      isActive ? items[index][0] : items[index][1],
+                      width: 24,
+                      height: 24,
+                      errorBuilder: (_, __, ___) => Icon(
+                        [
+                          Icons.home_outlined,
+                          Icons.report_problem_outlined,
+                          Icons.receipt_long_outlined,
+                          Icons.settings_outlined,
+                        ][index],
+                        color: isActive
+                            ? const Color(0xFF2ECC71)
+                            : const Color(0xFF9E9E9E),
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD TAB
+// ══════════════════════════════════════════════════════════════
+class _DashboardTab extends StatefulWidget {
+  final HomeController controller;
+  const _DashboardTab({required this.controller});
+
+  @override
+  State<_DashboardTab> createState() => _DashboardTabState();
+}
+
+class _DashboardTabState extends State<_DashboardTab> {
+  final PageController _bannerController = PageController();
+  Timer? _bannerTimer;
+  int _currentBannerIndex = 0;
+
+  // Daftar banner SVG — tambahkan lebih banyak sesuai kebutuhan
+  static const List<String> _banners = [
+    'assets/images/Asset_2.png',
+    'assets/images/Asset_4.png',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoSlide();
+  }
+
+  void _startAutoSlide() {
+    _bannerTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted) return;
+      final next = (_currentBannerIndex + 1) % _banners.length;
+      _bannerController.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _bannerTimer?.cancel();
+    _bannerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.controller.isLoading) {
       return const Center(
           child: CircularProgressIndicator(color: Color(0xFF2ECC71)));
     }
-    if (_controller.errorMessage != null) {
+    if (widget.controller.errorMessage != null) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -54,11 +187,11 @@ class _HomePageState extends State<HomePage> {
             const Icon(Icons.wifi_off_rounded,
                 size: 56, color: Color(0xFFB0B0C3)),
             const SizedBox(height: 12),
-            Text(_controller.errorMessage!,
+            Text(widget.controller.errorMessage!,
                 style: const TextStyle(color: Color(0xFF9E9E9E))),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _controller.refresh,
+              onPressed: widget.controller.refresh,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2ECC71),
                 foregroundColor: Colors.white,
@@ -74,36 +207,36 @@ class _HomePageState extends State<HomePage> {
 
     return RefreshIndicator(
       color: const Color(0xFF2ECC71),
-      onRefresh: _controller.refresh,
+      onRefresh: widget.controller.refresh,
       child: CustomScrollView(
         slivers: [
-          SliverToBoxAdapter(child: _buildSearchBar()),
-          SliverToBoxAdapter(child: _buildBanner()),
-          SliverToBoxAdapter(child: _buildRekomendasi()),
-          SliverToBoxAdapter(child: _buildFilterChips()),
-          _controller.filteredKamar.isEmpty
+          SliverToBoxAdapter(child: _buildSearchBar(context)),
+          SliverToBoxAdapter(child: _buildBannerSlider(context)),
+          SliverToBoxAdapter(child: _buildRekomendasi(context)),
+          SliverToBoxAdapter(child: _buildFilterChips(context)),
+          widget.controller.filteredKamar.isEmpty
               ? SliverToBoxAdapter(child: _buildEmptyState())
               : SliverPadding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 90),
                   sliver: SliverGrid(
                     delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final kamar = _controller.filteredKamar[index];
+                      (ctx, index) {
+                        final kamar = widget.controller.filteredKamar[index];
                         return KamarCard(
                           kamar: kamar,
                           mode: KamarCardMode.grid,
-                          onTap: () => _controller.goToKamarDetail(
-                              context, kamar.idKamar),
+                          onTap: () => widget.controller
+                              .goToKamarDetail(ctx, kamar.idKamar),
                         );
                       },
-                      childCount: _controller.filteredKamar.length,
+                      childCount: widget.controller.filteredKamar.length,
                     ),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      mainAxisSpacing: 14,
-                      crossAxisSpacing: 14,
-                      childAspectRatio: 0.82,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 0.78,
                     ),
                   ),
                 ),
@@ -112,31 +245,31 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ── Search Bar ────────────────────────────────────────────
-  Widget _buildSearchBar() {
+  // ── Search Bar ─────────────────────────────────────────────
+  Widget _buildSearchBar(BuildContext context) {
     return Container(
       color: const Color(0xFF2ECC71),
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 10,
+        top: MediaQuery.of(context).padding.top + 12,
         left: 16,
         right: 16,
         bottom: 14,
       ),
       child: GestureDetector(
-        onTap: () => _controller.goToSearch(context),
+        onTap: () => widget.controller.goToSearch(context),
         child: Container(
           height: 44,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(22),
           ),
           child: const Row(
             children: [
-              Icon(Icons.search, color: Color(0xFFAAAAAA), size: 20),
-              SizedBox(width: 10),
-              Text('Search',
-                  style: TextStyle(color: Color(0xFFBBBBBB), fontSize: 14)),
+              SizedBox(width: 14),
+              Icon(Icons.search, color: Color(0xFF9E9E9E), size: 20),
+              SizedBox(width: 8),
+              Text('Cari kamar kost...',
+                  style: TextStyle(color: Color(0xFFB0B0C3), fontSize: 14)),
             ],
           ),
         ),
@@ -144,205 +277,161 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ── Banner biru dengan awan & matahari ────────────────────
-  Widget _buildBanner() {
+  // ── Banner Slider ──────────────────────────────────────────
+  Widget _buildBannerSlider(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      height: 110,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        gradient: const LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [Color(0xFF42A5F5), Color(0xFF29B6F6), Color(0xFF4DD0E1)],
-        ),
-      ),
-      child: Stack(
-        clipBehavior: Clip.hardEdge,
+      color: const Color(0xFF2ECC71),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+      child: Column(
         children: [
-          // Matahari kuning pojok kanan atas
-          Positioned(
-            right: -20,
-            top: -20,
-            child: Container(
-              width: 88,
-              height: 88,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFFFDD835),
-              ),
-            ),
-          ),
-          // Highlight matahari
-          Positioned(
-            right: 22,
-            top: -4,
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.25),
-              ),
-            ),
-          ),
-          // Awan besar kanan
-          Positioned(
-            right: 14,
-            top: 46,
-            child: _cloud(64, 24),
-          ),
-          // Awan kecil kanan bawah
-          Positioned(
-            right: 52,
-            bottom: 10,
-            child: _cloud(46, 18),
-          ),
-          // Awan kecil kanan tengah
-          Positioned(
-            right: 90,
-            top: 14,
-            child: _cloud(36, 15),
-          ),
-          // Teks
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 130, 0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hi ${_controller.userName}',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+          // PageView banner
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SizedBox(
+              height: 140,
+              child: PageView.builder(
+                controller: _bannerController,
+                itemCount: _banners.length,
+                onPageChanged: (index) {
+                  setState(() => _currentBannerIndex = index);
+                },
+                itemBuilder: (_, index) => SizedBox(
+                    width: double.infinity,
+                    height: 140,
+                    child: Image.asset(
+                      _banners[index],
+                      width: double.infinity,
+                      height: 140,
+                      fit: BoxFit.cover,
+                      // Ganti placeholderBuilder dengan errorBuilder
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: const Color(0xFF27AE60),
+                        child: const Center(
+                          child: Icon(Icons.image_not_supported, color: Colors.white54),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 4),
-                const Text(
-                  'selamat datang',
-                  style: TextStyle(fontSize: 14, color: Colors.white),
-                ),
-              ],
+              ),
             ),
+          
+
+          const SizedBox(height: 10),
+
+          // Dot indicator
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(_banners.length, (index) {
+              final isActive = index == _currentBannerIndex;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: isActive ? 20 : 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: isActive ? Colors.white : Colors.white38,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              );
+            }),
           ),
         ],
       ),
     );
   }
 
-  Widget _cloud(double w, double h) => Container(
-        width: w,
-        height: h,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.88),
-          borderRadius: BorderRadius.circular(h / 2),
-        ),
-      );
-
-  // ── Rekomendasi (horizontal, dengan tombol Detail Kamar) ───
-  Widget _buildRekomendasi() {
-    final list = _controller.semuaKamar
-        .where((k) => k.tersedia)
-        .take(6)
+  // ── Rekomendasi ────────────────────────────────────────────
+  Widget _buildRekomendasi(BuildContext context) {
+    final tersedia = widget.controller.semuaKamar
+        .where((k) => k.statusKamar == 'tersedia')
+        .take(5)
         .toList();
+    if (tersedia.isEmpty) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.fromLTRB(16, 18, 16, 10),
-          child: Text(
-            'Rekomendasi kamar',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1A2E),
-            ),
-          ),
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 10),
+          child: Text('Rekomendasi Kamar',
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A1A2E))),
         ),
         SizedBox(
-          height: 215,
-          child: list.isEmpty
-              ? const Center(
-                  child: Text('Belum ada kamar tersedia',
-                      style: TextStyle(color: Color(0xFF9E9E9E))))
-              : ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: list.length,
-                  itemBuilder: (context, index) {
-                    final kamar = list[index];
-                    return SizedBox(
-                      width: 148,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: KamarCard(
-                          kamar: kamar,
-                          mode: KamarCardMode.horizontal,
-                          onTap: () => _controller.goToKamarDetail(
-                              context, kamar.idKamar),
-                        ),
-                      ),
-                    );
-                  },
+          height: 220,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: tersedia.length,
+            itemBuilder: (ctx, index) => Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: SizedBox(
+                width: 160,
+                child: KamarCard(
+                  kamar: tersedia[index],
+                  mode: KamarCardMode.horizontal,
+                  onTap: () => widget.controller
+                      .goToKamarDetail(ctx, tersedia[index].idKamar),
                 ),
+              ),
+            ),
+          ),
         ),
       ],
     );
   }
 
-  // ── Filter Chips ──────────────────────────────────────────
-  Widget _buildFilterChips() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-      child: SingleChildScrollView(
+  // ── Filter Chips ───────────────────────────────────────────
+  Widget _buildFilterChips(BuildContext context) {
+    const filters = ['Semua', 'Serba 300rb', 'Serba 600rb', 'Up to 900rb'];
+    return Container(
+      height: 48,
+      margin: const EdgeInsets.only(top: 8),
+      child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        child: Row(
-          children: HomeController.filterOptions.map((filter) {
-            final isSelected = _controller.selectedFilter == filter;
-            return GestureDetector(
-              onTap: () => _controller.applyFilter(filter),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                margin: const EdgeInsets.only(right: 10),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
-                decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFF2ECC71) : Colors.white,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(
-                    color: isSelected
-                        ? const Color(0xFF2ECC71)
-                        : const Color(0xFFE0E0E0),
-                  ),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: const Color(0xFF2ECC71).withOpacity(0.25),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          )
-                        ]
-                      : [],
-                ),
-                child: Text(
-                  filter,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: isSelected ? Colors.white : const Color(0xFF555555),
-                  ),
-                ),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: filters.length,
+        itemBuilder: (_, i) {
+          final isSelected =
+              widget.controller.selectedFilter == filters[i];
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: FilterChip(
+              label: Text(filters[i]),
+              selected: isSelected,
+              onSelected: (_) =>
+                  widget.controller.applyFilter(filters[i]),
+              selectedColor: const Color(0xFF2ECC71),
+              backgroundColor: Colors.white,
+              checkmarkColor: Colors.white,
+              labelStyle: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: isSelected
+                    ? Colors.white
+                    : const Color(0xFF555555),
               ),
-            );
-          }).toList(),
-        ),
+              side: BorderSide(
+                color: isSelected
+                    ? const Color(0xFF2ECC71)
+                    : const Color(0xFFE0E0E0),
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              showCheckmark: false,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+            ),
+          );
+        },
       ),
     );
   }
 
-  // ── Empty State ───────────────────────────────────────────
+  // ── Empty State ────────────────────────────────────────────
   Widget _buildEmptyState() {
     return const Padding(
       padding: EdgeInsets.all(40),
@@ -354,71 +443,6 @@ class _HomePageState extends State<HomePage> {
             Text('Tidak ada kamar ditemukan',
                 style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 14)),
           ],
-        ),
-      ),
-    );
-  }
-
-  // ── Bottom Nav ────────────────────────────────────────────
-  Widget _buildBottomNav() {
-    const items = [
-      ['assets/images/home green (2).png', 'assets/images/home black (2).png'],
-      ['assets/images/person 1.png', 'assets/images/person 2.png'],
-      ['assets/images/kamarku green.png', 'assets/images/kamarku black.png'],
-      ['assets/images/setting green.png', 'assets/images/setting black.png'],
-    ];
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-              color: Color(0x14000000),
-              blurRadius: 12,
-              offset: Offset(0, -3)),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 58,
-          child: Row(
-            children: List.generate(4, (index) {
-              final isActive = _currentNavIndex == index;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() => _currentNavIndex = index);
-                    if (index == 1) {
-                      _controller.goToKeluhan(context);
-                      setState(() => _currentNavIndex = 0);
-                    } else if (index == 2) {
-                      _controller.goToRiwayatKos(context);
-                      setState(() => _currentNavIndex = 0);
-                    } else if (index == 3) {
-                      _controller.goToSetting(context);
-                      setState(() => _currentNavIndex = 0);
-                    }
-                  },
-                  behavior: HitTestBehavior.opaque,
-                  child: Center(
-                    child: Image.asset(
-                      isActive ? items[index][0] : items[index][1],
-                      width: 24,
-                      height: 24,
-                      errorBuilder: (_, __, ___) => Icon(
-                        [Icons.home_outlined, Icons.person_outline,
-                         Icons.bed_outlined, Icons.settings_outlined][index],
-                        color: isActive
-                            ? const Color(0xFF2ECC71)
-                            : const Color(0xFF9E9E9E),
-                        size: 24,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
         ),
       ),
     );

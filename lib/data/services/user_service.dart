@@ -84,6 +84,7 @@ class UserService {
     required String email,
     required String noHp,
     required String password,
+    String? alamat,
   }) async {
     try {
       final response = await http.post(
@@ -94,7 +95,8 @@ class UserService {
           'email': email,
           'no_hp': noHp,
           'password': password,
-          'role': 'penyewa', // selalu penyewa untuk app user
+          'role': 'penyewa',
+          if (alamat != null && alamat.isNotEmpty) 'alamat': alamat,
         }),
       );
 

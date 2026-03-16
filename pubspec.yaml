@@ -21,7 +21,7 @@ dependencies:
   # ── Image ───────────────────────────────────────────────────
   cached_network_image: ^3.2.0
   flutter_cache_manager: ^3.3.0
-  flutter_svg: ^2.0.7
+  flutter_svg: ^2.2.4
 
   # ── UI / UX ─────────────────────────────────────────────────
   shimmer: ^3.0.0
@@ -44,34 +44,39 @@ flutter:
     # ── Gambar lama yang masih dipakai ─────────────────────────
 
     # ── Asset baru D'Kost (dari screenshot assets/images) ───────
-    - assets/images/dkos 1.png              # Logo D'Kost
-    - assets/images/home green (2).png      # Bottom nav: Dashboard aktif
-    - assets/images/home black (2).png      # Bottom nav: Dashboard nonaktif
-    - assets/images/Keluhan green.png       # Bottom nav: Keluhan aktif
-    - assets/images/Keluhan black.png       # Bottom nav: Keluhan nonaktif
-    - assets/images/kamarku green.png       # Bottom nav: Riwayat Kos aktif
-    - assets/images/kamarku black.png       # Bottom nav: Riwayat Kos nonaktif
-    - assets/images/setting green.png       # Bottom nav: Setting aktif
-    - assets/images/setting black.png       # Bottom nav: Setting nonaktif
-    - assets/images/person 1.png            # Avatar profil default
-    - assets/images/person 2.png            # Avatar profil alternatif
+    - assets/images/Asset_2.png
+    - assets/images/Asset_4.png
+    - assets/images/dkos_1.png              # Logo D'Kost
+    - assets/images/dkos_2.png              # Logo D'Kost
+    - assets/images/dkos_3.png              # Logo D'Kost
+    - assets/images/home_green.png      # Bottom nav: Dashboard aktif
+    - assets/images/home_black.png      # Bottom nav: Dashboard nonaktif
+    - assets/images/Keluhan_green.png       # Bottom nav: Keluhan aktif
+    - assets/images/Keluhan_black.png       # Bottom nav: Keluhan nonaktif
+    - assets/images/kamarku_green.png       # Bottom nav: Riwayat Kos aktif
+    - assets/images/kamarku_black.png       # Bottom nav: Riwayat Kos nonaktif
+    - assets/images/setting_green.png       # Bottom nav: Setting aktif
+    - assets/images/setting_black.png       # Bottom nav: Setting nonaktif
+    - assets/images/person_1.png            # Avatar profil default
+    - assets/images/person_2.png            # Avatar profil alternatif
     - assets/images/picture.png      
     - assets/images/robot.png           # Placeholder foto kamar
-    - assets/images/calendar 1.png          # Icon kalender (booking)
+    - assets/images/calendar_1.png          # Icon kalender (booking)
     - assets/images/attach_file.png         # Icon lampiran (keluhan)
-    - assets/images/detail informasi akun.png # Icon info akun
-    - assets/images/change-password-icon (1).png # Icon ganti password
-    - assets/images/logout (2).png          # Icon logout
+    - assets/images/detail_informasi_akun.png # Icon info akun
+    - assets/images/change-password-icon.png # Icon ganti password
+    - assets/images/logout.png          # Icon logout
 
 # ── Splash Screen ───────────────────────────────────────────────
 flutter_native_splash:
-  color: "#2ECC71"                    # Hijau D'Kost (ganti dari biru lama)
-  image: assets/images/splash_2.png
+  color: "#2ECC71"
+  image: assets/images/dkos_3.png
   android: true
   ios: true
+  web: true
 
 # ── Launcher Icon ───────────────────────────────────────────────
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/images/dkos 1.png"   # Ganti ke logo D'Kost
+  image_path: "assets/images/dkos_3.png"   # Ganti ke logo D'Kost

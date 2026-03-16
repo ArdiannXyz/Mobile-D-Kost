@@ -1,14 +1,5 @@
 // ============================================================
 // FRONTEND LAYER — kamar_detail_page.dart
-// Sesuai Figma:
-// - Foto kamar (PageView galeri)
-// - Nama + harga/bulan
-// - Dropdown durasi sewa
-// - Deskripsi produk
-// - Beri rating / Tulis ulasan
-// - Ulasan produk
-// - Bottom bar: tombol "Pesan Sekarang"
-// - Bottom sheet: pilih furnitur tambahan + total biaya
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -74,7 +65,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
         onPressed: () => _controller.goBack(context),
       ),
       title: const Text(
-        'Detail Produk',
+        'Detail Kamar',
         style: TextStyle(
           color: Color(0xFF1A1A2E),
           fontSize: 16,
@@ -91,36 +82,21 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Foto galeri
           _buildGallery(),
-
-          // Info kamar: nama, harga, durasi
           _buildInfoSection(),
-
           const SizedBox(height: 8),
-
-          // Deskripsi
           _buildSection(
             title: 'Deskripsi Produk',
             child: Text(
-              kamar.deskripsi.isEmpty
-                  ? 'Tidak ada deskripsi.'
-                  : kamar.deskripsi,
+              kamar.deskripsi.isEmpty ? 'Tidak ada deskripsi.' : kamar.deskripsi,
               style: const TextStyle(
                   fontSize: 13, color: Color(0xFF555555), height: 1.6),
             ),
           ),
-
           const SizedBox(height: 8),
-
-          // Rating section
           _buildRatingSection(),
-
           const SizedBox(height: 8),
-
-          // Ulasan
           _buildReviewSection(),
-
           const SizedBox(height: 80),
         ],
       ),
@@ -145,14 +121,12 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
                 )
               : _placeholderPhoto(),
         ),
-        // Counter foto jika ada banyak
         if (hasPhoto)
           Positioned(
             right: 12,
             bottom: 12,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.55),
                 borderRadius: BorderRadius.circular(12),
@@ -184,8 +158,9 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
     final kamar = _controller.kamar!;
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Nama + Harga
           Row(
@@ -223,50 +198,202 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
             ],
           ),
 
+          const SizedBox(height: 16),
+          const Divider(height: 1, color: Color(0xFFF0F0F0)),
           const SizedBox(height: 14),
 
-          // Dropdown Durasi Sewa
+          // ── Row: Lama Sewa + Mulai Sewa ──────────────────
           Row(
             children: [
-              const Text(
-                'Lama sewa',
-                style: TextStyle(fontSize: 13, color: Color(0xFF555555)),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFE0E0E0)),
-                  borderRadius: BorderRadius.circular(8),
+              // Dropdown Lama Sewa
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Lama sewa',
+                      style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF9E9E9E),
+                          fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      height: 40,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFE0E0E0)),
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<int>(
+                          value: _controller.durasiSewa,
+                          isDense: true,
+                          isExpanded: true,
+                          icon: const Icon(Icons.keyboard_arrow_down,
+                              size: 18, color: Color(0xFF555555)),
+                          items: List.generate(12, (i) => i + 1)
+                              .map((bulan) => DropdownMenuItem(
+                                    value: bulan,
+                                    child: Text(
+                                      '$bulan Bulan',
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFF1A1A2E)),
+                                    ),
+                                  ))
+                              .toList(),
+                          onChanged: (val) {
+                            if (val != null) _controller.setDurasi(val);
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<int>(
-                    value: _controller.durasiSewa,
-                    isDense: true,
-                    icon: const Icon(Icons.keyboard_arrow_down,
-                        size: 18, color: Color(0xFF555555)),
-                    items: List.generate(12, (i) => i + 1)
-                        .map((bulan) => DropdownMenuItem(
-                              value: bulan,
-                              child: Text(
-                                '$bulan Bulan',
-                                style: const TextStyle(
-                                    fontSize: 13, color: Color(0xFF1A1A2E)),
+              ),
+
+              const SizedBox(width: 12),
+
+              // Date Picker Mulai Sewa
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Mulai sewa',
+                      style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF9E9E9E),
+                          fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 6),
+                    GestureDetector(
+                      onTap: () => _pickTanggalMulai(context),
+                      child: Container(
+                        height: 40,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: _controller.tglMulaiSewa != null
+                                ? const Color(0xFF2ECC71)
+                                : const Color(0xFFE0E0E0),
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                        ),
+                        child: Row(
+                          children: [
+                            // Icon kalender dari assets
+                            Image.asset(
+                              'assets/images/kalender_1.png',
+                              width: 16,
+                              height: 16,
+                              color: _controller.tglMulaiSewa != null
+                                  ? const Color(0xFF2ECC71)
+                                  : const Color(0xFF9E9E9E),
+                              colorBlendMode: BlendMode.srcIn,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.calendar_today_outlined,
+                                size: 16,
+                                color: _controller.tglMulaiSewa != null
+                                    ? const Color(0xFF2ECC71)
+                                    : const Color(0xFF9E9E9E),
                               ),
-                            ))
-                        .toList(),
-                    onChanged: (val) {
-                      if (val != null) _controller.setDurasi(val);
-                    },
-                  ),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                _controller
+                                    .formatTanggal(_controller.tglMulaiSewa),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: _controller.tglMulaiSewa != null
+                                      ? const Color(0xFF1A1A2E)
+                                      : const Color(0xFFB0B0C3),
+                                  fontWeight: _controller.tglMulaiSewa != null
+                                      ? FontWeight.w500
+                                      : FontWeight.normal,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
+
+          // ── Tanggal Akhir Sewa (otomatis) ────────────────
+          if (_controller.tglAkhirSewa != null) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0FBF4),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFB7EAC8)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.info_outline,
+                      size: 14, color: Color(0xFF2ECC71)),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Akhir sewa: ${_controller.formatTanggal(_controller.tglAkhirSewa)}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF2ECC71),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
+  }
+
+  // ── Date Picker Handler ───────────────────────────────────
+  Future<void> _pickTanggalMulai(BuildContext context) async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _controller.tglMulaiSewa ?? now,
+      firstDate: now,                                          // tidak bisa pilih masa lalu
+      lastDate: DateTime(now.year + 2, now.month, now.day),
+      helpText: 'Pilih Tanggal Mulai Sewa',
+      confirmText: 'Pilih',
+      cancelText: 'Batal',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF2ECC71),       // header + selected date
+              onPrimary: Colors.white,
+              onSurface: Color(0xFF1A1A2E),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF2ECC71),
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      _controller.setTglMulai(picked);
+    }
   }
 
   // ── Rating Section ────────────────────────────────────────
@@ -363,7 +490,8 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
               : Column(
                   children: [
                     ...reviews.map((r) => _ReviewItem(review: r)),
-                   if (totalReviews > KamarDetailController.maxDisplayedReviews)
+                    if (totalReviews >
+                        KamarDetailController.maxDisplayedReviews)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: GestureDetector(
@@ -372,7 +500,8 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 7),
                             decoration: BoxDecoration(
-                              border: Border.all(color: const Color(0xFF2ECC71)),
+                              border: Border.all(
+                                  color: const Color(0xFF2ECC71)),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
@@ -441,11 +570,10 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
         width: double.infinity,
         height: 48,
         child: ElevatedButton(
-          onPressed: tersedia ? () => _showBookingBottomSheet() : null,
+          onPressed: tersedia ? () => _onPesanSekarang() : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: tersedia
-                ? const Color(0xFF2ECC71)
-                : const Color(0xFFB0B0C3),
+            backgroundColor:
+                tersedia ? const Color(0xFF2ECC71) : const Color(0xFFB0B0C3),
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12)),
@@ -458,6 +586,25 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
         ),
       ),
     );
+  }
+
+  void _onPesanSekarang() {
+    // Validasi tanggal mulai sebelum buka bottom sheet
+    final error = _controller.validateBooking();
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error),
+          backgroundColor: const Color(0xFFE74C3C),
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+      return;
+    }
+    _showBookingBottomSheet();
   }
 
   // ── Bottom Sheet Booking + Furnitur ───────────────────────
@@ -527,10 +674,13 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
     );
   }
 
-  String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+  String _cap(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }
 
-// ── Bottom Sheet Booking + Pilih Furnitur ─────────────────────
+// ══════════════════════════════════════════════════════════════
+// Bottom Sheet Booking + Pilih Furnitur
+// ══════════════════════════════════════════════════════════════
 class _BookingBottomSheet extends StatefulWidget {
   final KamarDetailController controller;
   const _BookingBottomSheet({required this.controller});
@@ -572,7 +722,6 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                // Foto mini
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: kamar.fotoPrimary != null
@@ -581,8 +730,7 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                           width: 72,
                           height: 72,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              _miniPlaceholder(),
+                          errorBuilder: (_, __, ___) => _miniPlaceholder(),
                         )
                       : _miniPlaceholder(),
                 ),
@@ -599,12 +747,21 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                           color: Color(0xFF1A1A2E),
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                       Text(
                         'Lama sewa: ${c.durasiSewa} Bulan',
                         style: const TextStyle(
                             fontSize: 12, color: Color(0xFF9E9E9E)),
                       ),
+                      // Tampilkan range tanggal di bottom sheet
+                      if (c.tglMulaiSewa != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          '${c.formatTanggal(c.tglMulaiSewa)} → ${c.formatTanggal(c.tglAkhirSewa)}',
+                          style: const TextStyle(
+                              fontSize: 11, color: Color(0xFF2ECC71)),
+                        ),
+                      ],
                       const SizedBox(height: 4),
                       Text(
                         c.formatHarga(c.totalBiaya),
@@ -652,7 +809,8 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Center(
                 child: Text('Tidak ada furnitur tersedia',
-                    style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13)),
+                    style:
+                        TextStyle(color: Color(0xFF9E9E9E), fontSize: 13)),
               ),
             )
           else
@@ -724,8 +882,7 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                 ),
                 child: const Text(
                   'Pesan Sekarang',
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -746,10 +903,13 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
             color: Color(0xFF2ECC71), size: 28),
       );
 
-  String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+  String _cap(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }
 
-// ── Furnitur Item Row ─────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// Furnitur Item Row
+// ══════════════════════════════════════════════════════════════
 class _FurniturItem extends StatelessWidget {
   final FurniturModel furnitur;
   final int qty;
@@ -771,7 +931,6 @@ class _FurniturItem extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
-          // Icon furnitur
           Container(
             width: 40,
             height: 40,
@@ -783,7 +942,6 @@ class _FurniturItem extends StatelessWidget {
                 color: Color(0xFF2ECC71), size: 20),
           ),
           const SizedBox(width: 10),
-          // Nama + harga
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -795,19 +953,15 @@ class _FurniturItem extends StatelessWidget {
                         color: Color(0xFF1A1A2E))),
                 Text(
                   '${formatHarga(furnitur.hargaSewaTambahan)}/bulan',
-                  style: const TextStyle(
-                      fontSize: 11, color: Color(0xFF9E9E9E)),
+                  style:
+                      const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
                 ),
               ],
             ),
           ),
-          // Counter qty
           Row(
             children: [
-              _CounterBtn(
-                icon: Icons.remove,
-                onTap: qty > 0 ? onKurang : null,
-              ),
+              _CounterBtn(icon: Icons.remove, onTap: qty > 0 ? onKurang : null),
               SizedBox(
                 width: 28,
                 child: Text(
@@ -820,9 +974,8 @@ class _FurniturItem extends StatelessWidget {
                 ),
               ),
               _CounterBtn(
-                icon: Icons.add,
-                onTap: qty < furnitur.jumlah ? onTambah : null,
-              ),
+                  icon: Icons.add,
+                  onTap: qty < furnitur.jumlah ? onTambah : null),
             ],
           ),
         ],
@@ -857,7 +1010,9 @@ class _CounterBtn extends StatelessWidget {
   }
 }
 
-// ── Review Item ───────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// Review Item
+// ══════════════════════════════════════════════════════════════
 class _ReviewItem extends StatelessWidget {
   final ReviewModel review;
   const _ReviewItem({required this.review});
