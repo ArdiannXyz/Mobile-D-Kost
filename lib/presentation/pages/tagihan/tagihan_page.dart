@@ -15,7 +15,9 @@ class _TagihanPageState extends State<TagihanPage> {
   void initState() {
     super.initState();
     _controller = TagihanController(
-      onStateChanged: () { if (mounted) setState(() {}); },
+      onStateChanged: () {
+        if (mounted) setState(() {});
+      },
     );
     _controller.loadTagihan();
   }
@@ -56,7 +58,7 @@ class _TagihanPageState extends State<TagihanPage> {
     );
   }
 
-  // ── Filter Chips: Belum Bayar | Telat | Lunas ──────────────
+  // ── Filter Chips ───────────────────────────────────────────
   Widget _buildFilterChips() {
     const filters = ['Belum Bayar', 'Telat', 'Lunas'];
     return Container(
@@ -100,7 +102,6 @@ class _TagihanPageState extends State<TagihanPage> {
             );
           }),
           const Spacer(),
-          // Info button
           GestureDetector(
             onTap: () => _controller.showInfo(context),
             child: const Icon(
@@ -189,7 +190,7 @@ class _TagihanPageState extends State<TagihanPage> {
 
 // ── Tagihan Card ───────────────────────────────────────────────
 class _TagihanCard extends StatelessWidget {
-  final dynamic tagihan;
+  final TagihanUiModel tagihan;
   final TagihanController controller;
   final VoidCallback onTap;
 
@@ -259,13 +260,41 @@ class _TagihanCard extends StatelessWidget {
                           fontSize: 12, color: Color(0xFF9E9E9E)),
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      controller.formatHarga(tagihan.totalTagihan),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A1A2E),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          controller.formatHarga(tagihan.totalTagihan),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1A1A2E),
+                          ),
+                        ),
+                        // Tombol bayar — hanya muncul kalau belum lunas
+                        if (tagihan.statusTagihan != 'lunas')
+                          SizedBox(
+                            height: 30,
+                            child: ElevatedButton(
+                              onPressed: () =>
+                                  controller.bayar(context, tagihan),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF2ECC71),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: const Text('Bayar',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600)),
+                            ),
+                          ),
+                      ],
                     ),
                   ],
                 ),

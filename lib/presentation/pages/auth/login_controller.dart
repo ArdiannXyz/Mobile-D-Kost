@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../data/services/user_service.dart';
+import '../../../data/services/midtrans_service.dart';  
+import '../../../data/helper/api_helper.dart';
 import '../../../data/helper/api_exception.dart';
 import 'register_page.dart';
 import 'lupa_password_page.dart';
@@ -38,7 +40,10 @@ class LoginController {
 
   Future<void> loginUser(BuildContext context) async {
     final errorMsg = validate();
-    if (errorMsg != null) { _showErrorSnackbar(context, errorMsg); return; }
+    if (errorMsg != null) {
+      _showErrorSnackbar(context, errorMsg);
+      return;
+    }
 
     isLoading = true;
     onStateChanged();
@@ -48,8 +53,17 @@ class LoginController {
         email: emailController.text.trim(),
         password: passwordController.text,
       );
+
       if (!context.mounted) return;
+
       if (data['error'] == false) {
+        // ← BARU — set token ke MidtransService
+        final token = await ApiHelper.getToken();
+        if (token != null) {
+          MidtransService.setToken(token);
+        }
+
+        if (!context.mounted) return;
         _showSuccessDialog(context);
       } else {
         _showErrorSnackbar(context, data['message'] ?? 'Login gagal.');
@@ -57,7 +71,8 @@ class LoginController {
     } on ApiException catch (e) {
       if (context.mounted) _showErrorSnackbar(context, e.message);
     } catch (_) {
-      if (context.mounted) _showErrorSnackbar(context, 'Terjadi kesalahan. Coba lagi nanti.');
+      if (context.mounted)
+        _showErrorSnackbar(context, 'Terjadi kesalahan. Coba lagi nanti.');
     } finally {
       isLoading = false;
       onStateChanged();
@@ -109,7 +124,7 @@ class _LoginSuccessDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      backgroundColor: Colors.white,          // ← PUTIH
+      backgroundColor: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -130,7 +145,7 @@ class _LoginSuccessDialog extends StatelessWidget {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A2E),     // ← HITAM
+                color: Color(0xFF1A1A2E),
               ),
             ),
             const SizedBox(height: 10),
@@ -139,7 +154,7 @@ class _LoginSuccessDialog extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: Color(0xFF9E9E9E),     // ← ABU-ABU
+                color: Color(0xFF9E9E9E),
               ),
             ),
             const SizedBox(height: 24),
@@ -150,7 +165,8 @@ class _LoginSuccessDialog extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2ECC71),
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   elevation: 0,
                 ),

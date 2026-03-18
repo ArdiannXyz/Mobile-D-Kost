@@ -157,6 +157,7 @@ class _DashboardTabState extends State<_DashboardTab> {
   void _startAutoSlide() {
     _bannerTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (!mounted) return;
+      if (!_bannerController.hasClients) return;
       final next = (_currentBannerIndex + 1) % _banners.length;
       _bannerController.animateToPage(
         next,

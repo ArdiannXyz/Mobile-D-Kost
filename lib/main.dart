@@ -3,21 +3,27 @@ import 'presentation/pages/home/search_page.dart';
 import 'package:dkost/presentation/pages/review_keluhan/lapor_keluhan_page.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter/material.dart';
-import '../../../data/helper/api_helper.dart';
+import 'package:intl/date_symbol_data_local.dart';                          
+import 'data/helper/api_helper.dart';
 import 'presentation/pages/kamar/kamarku_page.dart';
+import 'data/services/midtrans_service.dart';
+
 // ── Auth ───────────────────────────────────────────────────────
-import '../presentation/pages/auth/welcome_screen.dart';
-import '../presentation/pages/auth/login_page.dart';
-import '../presentation/pages/auth/register_page.dart';
-import '../presentation/pages/auth/lupa_password_page.dart';
-import '../presentation/pages/auth/masuk_otp_page.dart';
-import '../presentation/pages/auth/ganti_password_page.dart';
+import 'presentation/pages/auth/welcome_screen.dart';
+import 'presentation/pages/auth/login_page.dart';
+import 'presentation/pages/auth/register_page.dart';
+import 'presentation/pages/auth/lupa_password_page.dart';
+import 'presentation/pages/auth/masuk_otp_page.dart';
+import 'presentation/pages/auth/ganti_password_page.dart';
 
 // ── Home ───────────────────────────────────────────────────────
-import '../presentation/pages/home/home_page.dart';
+import 'presentation/pages/home/home_page.dart';
 
 // ── Booking ────────────────────────────────────────────────────
-import '../presentation/pages/booking/booking_page.dart';
+import 'presentation/pages/booking/booking_page.dart';
+
+// ── Tagihan ────────────────────────────────────────────────────
+import 'presentation/pages/tagihan/tagihan_page.dart';                     
 
 // ── Keluhan ────────────────────────────────────────────────────
 import 'presentation/pages/review_keluhan/keluhan_page.dart';
@@ -31,22 +37,30 @@ import 'presentation/pages/review_keluhan/edit_review_page.dart';
 import 'presentation/pages/profil_setting/setting_page.dart';
 import 'presentation/pages/profil_setting/detail_akun_page.dart';
 import 'presentation/pages/profil_setting/edit_akun_page.dart';
-import 'presentation/pages/profil_setting/panduan_page.dart' ;
+import 'presentation/pages/profil_setting/panduan_page.dart';
+
 // ── Model ──────────────────────────────────────────────────────
-import '../../../data/models/kamar_models.dart';
-import '../../../data/models/furnitur_models.dart';
-import '../../../data/models/review_models.dart';
-import '../../../data/models/user_models.dart';
+import 'data/models/kamar_models.dart';
+import 'data/models/furnitur_models.dart';
+import 'data/models/review_models.dart';
+import 'data/models/user_models.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await initializeDateFormatting('id_ID', null);
 
   final isLoggedIn = await ApiHelper.isLoggedIn();
 
-  // Hapus splash native setelah selesai init
-  FlutterNativeSplash.remove();
+  // ← TAMBAHKAN INI
+  if (isLoggedIn) {
+    final token = await ApiHelper.getToken();
+    if (token != null) {
+      MidtransService.setToken(token);
+    }
+  }
 
+  FlutterNativeSplash.remove();
   runApp(DKostApp(isLoggedIn: isLoggedIn));
 }
 
@@ -83,23 +97,15 @@ class DKostApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      // ── Halaman awal ─────────────────────────────────────────
       home: isLoggedIn ? const HomePage() : const WelcomeScreen(),
-
-      // ── Semua Routes ─────────────────────────────────────────
       routes: _buildRoutes(),
-
-      // ── Route dengan argument (onGenerateRoute) ───────────────
       onGenerateRoute: _generateRoute,
-
-      // ── Route tidak ditemukan ─────────────────────────────────
       onUnknownRoute: (settings) => MaterialPageRoute(
         builder: (_) => const _NotFoundPage(),
       ),
     );
   }
 
-  // ── Static routes (tanpa argument) ───────────────────────────
   Map<String, WidgetBuilder> _buildRoutes() {
     return {
       '/welcome':        (_) => const WelcomeScreen(),
@@ -116,32 +122,29 @@ class DKostApp extends StatelessWidget {
       '/detail-akun':    (_) => const DetailAkunPage(),
       '/panduan':        (_) => const PanduanPage(),
       '/kamarku':        (_) => const KamarkuPage(),
+      '/tagihan':        (_) => const TagihanPage(),                   
     };
   }
 
-  // ── Dynamic routes (dengan argument) ─────────────────────────
   Route<dynamic>? _generateRoute(RouteSettings settings) {
     final args = settings.arguments as Map<String, dynamic>?;
 
     switch (settings.name) {
 
-      // Kamar Detail
       case '/kamar-detail':
         final kamarId = args?['id'] as int? ?? 0;
         return _route(KamarDetailPage(kamarId: kamarId), settings);
 
-      // Booking — Detail Kamarku
       case '/detail-kamarku':
         final bookingId = args?['booking_id'] as int? ?? 0;
         return _route(DetailKamarkuPage(bookingId: bookingId), settings);
 
-      // Booking — Checkout
       case '/checkout':
-        final kamar      = args?['kamar'] as KamarModel;
-        final durasi     = args?['durasi'] as int? ?? 1;
-        final furnitur   = args?['furnitur'] as Map<int, int>? ?? {};
+        final kamar        = args?['kamar'] as KamarModel;
+        final durasi       = args?['durasi'] as int? ?? 1;
+        final furnitur     = args?['furnitur'] as Map<int, int>? ?? {};
         final listFurnitur = args?['furnitur_list'] as List<FurniturModel>? ?? [];
-        final tglMulai   = args?['tgl_mulai'] as String? ?? '';
+        final tglMulai     = args?['tgl_mulai'] as String? ?? '';
         return _route(
           CheckoutPage(
             kamar: kamar,
@@ -153,31 +156,25 @@ class DKostApp extends StatelessWidget {
           settings,
         );
 
-      // Semua Review
       case '/semua-review':
         final kamarId = args?['kamar_id'] as int? ?? 0;
         return _route(SemuaReviewPage(kamarId: kamarId), settings);
 
-      // Tulis Review
       case '/tulis-review':
         final kamarId = args?['kamar_id'] as int? ?? 0;
         return _route(TulisReviewPage(kamarId: kamarId), settings);
 
-      // Edit Review
       case '/edit-review':
         final review = args?['review'] as ReviewModel;
         return _route(EditReviewPage(existingReview: review), settings);
 
-      // Edit Profil
       case '/edit-profil':
         final user = args?['user'] as User;
         return _route(EditProfilPage(user: user), settings);
 
-      // OTP (dengan email argument)
       case '/masuk-otp':
         return _route(const MasukOtpPage(), settings);
 
-      // Ganti Password (dengan email argument)
       case '/ganti-password':
         return _route(const GantiPasswordPage(), settings);
 
@@ -186,13 +183,11 @@ class DKostApp extends StatelessWidget {
     }
   }
 
-  // ── Helper: buat MaterialPageRoute ───────────────────────────
   MaterialPageRoute _route(Widget page, RouteSettings settings) {
     return MaterialPageRoute(builder: (_) => page, settings: settings);
   }
 }
 
-// ── 404 Page ──────────────────────────────────────────────────
 class _NotFoundPage extends StatelessWidget {
   const _NotFoundPage();
 
