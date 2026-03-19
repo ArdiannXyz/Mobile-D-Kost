@@ -58,6 +58,7 @@ class SettingController {
 
     try {
       await UserService.logout(); // Clear session & hit API logout
+      //await ApiHelper.clearToken();   // ← TAMBAH INI
 
       if (!context.mounted) return;
       Navigator.pop(context); // Tutup loading

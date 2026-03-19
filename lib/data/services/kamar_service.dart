@@ -13,26 +13,29 @@ class KamarService {
   KamarService._();
 
   // ── GET: List semua kamar ──────────────────────────────────
-  static Future<List<KamarModel>> getKamarList() async {
-    try {
-      final headers = await ApiHelper.authHeaders;
-      final response = await http.get(
-        Uri.parse(ApiConstants.kamarList),
-        headers: headers,
-      );
-
-      final data = ApiHelper.handleResponse(response);
-      if (data['success'] == true) {
-        final List list = data['data'];
-        return list.map((e) => KamarModel.fromJson(e)).toList();
-      }
-      return [];
-    } on ApiException {
-      rethrow;
-    } catch (e) {
-      throw ApiException(message: 'Gagal memuat daftar kamar.', statusCode: 500);
+   static Future<List<KamarModel>> getKamarList() async {
+  try {
+    final headers = await ApiHelper.authHeaders;
+    print('KAMAR HEADERS: $headers');
+    final response = await http.get(
+      Uri.parse(ApiConstants.kamarList),
+      headers: headers,
+    );
+    print('KAMAR STATUS: ${response.statusCode}');
+    print('KAMAR BODY: ${response.body}');
+    final data = ApiHelper.handleResponse(response);
+    if (data['success'] == true) {
+      final List list = data['data'];
+      return list.map((e) => KamarModel.fromJson(e)).toList();
     }
+    return [];
+  } on ApiException {
+    rethrow;
+  } catch (e) {
+    print('KAMAR ERROR: $e');
+    throw ApiException(message: 'Gagal memuat daftar kamar.', statusCode: 500);
   }
+}
 
   // ── GET: Detail kamar ──────────────────────────────────────
   static Future<KamarModel?> getKamarDetail(int id) async {
