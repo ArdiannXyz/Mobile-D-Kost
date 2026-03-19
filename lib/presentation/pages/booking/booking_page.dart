@@ -1,8 +1,5 @@
 // ============================================================
 // FRONTEND LAYER — booking_pages.dart
-// Berisi 2 halaman sesuai Figma:
-// 1. DetailKamarkuPage — detail booking aktif
-// 2. CheckoutPage     — konfirmasi sebelum buat pesanan
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -72,7 +69,6 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
     );
   }
 
-  // ── Info Pemesanan Card ────────────────────────────────────
   Widget _buildInfoPemesanan() {
     final b = _controller.booking!;
     return _card(
@@ -85,14 +81,14 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
           _infoRow('Tanggal Booking', _controller.formatTanggal(b.tglBooking)),
           _infoRow('Mulai Sewa', _controller.formatTanggal(b.tglMulaiSewa)),
           _infoRow('Akhir Sewa', _controller.formatTanggal(b.tglAkhirSewa)),
-          _infoRow('Metode Pembayaran',
-              b.tagihan?.statusTagihan == 'lunas' ? 'Bank Mandiri' : '-'),
+          _infoRow('Status',
+              _controller.statusLabel(b.statusBooking),
+              valueColor: _controller.statusColor(b.statusBooking)),
         ],
       ),
     );
   }
 
-  // ── Kamar Card ─────────────────────────────────────────────
   Widget _buildKamarCard() {
     final b = _controller.booking!;
     return _card(
@@ -127,7 +123,6 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
     );
   }
 
-  // ── Furnitur Section ───────────────────────────────────────
   Widget _buildFurniturSection() {
     return Column(
       children: _controller.booking!.furniturList
@@ -175,7 +170,6 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
     );
   }
 
-  // ── Rincian Pembayaran ─────────────────────────────────────
   Widget _buildRincianPembayaran() {
     final b = _controller.booking!;
     return _card(
@@ -185,12 +179,14 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
           const Text('Rincian Pembayaran',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E))),
           const SizedBox(height: 12),
-          _rincianRow('Subtotal biaya produk',
+          _rincianRow('Subtotal biaya kamar',
               _controller.formatHarga(b.totalBiayaBulanan)),
-          _rincianRow('Biaya layanan', _controller.formatHarga(2000)),
+          if (_controller.totalFurnitur > 0)
+            _rincianRow('Biaya furnitur',
+                _controller.formatHarga(_controller.totalFurnitur)),
           const Divider(height: 20),
           _rincianRow('Total Pembayaran',
-              _controller.formatHarga(_controller.totalBiaya + 2000),
+              _controller.formatHarga(_controller.totalBiaya),
               isBold: true),
         ],
       ),
@@ -198,6 +194,12 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
   }
 
   Widget _buildBottomBar() {
+    final b = _controller.booking!;
+    // Ambil id_tagihan dari booking jika ada
+    final idTagihan  = b.tagihan?.idTagihan;
+    final totalBayar = _controller.totalBiaya;
+    final namaKamar  = 'Kos ${_cap(b.tipeKamar ?? '')} ${b.nomorKamar ?? ''}';
+
     return Container(
       color: Colors.white,
       padding: EdgeInsets.only(
@@ -207,7 +209,14 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
         width: double.infinity,
         height: 48,
         child: ElevatedButton(
-          onPressed: () => _controller.goToPayment(context),
+          onPressed: idTagihan == null
+              ? null
+              : () => _controller.goToPayment(
+                    context,
+                    idTagihan : idTagihan,
+                    totalBayar: totalBayar,
+                    namaKamar : namaKamar,
+                  ),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF2ECC71),
             foregroundColor: Colors.white,
@@ -252,12 +261,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
   void initState() {
     super.initState();
     _controller = CheckoutController(
-      kamar: widget.kamar,
-      durasiSewa: widget.durasiSewa,
+      kamar           : widget.kamar,
+      durasiSewa      : widget.durasiSewa,
       selectedFurnitur: widget.selectedFurnitur,
-      furniturList: widget.furniturList,
-      tglMulaiSewa: widget.tglMulaiSewa,
-      onStateChanged: () { if (mounted) setState(() {}); },
+      furniturList    : widget.furniturList,
+      tglMulaiSewa    : widget.tglMulaiSewa,
+      onStateChanged  : () { if (mounted) setState(() {}); },
     );
   }
 
@@ -298,7 +307,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           _infoRow('Tanggal Booking', _controller.formatTanggal(DateTime.now().toIso8601String())),
           _infoRow('Mulai Sewa', _controller.formatTanggal(widget.tglMulaiSewa)),
           _infoRow('Akhir Sewa', _controller.tglAkhirSewa),
-          _infoRow('Metode Pembayaran', 'Bank Mandiri'),
+          _infoRow('Durasi', '${widget.durasiSewa} Bulan'),
         ],
       ),
     );
@@ -325,10 +334,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   'Kos ${_cap(kamar.tipeKamar)} ${kamar.nomorKamar}',
                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
+                Text(
+                  '${widget.durasiSewa} Bulan',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
+                ),
+                const SizedBox(height: 4),
                 Text(
                   _controller.formatHarga(_controller.totalKamar),
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF2ECC71)),
                 ),
               ],
             ),
@@ -339,50 +353,46 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildFurniturSection() {
-    return Column(
-      children: _controller.furniturItems
-          .map((f) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _card(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Furnitur Tambahan',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 10),
-                      Row(
+    return _card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Furnitur Tambahan',
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E))),
+          const SizedBox(height: 10),
+          ..._controller.furniturItems.map((f) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8F5E9),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.chair_outlined,
+                          color: Color(0xFF2ECC71), size: 20),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE8F5E9),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(Icons.chair_outlined,
-                                color: Color(0xFF2ECC71), size: 24),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(f.nama,
-                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                                Text('${f.jumlah}x',
-                                    style: const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E))),
-                              ],
-                            ),
-                          ),
-                          Text(_controller.formatHarga(f.subtotal),
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                          Text(f.nama,
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                          Text('${f.jumlah}x · ${_controller.formatHarga(f.harga)}/bln',
+                              style: const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E))),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                    Text(_controller.formatHarga(f.subtotal),
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                  ],
                 ),
-              ))
-          .toList(),
+              )),
+        ],
+      ),
     );
   }
 
@@ -394,12 +404,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
           const Text('Rincian Pembayaran',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E))),
           const SizedBox(height: 12),
-          _rincianRow('Subtotal biaya produk',
+          _rincianRow('Biaya kamar (${widget.durasiSewa} bln)',
               _controller.formatHarga(_controller.totalKamar)),
-          _rincianRow('Biaya layanan', _controller.formatHarga(2000)),
+          if (_controller.totalFurnitur > 0)
+            _rincianRow('Biaya furnitur',
+                _controller.formatHarga(_controller.totalFurnitur)),
           const Divider(height: 20),
           _rincianRow('Total Pembayaran',
-              _controller.formatHarga(_controller.totalPembayaran + 2000),
+              _controller.formatHarga(_controller.totalPembayaran),
               isBold: true),
         ],
       ),
@@ -414,22 +426,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
           bottom: MediaQuery.of(context).padding.bottom + 12),
       child: Row(
         children: [
-          // Total di kiri
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Total :', style: TextStyle(fontSize: 12, color: Color(0xFF9E9E9E))),
+                const Text('Total :',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF9E9E9E))),
                 Text(
-                  _controller.formatHarga(_controller.totalPembayaran + 2000),
+                  _controller.formatHarga(_controller.totalPembayaran),
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
                 ),
               ],
             ),
           ),
-          // Tombol Buat Pesanan
           SizedBox(
             height: 48,
             child: ElevatedButton(
@@ -458,20 +469,23 @@ class _CheckoutPageState extends State<CheckoutPage> {
 }
 
 // ══════════════════════════════════════════════════════════════
-// SHARED HELPERS (dipakai kedua halaman)
+// SHARED HELPERS
 // ══════════════════════════════════════════════════════════════
 
 PreferredSizeWidget _appBar(String title) {
   return AppBar(
     backgroundColor: const Color(0xFF2ECC71),
     elevation: 0,
-    leading: Builder(builder: (ctx) => IconButton(
-      icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
-      onPressed: () => Navigator.pop(ctx),
-    )),
+    leading: Builder(
+      builder: (ctx) => IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+        onPressed: () => Navigator.pop(ctx),
+      ),
+    ),
     centerTitle: true,
     title: Text(title,
-        style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+        style: const TextStyle(
+            color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
   );
 }
 
@@ -482,13 +496,15 @@ Widget _card({required Widget child}) {
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(12),
-      boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2))],
+      boxShadow: const [
+        BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2))
+      ],
     ),
     child: child,
   );
 }
 
-Widget _infoRow(String label, String value) {
+Widget _infoRow(String label, String value, {Color? valueColor}) {
   return Padding(
     padding: const EdgeInsets.only(bottom: 6),
     child: Row(
@@ -496,12 +512,16 @@ Widget _infoRow(String label, String value) {
       children: [
         SizedBox(
           width: 130,
-          child: Text(label, style: const TextStyle(fontSize: 13, color: Color(0xFF555555))),
+          child: Text(label,
+              style: const TextStyle(fontSize: 13, color: Color(0xFF555555))),
         ),
         const Text(': ', style: TextStyle(color: Color(0xFF555555))),
         Expanded(
           child: Text(value,
-              style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A2E), fontWeight: FontWeight.w500)),
+              style: TextStyle(
+                  fontSize: 13,
+                  color: valueColor ?? const Color(0xFF1A1A2E),
+                  fontWeight: FontWeight.w500)),
         ),
       ],
     ),
@@ -550,7 +570,8 @@ Widget _errorView(String message, VoidCallback onRetry) {
         children: [
           const Icon(Icons.error_outline, size: 56, color: Color(0xFFB0B0C3)),
           const SizedBox(height: 12),
-          Text(message, textAlign: TextAlign.center,
+          Text(message,
+              textAlign: TextAlign.center,
               style: const TextStyle(color: Color(0xFF9E9E9E))),
           const SizedBox(height: 16),
           ElevatedButton(
@@ -558,7 +579,8 @@ Widget _errorView(String message, VoidCallback onRetry) {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF2ECC71),
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
             child: const Text('Coba Lagi'),
           ),
@@ -568,4 +590,5 @@ Widget _errorView(String message, VoidCallback onRetry) {
   );
 }
 
-String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+String _cap(String s) =>
+    s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);

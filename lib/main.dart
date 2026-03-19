@@ -1,10 +1,14 @@
 import 'package:dkost/presentation/pages/home/detail_kamar_page.dart';
+import 'package:dkost/presentation/pages/pembayaran/booking_page.dart';
 import 'presentation/pages/home/search_page.dart';
 import 'package:dkost/presentation/pages/review_keluhan/lapor_keluhan_page.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter/material.dart';
 import '../../../data/helper/api_helper.dart';
 import 'presentation/pages/kamar/kamarku_page.dart';
+import 'presentation/pages/pembayaran/payment_page.dart';
+import 'presentation/pages/pembayaran/pembayaran_status_page.dart';
+import 'Presentation/pages/review_keluhan/edit_keluhan_page.dart';
 // ── Auth ───────────────────────────────────────────────────────
 import '../presentation/pages/auth/welcome_screen.dart';
 import '../presentation/pages/auth/login_page.dart';
@@ -38,15 +42,16 @@ import '../../../data/models/furnitur_models.dart';
 import '../../../data/models/review_models.dart';
 import '../../../data/models/user_models.dart';
 
+import 'package:intl/date_symbol_data_local.dart';
+
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
+  await initializeDateFormatting('id_ID', null); // ← tambah baris ini
+
   final isLoggedIn = await ApiHelper.isLoggedIn();
-
-  // Hapus splash native setelah selesai init
   FlutterNativeSplash.remove();
-
   runApp(DKostApp(isLoggedIn: isLoggedIn));
 }
 
@@ -116,6 +121,13 @@ class DKostApp extends StatelessWidget {
       '/detail-akun':    (_) => const DetailAkunPage(),
       '/panduan':        (_) => const PanduanPage(),
       '/kamarku':        (_) => const KamarkuPage(),
+      '/booking-form' : (_) => const BookingFormPage(),
+      '/pembayaran'        : (_) => const PaymentPage(),
+      '/pembayaran-status' : (_) => const PembayaranStatusPage(),
+      '/edit-keluhan': (context) {
+  final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+  return EditKeluhanPage(keluhan: args['keluhan']);
+},
     };
   }
 

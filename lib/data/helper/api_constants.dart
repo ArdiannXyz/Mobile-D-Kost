@@ -41,7 +41,7 @@ static const String baseUrl = 'http://127.0.0.1:8000/api/';
 
   // ── Pembayaran Endpoints ───────────────────────────────────
   static const String pembayaranCreate = '${baseUrl}pembayaran';
-  static String pembayaranStatus(int id) => '${baseUrl}pembayaran/$id';
+  static String pembayaranStatus(int idTagihan) => '${baseUrl}pembayaran/status/$idTagihan';
 
   // ── Keluhan Endpoints ──────────────────────────────────────
   static const String keluhanCreate = '${baseUrl}keluhan';

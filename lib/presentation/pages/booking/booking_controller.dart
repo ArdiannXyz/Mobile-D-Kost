@@ -1,7 +1,5 @@
 // ============================================================
 // BACKEND LAYER — booking_controller.dart
-// Bertanggung jawab atas: load detail booking, kalkulasi
-// biaya, submit booking baru (checkout), navigasi.
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -44,13 +42,14 @@ class DetailKamarkuController {
 
   // ── Kalkulasi ──────────────────────────────────────────────
   double get totalFurnitur => booking?.furniturList
-          .fold(0, (sum, f) => sum! + f.subtotal * (booking?.durasiSewaBulan ?? 1)) ?? 0;
+      .fold(0, (sum, f) => sum! + f.subtotal * (booking?.durasiSewaBulan ?? 1)) ?? 0;
 
   double get totalBiaya => (booking?.totalBiayaBulanan ?? 0) + totalFurnitur;
 
   // ── Format helpers ─────────────────────────────────────────
   String formatHarga(double harga) {
-    final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0);
+    final formatter = NumberFormat.currency(
+        locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0);
     return formatter.format(harga);
   }
 
@@ -66,28 +65,39 @@ class DetailKamarkuController {
   String statusLabel(String status) {
     switch (status) {
       case 'menunggu_pembayaran': return 'Menunggu Pembayaran';
-      case 'aktif':    return 'Aktif';
-      case 'selesai':  return 'Selesai';
-      case 'batal':    return 'Dibatalkan';
-      case 'expired':  return 'Kadaluarsa';
-      default:         return status;
+      case 'aktif':               return 'Aktif';
+      case 'selesai':             return 'Selesai';
+      case 'batal':               return 'Dibatalkan';
+      case 'expired':             return 'Kadaluarsa';
+      default:                    return status;
     }
   }
 
   Color statusColor(String status) {
     switch (status) {
       case 'menunggu_pembayaran': return const Color(0xFFF39C12);
-      case 'aktif':    return const Color(0xFF2ECC71);
-      case 'selesai':  return const Color(0xFF3498DB);
-      case 'batal':    return const Color(0xFFE74C3C);
-      case 'expired':  return const Color(0xFF9E9E9E);
-      default:         return const Color(0xFF9E9E9E);
+      case 'aktif':               return const Color(0xFF2ECC71);
+      case 'selesai':             return const Color(0xFF3498DB);
+      case 'batal':               return const Color(0xFFE74C3C);
+      case 'expired':             return const Color(0xFF9E9E9E);
+      default:                    return const Color(0xFF9E9E9E);
     }
   }
 
-  void goToPayment(BuildContext context) {
-    Navigator.pushNamed(context, '/pembayaran',
-        arguments: {'booking_id': bookingId});
+  void goToPayment(BuildContext context, {
+    required int idTagihan,
+    required double totalBayar,
+    required String namaKamar,
+  }) {
+    Navigator.pushNamed(
+      context,
+      '/pembayaran',
+      arguments: {
+        'id_tagihan' : idTagihan,
+        'total_biaya': totalBayar,
+        'nama_kamar' : namaKamar,
+      },
+    );
   }
 
   void goBack(BuildContext context) => Navigator.pop(context);
@@ -154,22 +164,31 @@ class CheckoutController {
 
     try {
       final result = await BookingService.createBooking(
-        idKamar: kamar.idKamar,
-        tglMulaiSewa: tglMulaiSewa,
-        durasiSewaBulan: durasiSewa,
+        idKamar         : kamar.idKamar,
+        tglMulaiSewa    : tglMulaiSewa,
+        durasiSewaBulan : durasiSewa,
         selectedFurnitur: selectedFurnitur,
       );
 
       if (!context.mounted) return;
 
       if (result['success'] == true) {
-        final bookingId = result['data']['id_booking'];
+        // ← Ambil id_tagihan dan total_biaya dari response
+        final idTagihan  = result['data']['id_tagihan'] as int;
+        final totalBayar = (result['data']['total_biaya'] as num).toDouble();
+        final namaKamar  = 'Kos ${_cap(kamar.tipeKamar)} ${kamar.nomorKamar}';
+
         _showSuccess(context, 'Booking berhasil dibuat!');
-        // Navigasi ke halaman pembayaran
+
+        // Navigasi ke PaymentPage dengan id_tagihan
         Navigator.pushReplacementNamed(
           context,
           '/pembayaran',
-          arguments: {'booking_id': bookingId},
+          arguments: {
+            'id_tagihan' : idTagihan,
+            'total_biaya': totalBayar,
+            'nama_kamar' : namaKamar,
+          },
         );
       } else {
         _showError(context, result['message'] ?? 'Gagal membuat booking.');
@@ -186,7 +205,8 @@ class CheckoutController {
 
   // ── Format helpers ─────────────────────────────────────────
   String formatHarga(double harga) {
-    final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0);
+    final formatter = NumberFormat.currency(
+        locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0);
     return formatter.format(harga);
   }
 
@@ -194,7 +214,9 @@ class CheckoutController {
     try {
       final dt = DateTime.parse(tgl);
       return DateFormat('d/M/yyyy').format(dt);
-    } catch (_) { return tgl; }
+    } catch (_) {
+      return tgl;
+    }
   }
 
   String get tglAkhirSewa {
@@ -203,19 +225,27 @@ class CheckoutController {
       final tglAkhir = DateTime(
           tglMulai.year, tglMulai.month + durasiSewa, tglMulai.day);
       return DateFormat('d/M/yyyy').format(tglAkhir);
-    } catch (_) { return '-'; }
+    } catch (_) {
+      return '-';
+    }
   }
+
+  String _cap(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 
   void goBack(BuildContext context) => Navigator.pop(context);
 
-  void _showSuccess(BuildContext ctx, String msg) => _snack(ctx, msg, const Color(0xFF2ECC71));
-  void _showError(BuildContext ctx, String msg) => _snack(ctx, msg, Colors.red);
+  void _showSuccess(BuildContext ctx, String msg) =>
+      _snack(ctx, msg, const Color(0xFF2ECC71));
+  void _showError(BuildContext ctx, String msg) =>
+      _snack(ctx, msg, Colors.red);
   void _snack(BuildContext ctx, String msg, Color color) {
     ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
       content: Text(msg),
       backgroundColor: color,
       behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       margin: const EdgeInsets.all(16),
     ));
   }

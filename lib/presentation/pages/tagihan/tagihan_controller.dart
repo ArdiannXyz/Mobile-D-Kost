@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:dkost/data/helper/api_helper.dart';
 import 'package:dkost/data/helper/api_exception.dart';
+import 'package:dkost/data/helper/api_constants.dart';
 import 'package:dkost/data/services/booking_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-// Model sederhana untuk tagihan di UI
 class TagihanUiModel {
   final int idTagihan;
   final int idBooking;
@@ -12,8 +14,11 @@ class TagihanUiModel {
   final String? fotoKamar;
   final String periodeAwal;
   final String periodeAkhir;
+  final String periodeBulan;
   final double totalTagihan;
-  final String statusTagihan; // belum_bayar | lunas | terlambat
+  final double nominalDenda;
+  final String? tglJatuhTempo;
+  final String statusTagihan;
 
   const TagihanUiModel({
     required this.idTagihan,
@@ -22,13 +27,17 @@ class TagihanUiModel {
     this.fotoKamar,
     required this.periodeAwal,
     required this.periodeAkhir,
+    required this.periodeBulan,
     required this.totalTagihan,
+    required this.nominalDenda,
+    this.tglJatuhTempo,
     required this.statusTagihan,
   });
 }
 
 class TagihanController {
   bool isLoading = true;
+  bool isDeleting = false;
   String? errorMessage;
   List<TagihanUiModel> allTagihan = [];
   List<TagihanUiModel> filteredTagihan = [];
@@ -44,22 +53,27 @@ class TagihanController {
 
     try {
       final userId = await ApiHelper.getUserId();
-      if (userId == null) { errorMessage = 'Sesi tidak ditemukan.'; return; }
+      if (userId == null) {
+        errorMessage = 'Sesi tidak ditemukan.';
+        return;
+      }
 
-      // Load semua booking, lalu ambil tagihan dari setiap booking
       final bookings = await BookingService.getBookingList(userId);
       final List<TagihanUiModel> result = [];
 
       for (final booking in bookings) {
         if (booking.tagihan != null) {
           result.add(TagihanUiModel(
-            idTagihan: booking.tagihan!.idTagihan,
-            idBooking: booking.idBooking,
-            namaKamar: 'Kos ${_cap(booking.tipeKamar ?? '')} ${booking.nomorKamar ?? ''}',
-            fotoKamar: booking.fotoKamar,
-            periodeAwal: booking.tglMulaiSewa,
-            periodeAkhir: booking.tglAkhirSewa,
-            totalTagihan: booking.tagihan!.totalTagihan,
+            idTagihan    : booking.tagihan!.idTagihan,
+            idBooking    : booking.idBooking,
+            namaKamar    : 'Kos ${_cap(booking.tipeKamar ?? '')} ${booking.nomorKamar ?? ''}',
+            fotoKamar    : booking.fotoKamar,
+            periodeAwal  : booking.tglMulaiSewa,
+            periodeAkhir : booking.tglAkhirSewa,
+            periodeBulan : booking.tglMulaiSewa,
+            totalTagihan : booking.tagihan!.totalTagihan,
+            nominalDenda : 0,
+            tglJatuhTempo: booking.tagihan!.tglJatuhTempo,
             statusTagihan: booking.tagihan!.statusTagihan,
           ));
         }
@@ -74,6 +88,148 @@ class TagihanController {
     } finally {
       isLoading = false;
       onStateChanged();
+    }
+  }
+
+  // ── Hapus tagihan ──────────────────────────────────────────
+  Future<void> hapusTagihan(BuildContext context, TagihanUiModel tagihan) async {
+    // Konfirmasi dulu
+    final konfirmasi = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Text('Hapus Tagihan?',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+        content: const Text(
+            'Tagihan yang sudah lunas akan dihapus dari riwayat.',
+            style: TextStyle(fontSize: 13)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Batal',
+                style: TextStyle(color: Color(0xFF9E9E9E))),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Hapus',
+                style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (konfirmasi != true) return;
+
+    isDeleting = true;
+    onStateChanged();
+
+    try {
+      final headers = await ApiHelper.authHeaders;
+      final response = await http.delete(
+        Uri.parse('${ApiConstants.baseUrl}tagihan/${tagihan.idTagihan}'),
+        headers: headers,
+      );
+
+      final data = jsonDecode(response.body);
+      if (!context.mounted) return;
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        allTagihan.removeWhere((t) => t.idTagihan == tagihan.idTagihan);
+        _applyFilter();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Tagihan berhasil dihapus.'),
+            backgroundColor: const Color(0xFF2ECC71),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10)),
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+      } else {
+        _showError(context, data['message'] ?? 'Gagal menghapus tagihan.');
+      }
+    } catch (e) {
+      if (context.mounted) _showError(context, 'Terjadi kesalahan: $e');
+    } finally {
+      isDeleting = false;
+      onStateChanged();
+    }
+  }
+
+  // ── Cek tagihan bulan ini ──────────────────────────────────
+  Future<void> cekTagihanBulanIni(
+      BuildContext context, TagihanUiModel tagihan) async {
+    try {
+      final headers = await ApiHelper.authHeaders;
+      final response = await http.get(
+        Uri.parse(
+            '${ApiConstants.baseUrl}tagihan/bulan-ini/${tagihan.idBooking}'),
+        headers: headers,
+      );
+
+      final data = jsonDecode(response.body);
+      if (!context.mounted) return;
+
+      final sudahAda = data['sudah_ada'] as bool? ?? false;
+      final bulanIni = DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now());
+
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14)),
+          title: Text('Tagihan $bulanIni',
+              style: const TextStyle(
+                  fontSize: 15, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+              sudahAda
+                  ? (data['data']?['status_tagihan'] == 'lunas'
+                      ? Icons.check_circle_outline      // ✅ lunas
+                      : Icons.cancel_outlined)          // ❌ belum bayar
+                  : Icons.pending_outlined,             // ⏳ belum dibuat
+              color: sudahAda
+                  ? (data['data']?['status_tagihan'] == 'lunas'
+                      ? const Color(0xFF2ECC71)         // hijau
+                      : const Color(0xFFE74C3C))        // merah
+                  : const Color(0xFFF39C12),            // orange
+              size: 48,
+            ),
+              const SizedBox(height: 12), 
+              Text(
+                sudahAda
+                    ? 'Tagihan bulan ini sudah ada.\nStatus: ${_statusLabel(data['data']?['status_tagihan'] ?? '')}'
+                    : 'Tagihan bulan ini belum dibuat.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 13, height: 1.5),
+              ),
+              if (sudahAda && data['data'] != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  formatHarga((data['data']['total_tagihan'] as num)
+                      .toDouble()),
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1A1A2E)),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK',
+                  style: TextStyle(color: Color(0xFF2ECC71))),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      if (context.mounted) _showError(context, 'Gagal cek tagihan: $e');
     }
   }
 
@@ -115,25 +271,43 @@ class TagihanController {
     try {
       final dt = DateTime.parse(tgl);
       return DateFormat('dd - MM - yyyy').format(dt);
-    } catch (_) { return tgl; }
+    } catch (_) {
+      return tgl;
+    }
+  }
+
+  String _statusLabel(String status) {
+    switch (status) {
+      case 'belum_bayar': return 'Belum Bayar';
+      case 'lunas':       return 'Lunas';
+      case 'terlambat':   return 'Telat';
+      default:            return status;
+    }
   }
 
   void showInfo(BuildContext context) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text('Info Tagihan',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            style:
+                TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _InfoRow(color: Color(0xFFF39C12), label: 'Belum Bayar - tagihan aktif'),
+            _InfoRow(
+                color: Color(0xFFF39C12),
+                label: 'Belum Bayar - tagihan aktif'),
             SizedBox(height: 6),
-            _InfoRow(color: Color(0xFFE74C3C), label: 'Telat - melewati jatuh tempo'),
+            _InfoRow(
+                color: Color(0xFFE74C3C),
+                label: 'Telat - melewati jatuh tempo'),
             SizedBox(height: 6),
-            _InfoRow(color: Color(0xFF2ECC71), label: 'Lunas - sudah dibayar'),
+            _InfoRow(
+                color: Color(0xFF2ECC71), label: 'Lunas - sudah dibayar'),
           ],
         ),
         actions: [
@@ -152,6 +326,17 @@ class TagihanController {
         arguments: {'booking_id': tagihan.idBooking});
   }
 
+  void _showError(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+      backgroundColor: Colors.red.shade600,
+      behavior: SnackBarBehavior.floating,
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: const EdgeInsets.all(16),
+    ));
+  }
+
   String _cap(String s) =>
       s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }
@@ -166,8 +351,10 @@ class _InfoRow extends StatelessWidget {
     return Row(
       children: [
         Container(
-            width: 12, height: 12,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+            width: 12,
+            height: 12,
+            decoration:
+                BoxDecoration(color: color, shape: BoxShape.circle)),
         const SizedBox(width: 8),
         Text(label, style: const TextStyle(fontSize: 13)),
       ],

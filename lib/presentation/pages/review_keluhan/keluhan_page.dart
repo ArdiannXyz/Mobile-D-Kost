@@ -49,11 +49,12 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
   Widget _buildHeader() {
     return Column(
       children: [
-        // ── Bagian hijau: hanya title "Keluhan" ──────────
         Container(
           width: double.infinity,
           decoration: const BoxDecoration(
             color: Color(0xFF2ECC71),
+            borderRadius: BorderRadius.only(
+            ),
             boxShadow: [
               BoxShadow(
                 color: Color(0x222ECC71),
@@ -184,6 +185,7 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
             keluhan: keluhan,
             statusLabel: _controller.statusLabel(keluhan.statusKeluhan),
             statusColor: _controller.statusColor(keluhan.statusKeluhan),
+            onTap: () => _controller.showEditDialog(context, keluhan), // ← tambah
           );
         },
       ),
@@ -195,57 +197,62 @@ class _KeluhanCard extends StatelessWidget {
   final dynamic keluhan;
   final String statusLabel;
   final Color statusColor;
+  final VoidCallback? onTap; // ← tambah
 
   const _KeluhanCard({
     required this.keluhan,
     required this.statusLabel,
     required this.statusColor,
+    this.onTap, // ← tambah
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 8, offset: Offset(0, 2))],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: _buildFoto(),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  keluhan.deskripsiMasalah,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Tanggal Lapor : ${_formatTanggal(keluhan.tglLapor)}',
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Text('Status : ', style: TextStyle(fontSize: 12, color: Color(0xFF555555), fontWeight: FontWeight.w500)),
-                    Text(statusLabel, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: statusColor)),
-                  ],
-                ),
-              ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 8, offset: Offset(0, 2))],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: _buildFoto(),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    keluhan.deskripsiMasalah,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Tanggal Lapor : ${_formatTanggal(keluhan.tglLapor)}',
+                    style: const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Text('Status : ', style: TextStyle(fontSize: 12, color: Color(0xFF555555), fontWeight: FontWeight.w500)),
+                      Text(statusLabel, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: statusColor)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
