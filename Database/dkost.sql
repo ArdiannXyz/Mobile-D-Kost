@@ -87,7 +87,7 @@ CREATE TABLE `furnitur` (
 CREATE TABLE `galeri_kamar` (
   `id_foto` int NOT NULL,
   `id_kamar` int DEFAULT NULL,
-  `url_foto` longblob,
+  `url_foto` varchar(255) DEFAULT NULL,
   `is_main` tinyint(1) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

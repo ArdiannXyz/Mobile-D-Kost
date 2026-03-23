@@ -50,7 +50,7 @@ class KamarCard extends StatelessWidget {
                 top: Radius.circular(12),
               ),
               child: AspectRatio(
-                aspectRatio: mode == KamarCardMode.horizontal ? 4 / 3 : 16 / 10,
+                aspectRatio: mode == KamarCardMode.horizontal ? 8 / 7 : 16 / 14,
                 child: _buildImage(),
               ),
             ),
@@ -110,7 +110,7 @@ class KamarCard extends StatelessWidget {
                   ),
 
                   // Tombol "Detail Kamar" HANYA untuk mode horizontal (rekomendasi)
-                  if (mode == KamarCardMode.horizontal) ...[
+                  if (mode == KamarCardMode.grid) ...[
                     const SizedBox(height: 8),
                     SizedBox(
                       width: double.infinity,

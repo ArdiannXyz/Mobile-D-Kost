@@ -237,7 +237,7 @@ class _DashboardTabState extends State<_DashboardTab> {
                       crossAxisCount: 2,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
-                      childAspectRatio: 0.78,
+                      childAspectRatio: 0.70,
                     ),
                   ),
                 ),
@@ -281,34 +281,37 @@ class _DashboardTabState extends State<_DashboardTab> {
   // ── Banner Slider ──────────────────────────────────────────
   Widget _buildBannerSlider(BuildContext context) {
     return Container(
-      color: const Color(0xFF2ECC71),
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+      color: const Color(0xFFF5F7FA),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Column(
         children: [
           // PageView banner
           ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: SizedBox(
-              height: 140,
-              child: PageView.builder(
-                controller: _bannerController,
-                itemCount: _banners.length,
-                onPageChanged: (index) {
-                  setState(() => _currentBannerIndex = index);
-                },
-                itemBuilder: (_, index) => SizedBox(
-                    width: double.infinity,
-                    height: 140,
-                    child: Image.asset(
-                      _banners[index],
-                      width: double.infinity,
-                      height: 140,
-                      fit: BoxFit.cover,
-                      // Ganti placeholderBuilder dengan errorBuilder
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: const Color(0xFF27AE60),
-                        child: const Center(
-                          child: Icon(Icons.image_not_supported, color: Colors.white54),
+              borderRadius: BorderRadius.circular(16),
+              child: SizedBox(
+                height: 140,
+                child: PageView.builder(
+                  controller: PageController(
+                    viewportFraction: 1.1, // ← makin kecil, makin keliatan banner sebelah
+                  ),
+                  itemCount: _banners.length,
+                  onPageChanged: (index) {
+                    setState(() => _currentBannerIndex = index);
+                  },
+                  itemBuilder: (_, index) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6), // ← jarak antar banner
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16), // ← rounded per banner
+                      child: Image.asset(
+                        _banners[index],
+                        width: double.infinity,
+                        height: 140,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: const Color(0xFF27AE60),
+                          child: const Center(
+                            child: Icon(Icons.image_not_supported, color: Colors.white54),
+                          ),
                         ),
                       ),
                     ),
@@ -332,7 +335,7 @@ class _DashboardTabState extends State<_DashboardTab> {
                 width: isActive ? 20 : 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: isActive ? Colors.white : Colors.white38,
+                  color: isActive ? Colors.lightGreen : Colors.white38,
                   borderRadius: BorderRadius.circular(4),
                 ),
               );
@@ -363,7 +366,7 @@ class _DashboardTabState extends State<_DashboardTab> {
                   color: Color(0xFF1A1A2E))),
         ),
         SizedBox(
-          height: 220,
+          height: 210,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
