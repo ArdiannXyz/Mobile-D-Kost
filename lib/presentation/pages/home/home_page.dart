@@ -340,8 +340,8 @@ class _DashboardTabState extends State<_DashboardTab> {
 
   Widget _buildBannerSlider(BuildContext context) {
     return Container(
-      color: const Color(0xFF2ECC71),
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+      color: const Color(0xFFF5F7FA),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Column(
         children: [
           ClipRRect(
@@ -386,7 +386,7 @@ class _DashboardTabState extends State<_DashboardTab> {
                 width: isActive ? 20 : 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: isActive ? Colors.white : Colors.white38,
+                  color: isActive ? Colors.lightGreen : Colors.white38,
                   borderRadius: BorderRadius.circular(4),
                 ),
               );
@@ -416,7 +416,7 @@ class _DashboardTabState extends State<_DashboardTab> {
                   color: Color(0xFF1A1A2E))),
         ),
         SizedBox(
-          height: 220,
+          height: 210,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),

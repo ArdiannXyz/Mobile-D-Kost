@@ -7,12 +7,10 @@
 class ApiConstants {
   ApiConstants._(); // Prevent instantiation
 
-  // ── Base URL ───────────────────────────────────────────────
-  // Ganti ke IP lokal saat testing di device fisik
-  // Ganti ke domain production saat deploy
-// lib/data/helper/api_constants.dart
-static const String baseUrl = 'http://127.0.0.1:8000/api/';
-  // static const String baseUrl = 'https://dkost.example.com/api/';
+
+  //static const String baseUrl = 'http://127.0.0.1:8000/api/';        // Browser
+  //static const String baseUrl = 'http://10.219.106.109/api/';      // Emulator Android
+  static const String baseUrl = 'http://10.105.87.254:8000/api/';   // HP Fisik
 
   // ── Auth Endpoints ─────────────────────────────────────────
   static const String register   = '${baseUrl}register';
