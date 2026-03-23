@@ -41,17 +41,21 @@ class _KamarkuPageState extends State<KamarkuPage> {
   }
 
   // ── Header ─────────────────────────────────────────────────
-  Widget _buildHeader() {
-    return Container(
-      color: const Color(0xFF2ECC71),
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 12,
-        left: 16, right: 16, bottom: 16,
-      ),
-      child: Row(
-        children: [
-          // Tombol back ke Setting
-          GestureDetector(
+ Widget _buildHeader() {
+  return Container(
+    color: const Color(0xFF2ECC71),
+    width: double.infinity,
+    padding: EdgeInsets.only(
+      top: MediaQuery.of(context).padding.top + 12,
+      bottom: 16,
+    ),
+    child: Stack(
+      alignment: Alignment.center,
+      children: [
+        // Tombol Back di kiri
+        Positioned(
+          left: 16,
+          child: GestureDetector(
             onTap: () => Navigator.pop(context),
             child: const Icon(
               Icons.arrow_back_ios_new,
@@ -59,19 +63,21 @@ class _KamarkuPageState extends State<KamarkuPage> {
               size: 18,
             ),
           ),
-          const SizedBox(width: 12),
-          const Text(
-            'Kamarku',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+        ),
+
+        // Text benar-benar di tengah
+        const Text(
+          'Kamarku',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   // ── Content ────────────────────────────────────────────────
   Widget _buildContent() {

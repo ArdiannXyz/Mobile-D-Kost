@@ -1,12 +1,5 @@
 // ============================================================
 // BACKEND LAYER — search_controller.dart
-// Bertanggung jawab atas: load kamar, search real-time,
-// riwayat pencarian, saran pencarian, navigasi.
-//
-// Yang DIHAPUS dari versi lama:
-// - ProductService, UserService.fetchFavorites, toggleFavorite
-// - Filter harga & rating (tidak relevan untuk kost)
-// - popularKeywords batik → diganti tipe kamar D'Kost
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -18,18 +11,15 @@ import '../../../data/models/kamar_models.dart';
 enum SearchMode { suggestion, results }
 
 class SearchController {
-  // ── State ──────────────────────────────────────────────────
   bool isLoading = true;
   SearchMode currentMode = SearchMode.suggestion;
   String currentQuery = '';
 
-  // ── Data ───────────────────────────────────────────────────
   List<KamarModel> allKamar = [];
   List<KamarModel> searchResults = [];
   List<String> searchHistory = [];
   List<String> searchSuggestions = [];
 
-  // Kata kunci populer sesuai D'Kost
   static const List<String> popularKeywords = [
     'Kos Biasa',
     'Kos Sedang',
@@ -38,52 +28,37 @@ class SearchController {
     'Harga Terjangkau',
   ];
 
-  // ── Controllers ────────────────────────────────────────────
   final TextEditingController searchTextController = TextEditingController();
   final FocusNode searchFocusNode = FocusNode();
-
   final VoidCallback onStateChanged;
 
   SearchController({required this.onStateChanged});
 
-  // ── Init ───────────────────────────────────────────────────
   Future<void> init() async {
     isLoading = true;
     onStateChanged();
-
     try {
-      await Future.wait([
-        _loadKamar(),
-        _loadSearchHistory(),
-      ]);
-    } catch (_) {
-      // tetap lanjut meski error
-    } finally {
+      await Future.wait([_loadKamar(), _loadSearchHistory()]);
+    } catch (_) {}
+    finally {
       isLoading = false;
       onStateChanged();
     }
-
-    // Listen perubahan teks untuk saran
     searchTextController.addListener(_onTextChanged);
   }
 
-  // ── Dispose ────────────────────────────────────────────────
   void dispose() {
     searchTextController.removeListener(_onTextChanged);
     searchTextController.dispose();
     searchFocusNode.dispose();
   }
 
-  // ── Load Kamar ─────────────────────────────────────────────
   Future<void> _loadKamar() async {
     try {
       allKamar = await KamarService.getKamarList();
-    } on ApiException {
-      rethrow;
-    } catch (_) {}
+    } on ApiException { rethrow; } catch (_) {}
   }
 
-  // ── Riwayat Pencarian ──────────────────────────────────────
   Future<void> _loadSearchHistory() async {
     final prefs = await SharedPreferences.getInstance();
     searchHistory = prefs.getStringList('kamar_search_history') ?? [];
@@ -94,9 +69,7 @@ class SearchController {
     final prefs = await SharedPreferences.getInstance();
     searchHistory.remove(query);
     searchHistory.insert(0, query);
-    if (searchHistory.length > 10) {
-      searchHistory = searchHistory.sublist(0, 10);
-    }
+    if (searchHistory.length > 10) searchHistory = searchHistory.sublist(0, 10);
     await prefs.setStringList('kamar_search_history', searchHistory);
   }
 
@@ -114,7 +87,6 @@ class SearchController {
     onStateChanged();
   }
 
-  // ── Saran Real-time ────────────────────────────────────────
   void _onTextChanged() {
     final query = searchTextController.text.trim();
     if (query.isEmpty) {
@@ -124,45 +96,83 @@ class SearchController {
       return;
     }
 
-    // Generate saran dari data kamar
-final suggestions = allKamar
-    .where((k) {
-      final namaLengkap = 'kos ${k.tipeKamar} ${k.nomorKamar}'.toLowerCase();
-      return namaLengkap.contains(query.toLowerCase()) ||
-          k.nomorKamar.toLowerCase().contains(query.toLowerCase()) ||
-          k.tipeKamar.toLowerCase().contains(query.toLowerCase());
-    })
-    .map((k) => 'Kos ${_cap(k.tipeKamar)} ${k.nomorKamar}')
-    .toSet()
-    .take(5)
-    .toList();
+    final suggestions = allKamar
+        .where((k) {
+          final namaLengkap = 'kos ${k.tipeKamar} ${k.nomorKamar}'.toLowerCase();
+          return namaLengkap.contains(query.toLowerCase()) ||
+              k.nomorKamar.toLowerCase().contains(query.toLowerCase()) ||
+              k.tipeKamar.toLowerCase().contains(query.toLowerCase());
+        })
+        .map((k) => 'Kos ${_cap(k.tipeKamar)} ${k.nomorKamar}')
+        .toSet()
+        .take(5)
+        .toList();
 
     searchSuggestions = suggestions;
     onStateChanged();
   }
 
   // ── Eksekusi Pencarian ─────────────────────────────────────
-void performSearch(String query) {
-  currentQuery = query.trim();
-  if (currentQuery.isEmpty) return;
+  void performSearch(String query) {
+    currentQuery = query.trim();
+    if (currentQuery.isEmpty) return;
 
-  _saveToHistory(currentQuery);
+    _saveToHistory(currentQuery);
 
-  final q = currentQuery.toLowerCase();
+    final q = currentQuery.toLowerCase();
 
-  searchResults = allKamar.where((k) {
-    final namaLengkap = 'kos ${k.tipeKamar} ${k.nomorKamar}'.toLowerCase();
-    return namaLengkap.contains(q) ||
-        k.nomorKamar.toLowerCase().contains(q) ||
-        k.tipeKamar.toLowerCase().contains(q) ||
-        k.deskripsi.toLowerCase().contains(q) ||
-        'kos ${k.tipeKamar}'.toLowerCase().contains(q);
-  }).toList();
+    // ── Keyword khusus harga ──────────────────────────────
+    if (q.contains('terjangkau') || q.contains('murah')) {
+      // Tampilkan kamar dengan harga di bawah rata-rata
+      final avgHarga = allKamar.isEmpty
+          ? 0.0
+          : allKamar.map((k) => k.hargaPerBulan).reduce((a, b) => a + b) /
+              allKamar.length;
+      searchResults = allKamar
+          .where((k) => k.hargaPerBulan <= avgHarga)
+          .toList()
+        ..sort((a, b) => a.hargaPerBulan.compareTo(b.hargaPerBulan));
+      currentMode = SearchMode.results;
+      searchSuggestions = [];
+      onStateChanged();
+      return;
+    }
 
-  currentMode = SearchMode.results;
-  searchSuggestions = [];
-  onStateChanged();
-}
+    if (q.contains('mahal') || q.contains('premium') || q.contains('mewah')) {
+      searchResults = allKamar
+          .where((k) => k.tipeKamar.toLowerCase() == 'mewah')
+          .toList()
+        ..sort((a, b) => b.hargaPerBulan.compareTo(a.hargaPerBulan));
+      currentMode = SearchMode.results;
+      searchSuggestions = [];
+      onStateChanged();
+      return;
+    }
+
+    if (q.contains('tersedia')) {
+      searchResults = allKamar
+          .where((k) => k.statusKamar == 'tersedia')
+          .toList();
+      currentMode = SearchMode.results;
+      searchSuggestions = [];
+      onStateChanged();
+      return;
+    }
+
+    // ── Pencarian normal berdasarkan nama/tipe/deskripsi ──
+    searchResults = allKamar.where((k) {
+      final namaLengkap = 'kos ${k.tipeKamar} ${k.nomorKamar}'.toLowerCase();
+      return namaLengkap.contains(q) ||
+          k.nomorKamar.toLowerCase().contains(q) ||
+          k.tipeKamar.toLowerCase().contains(q) ||
+          k.deskripsi.toLowerCase().contains(q) ||
+          'kos ${k.tipeKamar}'.toLowerCase().contains(q);
+    }).toList();
+
+    currentMode = SearchMode.results;
+    searchSuggestions = [];
+    onStateChanged();
+  }
 
   void useSuggestion(String suggestion) {
     searchTextController.text = suggestion;
@@ -177,14 +187,11 @@ void performSearch(String query) {
     onStateChanged();
   }
 
-  // ── Navigasi ───────────────────────────────────────────────
   void goToDetail(BuildContext context, int kamarId) {
     Navigator.pushNamed(context, '/kamar-detail', arguments: {'id': kamarId});
   }
 
-  void goBack(BuildContext context) {
-    Navigator.pop(context);
-  }
+  void goBack(BuildContext context) => Navigator.pop(context);
 
   String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }

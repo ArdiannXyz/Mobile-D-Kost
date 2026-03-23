@@ -8,19 +8,36 @@ class TagihanPage extends StatefulWidget {
   State<TagihanPage> createState() => _TagihanPageState();
 }
 
-class _TagihanPageState extends State<TagihanPage> {
+class _TagihanPageState extends State<TagihanPage> 
+    with WidgetsBindingObserver {  // ← tambah mixin ini
   late final TagihanController _controller;
+  
+@override
+void initState() {
+  super.initState();
+  _controller = TagihanController(
+    onStateChanged: () { if (mounted) setState(() {}); },
+  );
+  _controller.loadTagihan();
+}
+
+// ← tambah ini agar refresh saat balik ke halaman
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+}
 
   @override
-  void initState() {
-    super.initState();
-    _controller = TagihanController(
-      onStateChanged: () {
-        if (mounted) setState(() {});
-      },
-    );
-    _controller.loadTagihan();
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _controller.loadTagihan();
+    }
   }
+    void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // ← tambah
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +53,6 @@ class _TagihanPageState extends State<TagihanPage> {
     );
   }
 
-  // ── Header ─────────────────────────────────────────────────
   Widget _buildHeader() {
     return Container(
       color: const Color(0xFF2ECC71),
@@ -58,7 +74,6 @@ class _TagihanPageState extends State<TagihanPage> {
     );
   }
 
-  // ── Filter Chips ───────────────────────────────────────────
   Widget _buildFilterChips() {
     const filters = ['Belum Bayar', 'Telat', 'Lunas'];
     return Container(
@@ -104,18 +119,14 @@ class _TagihanPageState extends State<TagihanPage> {
           const Spacer(),
           GestureDetector(
             onTap: () => _controller.showInfo(context),
-            child: const Icon(
-              Icons.info_outline,
-              color: Color(0xFF9E9E9E),
-              size: 20,
-            ),
+            child: const Icon(Icons.info_outline,
+                color: Color(0xFF9E9E9E), size: 20),
           ),
         ],
       ),
     );
   }
 
-  // ── Content ────────────────────────────────────────────────
   Widget _buildContent() {
     if (_controller.isLoading) {
       return const Center(
@@ -216,53 +227,51 @@ class _TagihanCard extends StatelessWidget {
                 offset: Offset(0, 2)),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              // Foto kamar
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: tagihan.fotoKamar != null
-                    ? Image.network(
-                        tagihan.fotoKamar!,
-                        width: 72,
-                        height: 72,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _placeholder(),
-                      )
-                    : _placeholder(),
-              ),
-              const SizedBox(width: 12),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  // Foto kamar
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: tagihan.fotoKamar != null
+                        ? Image.network(
+                            tagihan.fotoKamar!,
+                            width: 72,
+                            height: 72,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => _placeholder(),
+                          )
+                        : _placeholder(),
+                  ),
+                  const SizedBox(width: 12),
 
-              // Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      tagihan.namaKamar ?? 'Kamar',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A1A2E),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Sewa : ${controller.formatTanggal(tagihan.periodeAwal)}',
-                      style: const TextStyle(
-                          fontSize: 12, color: Color(0xFF9E9E9E)),
-                    ),
-                    Text(
-                      'Berakhir : ${controller.formatTanggal(tagihan.periodeAkhir)}',
-                      style: const TextStyle(
-                          fontSize: 12, color: Color(0xFF9E9E9E)),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          tagihan.namaKamar ?? 'Kamar',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1A1A2E),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Sewa : ${controller.formatTanggal(tagihan.periodeAwal)}',
+                          style: const TextStyle(
+                              fontSize: 12, color: Color(0xFF9E9E9E)),
+                        ),
+                        Text(
+                          'Berakhir : ${controller.formatTanggal(tagihan.periodeAkhir)}',
+                          style: const TextStyle(
+                              fontSize: 12, color: Color(0xFF9E9E9E)),
+                        ),
+                        const SizedBox(height: 6),
                         Text(
                           controller.formatHarga(tagihan.totalTagihan),
                           style: const TextStyle(
@@ -271,36 +280,46 @@ class _TagihanCard extends StatelessWidget {
                             color: Color(0xFF1A1A2E),
                           ),
                         ),
-                        // Tombol bayar — hanya muncul kalau belum lunas
-                        if (tagihan.statusTagihan != 'lunas')
-                          SizedBox(
-                            height: 30,
-                            child: ElevatedButton(
-                              onPressed: () =>
-                                  controller.bayar(context, tagihan),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF2ECC71),
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                elevation: 0,
-                              ),
-                              child: const Text('Bayar',
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600)),
-                            ),
-                          ),
                       ],
                     ),
-                  ],
+                  ),
+
+                  // Status badge
+                  _StatusBadge(status: tagihan.statusTagihan),
+                ],
+              ),
+            ),
+
+            // ── Action buttons ────────────────────────────
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Color(0xFFF0F0F0)),
                 ),
               ),
-            ],
-          ),
+              child: Row(
+                children: [
+                  // Cek tagihan bulan ini
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: () =>
+                          controller.cekTagihanBulanIni(context, tagihan),
+                      icon: const Icon(Icons.calendar_month_outlined,
+                          size: 14, color: Color(0xFF2ECC71)),
+                      label: const Text(
+                        'Cek Bulan Ini',
+                        style: TextStyle(
+                            fontSize: 12, color: Color(0xFF2ECC71)),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -316,6 +335,48 @@ class _TagihanCard extends StatelessWidget {
       ),
       child: const Icon(Icons.bed_outlined,
           color: Color(0xFF2ECC71), size: 28),
+    );
+  }
+}
+
+// ── Status Badge ───────────────────────────────────────────────
+class _StatusBadge extends StatelessWidget {
+  final String status;
+  const _StatusBadge({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    Color color;
+    String label;
+    switch (status) {
+      case 'lunas':
+        color = const Color(0xFF2ECC71);
+        label = 'Lunas';
+        break;
+      case 'terlambat':
+        color = const Color(0xFFE74C3C);
+        label = 'Telat';
+        break;
+      default:
+        color = const Color(0xFFF39C12);
+        label = 'Belum Bayar';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
     );
   }
 }

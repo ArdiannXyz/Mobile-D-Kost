@@ -1,18 +1,23 @@
-class ApiConstants {
-  ApiConstants._();
+// ============================================================
+// api_constants.dart
+// Semua URL dan endpoint API terpusat di sini.
+// Ganti baseUrl sesuai environment (local / production).
+// ============================================================
 
-  // Pilih salah satu, comment sisanya:
+class ApiConstants {
+  ApiConstants._(); // Prevent instantiation
+
 
   //static const String baseUrl = 'http://127.0.0.1:8000/api/';        // Browser
   //static const String baseUrl = 'http://10.219.106.109/api/';      // Emulator Android
   static const String baseUrl = 'http://10.105.87.254:8000/api/';   // HP Fisik
 
   // ── Auth Endpoints ─────────────────────────────────────────
-  static const String register      = '${baseUrl}register';
-  static const String login         = '${baseUrl}login';
-  static const String logout        = '${baseUrl}logout';
+  static const String register   = '${baseUrl}register';
+  static const String login      = '${baseUrl}login';
+  static const String logout     = '${baseUrl}logout';
   static const String lupaPassword  = '${baseUrl}lupa-password';
-  static const String cekOtp        = '${baseUrl}cek-otp';
+  static const String cekOtp     = '${baseUrl}cek-otp';
   static const String gantiPassword = '${baseUrl}ganti-password';
 
   // ── User Endpoints ─────────────────────────────────────────
@@ -20,28 +25,28 @@ class ApiConstants {
   static String updateUser(int id)  => '${baseUrl}user/$id';
 
   // ── Kamar Endpoints ────────────────────────────────────────
-  static const String kamarList     = '${baseUrl}kamar';
+  static const String kamarList   = '${baseUrl}kamar';
   static String kamarDetail(int id) => '${baseUrl}kamar/$id';
 
   // ── Booking Endpoints ──────────────────────────────────────
-  static const String bookingCreate         = '${baseUrl}booking';
-  static String bookingList(int userId)     => '${baseUrl}booking/user/$userId';
-  static String bookingDetail(int id)       => '${baseUrl}booking/$id';
+  static const String bookingCreate = '${baseUrl}booking';
+  static String bookingList(int userId) => '${baseUrl}booking/user/$userId';
+  static String bookingDetail(int id)   => '${baseUrl}booking/$id';
 
   // ── Tagihan Endpoints ──────────────────────────────────────
-  static String tagihanList(int bookingId)  => '${baseUrl}tagihan/booking/$bookingId';
+  static String tagihanList(int bookingId) => '${baseUrl}tagihan/booking/$bookingId';
   static String tagihanDetail(int id)       => '${baseUrl}tagihan/$id';
 
   // ── Pembayaran Endpoints ───────────────────────────────────
-  static const String pembayaranCreate      = '${baseUrl}pembayaran';
-  static String pembayaranStatus(int id)    => '${baseUrl}pembayaran/$id';
+  static const String pembayaranCreate = '${baseUrl}pembayaran';
+  static String pembayaranStatus(int idTagihan) => '${baseUrl}pembayaran/status/$idTagihan';
 
   // ── Keluhan Endpoints ──────────────────────────────────────
-  static const String keluhanCreate         = '${baseUrl}keluhan';
-  static String keluhanList(int userId)     => '${baseUrl}keluhan/user/$userId';
+  static const String keluhanCreate = '${baseUrl}keluhan';
+  static String keluhanList(int userId) => '${baseUrl}keluhan/user/$userId';
 
   // ── Review Endpoints ───────────────────────────────────────
-  static const String reviewCreate          = '${baseUrl}review';
-  static String reviewList(int kamarId)     => '${baseUrl}review/kamar/$kamarId';
-  static String reviewUpdate(int id)        => '${baseUrl}review/$id';
-} 
+  static const String reviewCreate = '${baseUrl}review';
+  static String reviewList(int kamarId) => '${baseUrl}review/kamar/$kamarId';
+  static String reviewUpdate(int id)    => '${baseUrl}review/$id';
+}

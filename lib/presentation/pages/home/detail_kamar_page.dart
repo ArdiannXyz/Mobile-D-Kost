@@ -362,39 +362,41 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
   }
 
   // ── Date Picker Handler ───────────────────────────────────
-  Future<void> _pickTanggalMulai(BuildContext context) async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _controller.tglMulaiSewa ?? now,
-      firstDate: now,                                          // tidak bisa pilih masa lalu
-      lastDate: DateTime(now.year + 2, now.month, now.day),
-      helpText: 'Pilih Tanggal Mulai Sewa',
-      confirmText: 'Pilih',
-      cancelText: 'Batal',
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF2ECC71),       // header + selected date
-              onPrimary: Colors.white,
-              onSurface: Color(0xFF1A1A2E),
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF2ECC71),
+      Future<void> _pickTanggalMulai(BuildContext context) async {
+        final now = DateTime.now();
+        final maxDate = now.add(const Duration(days: 3)); // ← maksimal 3 hari
+        
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: _controller.tglMulaiSewa ?? now,
+          firstDate: now,
+          lastDate: maxDate, // ← ganti ini
+          helpText: 'Pilih Tanggal Mulai Sewa',
+          confirmText: 'Pilih',
+          cancelText: 'Batal',
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: const ColorScheme.light(
+                  primary: Color(0xFF2ECC71),
+                  onPrimary: Colors.white,
+                  onSurface: Color(0xFF1A1A2E),
+                ),
+                textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF2ECC71),
+                  ),
+                ),
               ),
-            ),
-          ),
-          child: child!,
+              child: child!,
+            );
+          },
         );
-      },
-    );
 
-    if (picked != null) {
-      _controller.setTglMulai(picked);
-    }
-  }
+        if (picked != null) {
+          _controller.setTglMulai(picked);
+        }
+      }
 
   // ── Rating Section ────────────────────────────────────────
   Widget _buildRatingSection() {

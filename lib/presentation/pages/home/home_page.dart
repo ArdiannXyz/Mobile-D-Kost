@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'home_controller.dart';
 import 'package:dkost/presentation/widgets/kamar_card.dart';
 import 'package:dkost/presentation/pages/review_keluhan/keluhan_page.dart';
 import 'package:dkost/presentation/pages/tagihan/tagihan_page.dart';
 import 'package:dkost/presentation/pages/profil_setting/setting_page.dart';
+
+// ── GlobalKey untuk akses refresh dari luar ──────────────────
+final GlobalKey<_KeluhanListPageRefreshState> keluhanRefreshKey =
+    GlobalKey<_KeluhanListPageRefreshState>();
+final GlobalKey<_TagihanPageRefreshState> tagihanRefreshKey =
+    GlobalKey<_TagihanPageRefreshState>();
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,9 +22,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final HomeController _controller;
   int _currentNavIndex = 0;
-
-  // Track tab mana yang sudah pernah dibuka
-  final Set<int> _visitedTabs = {0}; // Tab 0 langsung load
+  final Set<int> _visitedTabs = {0};
 
   @override
   void initState() {
@@ -32,6 +35,22 @@ class _HomePageState extends State<HomePage> {
     _controller.loadData();
   }
 
+void _onTabTapped(int index) {
+  setState(() {
+    _currentNavIndex = index;
+    _visitedTabs.add(index);
+  });
+
+  // Auto refresh saat tab dibuka
+  if (index == 0) {
+    _controller.loadData(); // ← tambah ini untuk refresh dashboard
+  } else if (index == 1) {
+    keluhanRefreshKey.currentState?.refresh();
+  } else if (index == 2) {
+    tagihanRefreshKey.currentState?.refresh();
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,20 +58,19 @@ class _HomePageState extends State<HomePage> {
       body: IndexedStack(
         index: _currentNavIndex,
         children: [
-          // Tab 0: Dashboard — selalu load
           _DashboardTab(controller: _controller),
 
-          // Tab 1: Keluhan — lazy load
+          // Tab 1: Keluhan
           _visitedTabs.contains(1)
-              ? const KeluhanListPage()
+              ? _KeluhanListPageRefresh(key: keluhanRefreshKey)
               : const SizedBox.shrink(),
 
-          // Tab 2: Tagihan — lazy load
+          // Tab 2: Tagihan
           _visitedTabs.contains(2)
-              ? const TagihanPage()
+              ? _TagihanPageRefresh(key: tagihanRefreshKey)
               : const SizedBox.shrink(),
 
-          // Tab 3: Setting — lazy load
+          // Tab 3: Setting
           _visitedTabs.contains(3)
               ? const SettingPage()
               : const SizedBox.shrink(),
@@ -90,12 +108,7 @@ class _HomePageState extends State<HomePage> {
               final isActive = _currentNavIndex == index;
               return Expanded(
                 child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _currentNavIndex = index;
-                      _visitedTabs.add(index);
-                    });
-                  },
+                  onTap: () => _onTabTapped(index),
                   behavior: HitTestBehavior.opaque,
                   child: Center(
                     child: Image.asset(
@@ -126,6 +139,55 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+// ── Wrapper Keluhan dengan refresh ────────────────────────────
+class _KeluhanListPageRefresh extends StatefulWidget {
+  const _KeluhanListPageRefresh({super.key});
+
+  @override
+  State<_KeluhanListPageRefresh> createState() =>
+      _KeluhanListPageRefreshState();
+}
+
+class _KeluhanListPageRefreshState extends State<_KeluhanListPageRefresh> {
+  int _refreshKey = 0;
+
+  void refresh() {
+    if (mounted) setState(() => _refreshKey++);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return KeyedSubtree(
+      key: ValueKey(_refreshKey),
+      child: const KeluhanListPage(),
+    );
+  }
+}
+
+// ── Wrapper Tagihan dengan refresh ────────────────────────────
+class _TagihanPageRefresh extends StatefulWidget {
+  const _TagihanPageRefresh({super.key});
+
+  @override
+  State<_TagihanPageRefresh> createState() => _TagihanPageRefreshState();
+}
+
+class _TagihanPageRefreshState extends State<_TagihanPageRefresh> {
+  int _refreshKey = 0;
+
+  void refresh() {
+    if (mounted) setState(() => _refreshKey++);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return KeyedSubtree(
+      key: ValueKey(_refreshKey),
+      child: const TagihanPage(),
+    );
+  }
+}
+
 // ══════════════════════════════════════════════════════════════
 // DASHBOARD TAB
 // ══════════════════════════════════════════════════════════════
@@ -142,7 +204,6 @@ class _DashboardTabState extends State<_DashboardTab> {
   Timer? _bannerTimer;
   int _currentBannerIndex = 0;
 
-  // Daftar banner SVG — tambahkan lebih banyak sesuai kebutuhan
   static const List<String> _banners = [
     'assets/images/Asset_2.png',
     'assets/images/Asset_4.png',
@@ -246,7 +307,6 @@ class _DashboardTabState extends State<_DashboardTab> {
     );
   }
 
-  // ── Search Bar ─────────────────────────────────────────────
   Widget _buildSearchBar(BuildContext context) {
     return Container(
       color: const Color(0xFF2ECC71),
@@ -278,52 +338,43 @@ class _DashboardTabState extends State<_DashboardTab> {
     );
   }
 
-  // ── Banner Slider ──────────────────────────────────────────
   Widget _buildBannerSlider(BuildContext context) {
     return Container(
       color: const Color(0xFFF5F7FA),
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Column(
         children: [
-          // PageView banner
           ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: SizedBox(
-                height: 140,
-                child: PageView.builder(
-                  controller: PageController(
-                    viewportFraction: 1.1, // ← makin kecil, makin keliatan banner sebelah
-                  ),
-                  itemCount: _banners.length,
-                  onPageChanged: (index) {
-                    setState(() => _currentBannerIndex = index);
-                  },
-                  itemBuilder: (_, index) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6), // ← jarak antar banner
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // ← rounded per banner
-                      child: Image.asset(
-                        _banners[index],
-                        width: double.infinity,
-                        height: 140,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: const Color(0xFF27AE60),
-                          child: const Center(
-                            child: Icon(Icons.image_not_supported, color: Colors.white54),
-                          ),
-                        ),
+            borderRadius: BorderRadius.circular(16),
+            child: SizedBox(
+              height: 140,
+              child: PageView.builder(
+                controller: _bannerController,
+                itemCount: _banners.length,
+                onPageChanged: (index) {
+                  setState(() => _currentBannerIndex = index);
+                },
+                itemBuilder: (_, index) => SizedBox(
+                  width: double.infinity,
+                  height: 140,
+                  child: Image.asset(
+                    _banners[index],
+                    width: double.infinity,
+                    height: 140,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: const Color(0xFF27AE60),
+                      child: const Center(
+                        child: Icon(Icons.image_not_supported,
+                            color: Colors.white54),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-          
-
+          ),
           const SizedBox(height: 10),
-
-          // Dot indicator
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(_banners.length, (index) {
@@ -346,7 +397,6 @@ class _DashboardTabState extends State<_DashboardTab> {
     );
   }
 
-  // ── Rekomendasi ────────────────────────────────────────────
   Widget _buildRekomendasi(BuildContext context) {
     final tersedia = widget.controller.semuaKamar
         .where((k) => k.statusKamar == 'tersedia')
@@ -389,7 +439,6 @@ class _DashboardTabState extends State<_DashboardTab> {
     );
   }
 
-  // ── Filter Chips ───────────────────────────────────────────
   Widget _buildFilterChips(BuildContext context) {
     const filters = ['Semua', 'Serba 300rb', 'Serba 600rb', 'Up to 900rb'];
     return Container(
@@ -400,24 +449,20 @@ class _DashboardTabState extends State<_DashboardTab> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: filters.length,
         itemBuilder: (_, i) {
-          final isSelected =
-              widget.controller.selectedFilter == filters[i];
+          final isSelected = widget.controller.selectedFilter == filters[i];
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: FilterChip(
               label: Text(filters[i]),
               selected: isSelected,
-              onSelected: (_) =>
-                  widget.controller.applyFilter(filters[i]),
+              onSelected: (_) => widget.controller.applyFilter(filters[i]),
               selectedColor: const Color(0xFF2ECC71),
               backgroundColor: Colors.white,
               checkmarkColor: Colors.white,
               labelStyle: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: isSelected
-                    ? Colors.white
-                    : const Color(0xFF555555),
+                color: isSelected ? Colors.white : const Color(0xFF555555),
               ),
               side: BorderSide(
                 color: isSelected
@@ -435,7 +480,6 @@ class _DashboardTabState extends State<_DashboardTab> {
     );
   }
 
-  // ── Empty State ────────────────────────────────────────────
   Widget _buildEmptyState() {
     return const Padding(
       padding: EdgeInsets.all(40),

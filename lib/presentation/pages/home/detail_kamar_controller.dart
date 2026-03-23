@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../data/services/kamar_service.dart';
 import '../../../data/services/review_service.dart';
 import '../../../data/services/furnitur_service.dart';
+import '../../../data/helper/api_helper.dart';
 import '../../../data/helper/api_exception.dart';
 import '../../../data/models/kamar_models.dart';
 import '../../../data/models/review_models.dart';
@@ -20,22 +21,23 @@ class KamarDetailController {
   // ── Data ───────────────────────────────────────────────────
   KamarModel? kamar;
   List<String> galeriUrls = [];
-  List<Map<String, dynamic>> fasilitasList = [];
   List<ReviewModel> reviewList = [];
   List<ReviewModel> displayedReviews = [];
   List<FurniturModel> furniturList = [];
   bool showAllReviews = false;
   static const int maxDisplayedReviews = 3;
 
+  // ── Review milik user yang login ───────────────────────────
+  ReviewModel? _myExistingReview;
+  ReviewModel? get myExistingReview => _myExistingReview;
+  bool get sudahReview => _myExistingReview != null;
+
   // ── Data Booking ───────────────────────────────────────────
   int durasiSewa = 1;
-  DateTime? tglMulaiSewa;       // dipilih user via date picker
+  DateTime? tglMulaiSewa;
   final int kamarId;
-
-  // Furnitur yang dipilih: Map<id_furnitur, jumlah>
   Map<int, int> selectedFurnitur = {};
 
-  // Callback untuk trigger setState di View
   final VoidCallback onStateChanged;
 
   KamarDetailController({
@@ -53,13 +55,11 @@ class KamarDetailController {
     );
   }
 
-  // ── Set Tanggal Mulai ──────────────────────────────────────
   void setTglMulai(DateTime date) {
     tglMulaiSewa = date;
     onStateChanged();
   }
 
-  // ── Format Tanggal ─────────────────────────────────────────
   String formatTanggal(DateTime? date) {
     if (date == null) return 'Pilih tanggal';
     const bulan = [
@@ -72,6 +72,7 @@ class KamarDetailController {
   // ── Init ───────────────────────────────────────────────────
   Future<void> init() async {
     isLoading = true;
+    errorMessage = null;
     onStateChanged();
 
     try {
@@ -79,7 +80,7 @@ class KamarDetailController {
         _loadKamarDetail(),
         _loadFurnitur(),
       ]);
-      _loadReviews();
+      _loadReviews(); // tidak di-await agar tidak block UI
     } on ApiException catch (e) {
       errorMessage = e.message;
     } catch (_) {
@@ -101,21 +102,30 @@ class KamarDetailController {
     furniturList = await FurniturService.getFurniturList();
   }
 
+  // ── Load Reviews + cek apakah user sudah review ────────────
   Future<void> _loadReviews() async {
     isLoadingReviews = true;
     onStateChanged();
     try {
       reviewList = await ReviewService.getReviewsByKamar(kamarId);
       displayedReviews = reviewList.take(maxDisplayedReviews).toList();
+
+      // Cek review milik user yang sedang login
+      final userId = await ApiHelper.getUserId();
+      if (userId != null) {
+        _myExistingReview = reviewList
+            .where((r) => r.idUser == userId)
+            .firstOrNull;
+      }
     } catch (_) {
       reviewList = [];
+      _myExistingReview = null;
     } finally {
       isLoadingReviews = false;
       onStateChanged();
     }
   }
 
-  // ── Toggle Show All Reviews ────────────────────────────────
   void toggleShowAllReviews() {
     showAllReviews = !showAllReviews;
     displayedReviews = showAllReviews
@@ -124,13 +134,12 @@ class KamarDetailController {
     onStateChanged();
   }
 
-  // ── Durasi Sewa ────────────────────────────────────────────
+  // ── Durasi & Furnitur ──────────────────────────────────────
   void setDurasi(int bulan) {
     durasiSewa = bulan;
     onStateChanged();
   }
 
-  // ── Furnitur Selection ─────────────────────────────────────
   void tambahFurnitur(int furniturId) {
     selectedFurnitur[furniturId] = (selectedFurnitur[furniturId] ?? 0) + 1;
     onStateChanged();
@@ -171,10 +180,27 @@ class KamarDetailController {
   double get totalBiaya => totalBiayaKamar + totalBiayaFurnitur;
 
   // ── Validasi sebelum booking ───────────────────────────────
-  /// Mengembalikan null jika valid, atau pesan error jika tidak
   String? validateBooking() {
-    if (tglMulaiSewa == null) return 'Pilih tanggal mulai sewa terlebih dahulu.';
+    if (tglMulaiSewa == null) {
+      return 'Pilih tanggal mulai sewa terlebih dahulu.';
+    }
     return null;
+  }
+
+  // ── Format Harga ───────────────────────────────────────────
+  String formatHarga(double harga) {
+    if (harga >= 1000000) {
+      final juta = (harga / 1000000).floor();
+      final sisa = (harga % 1000000 / 1000).floor();
+      if (sisa == 0) {
+        return 'Rp.${juta}.000.000';
+      } else {
+        return 'Rp.${juta}.${sisa.toString().padLeft(3, '0')}.000';
+      }
+    } else if (harga >= 1000) {
+      return 'Rp.${(harga / 1000).toStringAsFixed(0)}.000';
+    }
+    return 'Rp.${harga.toStringAsFixed(0)}';
   }
 
   // ── Navigasi ───────────────────────────────────────────────
@@ -183,12 +209,12 @@ class KamarDetailController {
       context,
       '/booking-form',
       arguments: {
-        'kamar_id'   : kamarId,
-        'durasi'     : durasiSewa,
-        'tgl_mulai'  : tglMulaiSewa?.toIso8601String(),
-        'tgl_akhir'  : tglAkhirSewa?.toIso8601String(),
-        'furnitur'   : selectedFurnitur,
-        'total'      : totalBiaya,
+        'kamar_id'  : kamarId,
+        'durasi'    : durasiSewa,
+        'tgl_mulai' : tglMulaiSewa?.toIso8601String(),
+        'tgl_akhir' : tglAkhirSewa?.toIso8601String(),
+        'furnitur'  : selectedFurnitur,
+        'total'     : totalBiaya,
       },
     );
   }
@@ -201,23 +227,22 @@ class KamarDetailController {
     );
   }
 
+  // ← Sudah review → edit, belum review → tulis
   void goToTulisReview(BuildContext context) {
-    Navigator.pushNamed(
-      context,
-      '/tulis-review',
-      arguments: {'kamar_id': kamarId},
-    );
+    if (sudahReview && _myExistingReview != null) {
+      Navigator.pushNamed(
+        context,
+        '/edit-review',
+        arguments: {'review': _myExistingReview},
+      );
+    } else {
+      Navigator.pushNamed(
+        context,
+        '/tulis-review',
+        arguments: {'kamar_id': kamarId},
+      );
+    }
   }
 
   void goBack(BuildContext context) => Navigator.pop(context);
-
-  // ── Format Harga ──────────────────────────────────────────
-  String formatHarga(double harga) {
-    if (harga >= 1000000) {
-      return 'Rp.${(harga / 1000000).toStringAsFixed(0)}.000.000';
-    } else if (harga >= 1000) {
-      return 'Rp.${(harga / 1000).toStringAsFixed(0)}.000';
-    }
-    return 'Rp.${harga.toStringAsFixed(0)}';
-  }
 }

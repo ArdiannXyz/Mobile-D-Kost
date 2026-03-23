@@ -5,13 +5,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../data/services/booking_service.dart';
-import '../../../data/services/midtrans_service.dart';        
 import '../../../data/helper/api_exception.dart';
 import '../../../data/models/booking_models.dart';
 import '../../../data/models/kamar_models.dart';
 import '../../../data/models/furnitur_models.dart';
-import '../payment/midtrans_page.dart';     
-                  
+
 // ── Controller: Detail Kamarku ────────────────────────────────
 class DetailKamarkuController {
   bool isLoading = true;
@@ -86,90 +84,20 @@ class DetailKamarkuController {
     }
   }
 
-  // ── Bayar Sekarang — buka Midtrans ────────────────────────
-  Future<void> goToPayment(BuildContext context) async {
-    final idTagihan = booking?.tagihan?.idTagihan;
-
-    if (idTagihan == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Tagihan belum tersedia'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    // Tampilkan loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+  void goToPayment(BuildContext context, {
+    required int idTagihan,
+    required double totalBayar,
+    required String namaKamar,
+  }) {
+    Navigator.pushNamed(
+      context,
+      '/pembayaran',
+      arguments: {
+        'id_tagihan' : idTagihan,
+        'total_biaya': totalBayar,
+        'nama_kamar' : namaKamar,
+      },
     );
-
-    // Request snap token ke Laravel
-    final result = await MidtransService.createSnapToken(idTagihan);
-
-    // Tutup loading
-    if (context.mounted) Navigator.pop(context);
-    if (!context.mounted) return;
-
-    if (result['status'] == 'success') {
-      final paymentResult = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => MidtransPage(
-            snapUrl: result['snap_url'],
-            orderId: result['order_id'],
-          ),
-        ),
-      );
-
-      if (!context.mounted) return;
-
-      switch (paymentResult) {
-        case 'success':
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('✅ Pembayaran berhasil!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          await refresh(); // Refresh detail booking
-          break;
-        case 'pending':
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('⏳ Menunggu konfirmasi pembayaran'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-          break;
-        case 'failed':
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('❌ Pembayaran gagal'),
-              backgroundColor: Colors.red,
-            ),
-          );
-          break;
-        case 'cancelled':
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Pembayaran dibatalkan'),
-              backgroundColor: Colors.grey,
-            ),
-          );
-          break;
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result['message'] ?? 'Gagal memproses pembayaran'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
   }
 
   void goBack(BuildContext context) => Navigator.pop(context);
@@ -204,10 +132,7 @@ class CheckoutController {
       final f = furniturList.firstWhere(
         (f) => f.idFurnitur == entry.key,
         orElse: () => FurniturModel(
-            idFurnitur: 0,
-            namaFurnitur: '',
-            jumlah: 0,
-            hargaSewaTambahan: 0),
+            idFurnitur: 0, namaFurnitur: '', jumlah: 0, hargaSewaTambahan: 0),
       );
       total += f.hargaSewaTambahan * entry.value * durasiSewa;
     }
@@ -221,10 +146,7 @@ class CheckoutController {
       final f = furniturList.firstWhere(
         (f) => f.idFurnitur == entry.key,
         orElse: () => FurniturModel(
-            idFurnitur: 0,
-            namaFurnitur: '-',
-            jumlah: 0,
-            hargaSewaTambahan: 0),
+            idFurnitur: 0, namaFurnitur: '-', jumlah: 0, hargaSewaTambahan: 0),
       );
       return _FurniturCheckoutItem(
         nama: f.namaFurnitur,
@@ -242,19 +164,32 @@ class CheckoutController {
 
     try {
       final result = await BookingService.createBooking(
-        idKamar: kamar.idKamar,
-        tglMulaiSewa: tglMulaiSewa,
-        durasiSewaBulan: durasiSewa,
+        idKamar         : kamar.idKamar,
+        tglMulaiSewa    : tglMulaiSewa,
+        durasiSewaBulan : durasiSewa,
         selectedFurnitur: selectedFurnitur,
       );
 
       if (!context.mounted) return;
 
       if (result['success'] == true) {
+        // ← Ambil id_tagihan dan total_biaya dari response
+        final idTagihan  = result['data']['id_tagihan'] as int;
+        final totalBayar = (result['data']['total_biaya'] as num).toDouble();
+        final namaKamar  = 'Kos ${_cap(kamar.tipeKamar)} ${kamar.nomorKamar}';
+
         _showSuccess(context, 'Booking berhasil dibuat!');
 
-        // Arahkan ke halaman tagihan untuk bayar
-        Navigator.pushReplacementNamed(context, '/tagihan');
+        // Navigasi ke PaymentPage dengan id_tagihan
+        Navigator.pushReplacementNamed(
+          context,
+          '/pembayaran',
+          arguments: {
+            'id_tagihan' : idTagihan,
+            'total_biaya': totalBayar,
+            'nama_kamar' : namaKamar,
+          },
+        );
       } else {
         _showError(context, result['message'] ?? 'Gagal membuat booking.');
       }
@@ -295,6 +230,9 @@ class CheckoutController {
     }
   }
 
+  String _cap(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+
   void goBack(BuildContext context) => Navigator.pop(context);
 
   void _showSuccess(BuildContext ctx, String msg) =>
@@ -306,7 +244,8 @@ class CheckoutController {
       content: Text(msg),
       backgroundColor: color,
       behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       margin: const EdgeInsets.all(16),
     ));
   }
