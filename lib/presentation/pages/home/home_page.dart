@@ -298,7 +298,7 @@ class _DashboardTabState extends State<_DashboardTab> {
                       crossAxisCount: 2,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
-                      childAspectRatio: 0.78,
+                      childAspectRatio: 0.70,
                     ),
                   ),
                 ),
