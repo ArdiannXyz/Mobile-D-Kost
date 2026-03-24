@@ -83,7 +83,7 @@ void _onTabTapped(int index) {
   Widget _buildBottomNav() {
     const items = [
       ['assets/images/home_green.png', 'assets/images/home_black.png'],
-      ['assets/images/keluhan_green.png', 'assets/images/keluhan_black.png'],
+      ['assets/images/Keluhan_green.png', 'assets/images/Keluhan_black.png'],
       ['assets/images/kamarku_green.png', 'assets/images/kamarku_black.png'],
       ['assets/images/setting_green.png', 'assets/images/setting_black.png'],
     ];
@@ -322,7 +322,7 @@ class _DashboardTabState extends State<_DashboardTab> {
           height: 44,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(14),
           ),
           child: const Row(
             children: [
@@ -345,35 +345,38 @@ class _DashboardTabState extends State<_DashboardTab> {
       child: Column(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: SizedBox(
-              height: 140,
-              child: PageView.builder(
-                controller: _bannerController,
-                itemCount: _banners.length,
-                onPageChanged: (index) {
-                  setState(() => _currentBannerIndex = index);
-                },
-                itemBuilder: (_, index) => SizedBox(
-                  width: double.infinity,
-                  height: 140,
-                  child: Image.asset(
-                    _banners[index],
-                    width: double.infinity,
-                    height: 140,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: const Color(0xFF27AE60),
-                      child: const Center(
-                        child: Icon(Icons.image_not_supported,
-                            color: Colors.white54),
+              borderRadius: BorderRadius.circular(16),
+              child: SizedBox(
+                height: 140,
+                child: PageView.builder(
+                  controller: PageController(
+                    viewportFraction: 1.1, // ← makin kecil, makin keliatan banner sebelah
+                  ),
+                  itemCount: _banners.length,
+                  onPageChanged: (index) {
+                    setState(() => _currentBannerIndex = index);
+                  },
+                  itemBuilder: (_, index) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6), // ← jarak antar banner
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16), // ← rounded per banner
+                      child: Image.asset(
+                        _banners[index],
+                        width: double.infinity,
+                        height: 140,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: const Color(0xFF2ECC71),
+                          child: const Center(
+                            child: Icon(Icons.image_not_supported, color: Colors.white54),
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -386,7 +389,7 @@ class _DashboardTabState extends State<_DashboardTab> {
                 width: isActive ? 20 : 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: isActive ? Colors.lightGreen : Colors.white38,
+                  color: isActive ? const Color(0xFF2ECC71) : Colors.white38,
                   borderRadius: BorderRadius.circular(4),
                 ),
               );
@@ -443,7 +446,7 @@ class _DashboardTabState extends State<_DashboardTab> {
     const filters = ['Semua', 'Serba 300rb', 'Serba 600rb', 'Up to 900rb'];
     return Container(
       height: 48,
-      margin: const EdgeInsets.only(top: 8),
+      margin: const EdgeInsets.only(top: 8, bottom: 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -470,9 +473,9 @@ class _DashboardTabState extends State<_DashboardTab> {
                     : const Color(0xFFE0E0E0),
               ),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
+                  borderRadius: BorderRadius.circular(11)),
               showCheckmark: false,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 9),
             ),
           );
         },

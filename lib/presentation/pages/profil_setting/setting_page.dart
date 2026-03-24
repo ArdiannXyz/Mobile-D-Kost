@@ -47,7 +47,7 @@ class _SettingPageState extends State<SettingPage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   _buildMenuGroup([
                     _MenuItem(
                       assetIcon: 'assets/images/kamarku_green.png',
@@ -72,7 +72,7 @@ class _SettingPageState extends State<SettingPage> {
                           _controller.goToLupaPassword(context),
                     ),
                   ]),
-                  const SizedBox(height: 12),
+                  
                   _buildMenuGroup([
                     _MenuItem(
                       assetIcon: 'assets/images/logout.png',
@@ -94,30 +94,21 @@ class _SettingPageState extends State<SettingPage> {
   // ── Header ────────────────────────────────────────────────
   Widget _buildHeader() {
     return Container(
-      color: const Color(0xFF2ECC71),
       width: double.infinity,
+      decoration: const BoxDecoration(
+        color: Color(0xFF2ECC71),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(18),  // ← sesuaikan angkanya
+          bottomRight: Radius.circular(18),
+        ),
+      ),
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 20,
         bottom: 28,
       ),
       child: Column(
         children: [
-          // Label "Setting" di kiri atas
-          Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16, bottom: 16),
-              child: Text(
-                'Setting',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-
+         SizedBox(height: 10,),
           // Avatar
           Container(
             width: 90,
@@ -179,29 +170,27 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   // ── Menu Group ────────────────────────────────────────────
-  Widget _buildMenuGroup(List<_MenuItem> items) {
-    return Container(
-      color: Colors.white,
-      child: Column(
-        children: items.asMap().entries.map((entry) {
-          final index = entry.key;
-          final item = entry.value;
-          return Column(
-            children: [
-              _buildMenuTile(item),
-              if (index < items.length - 1)
-                const Divider(
-                  height: 1,
-                  indent: 56,
-                  endIndent: 16,
-                  color: Color(0xFFF0F0F0),
-                ),
-            ],
-          );
-        }).toList(),
+Widget _buildMenuGroup(List<_MenuItem> items) {
+  return Column(
+    children: items.map((item) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4), // ← gap antar card
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12), // ← rounded per item
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0A000000),
+              blurRadius: 4,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+        child: _buildMenuTile(item),
       ),
-    );
-  }
+    )).toList(),
+  );
+}
 
   Widget _buildMenuTile(_MenuItem item) {
     return InkWell(
@@ -213,7 +202,7 @@ class _SettingPageState extends State<SettingPage> {
             // Icon dari asset
             SizedBox(
               width: 28,
-              height: 28,
+              height: 32,
               child: Image.asset(
                 item.assetIcon,
                 width: 24,

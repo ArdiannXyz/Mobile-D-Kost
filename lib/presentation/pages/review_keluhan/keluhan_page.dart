@@ -103,7 +103,7 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
                       horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: const Color(0xFF2ECC71),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(11),
                   ),
                   child: const Text(
                     'Lapor keluhan',

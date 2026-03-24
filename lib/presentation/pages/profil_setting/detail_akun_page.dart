@@ -142,11 +142,43 @@ class _DetailAkunPageState extends State<DetailAkunPage> {
           const SizedBox(height: 12),
 
           // ── Card Info ─────────────────────────────────────
-          Container(
+          Column(
+            children: [
+              _buildInfoCard(
+                icon: Icons.person_outline,
+                value: user.nama,
+              ),
+              _buildInfoCard(
+                icon: Icons.email_outlined,
+                value: _controller.maskEmail(user.email),
+              ),
+              _buildInfoCard(
+                icon: Icons.phone_outlined,
+                value: user.noHp.isNotEmpty ? user.noHp : '-',
+              ),
+              _buildInfoCard(
+                icon: Icons.location_on_outlined,
+                value: user.alamat != null && user.alamat!.isNotEmpty
+                    ? user.alamat!
+                    : '-',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+          Widget _buildInfoCard({
+          required IconData icon,
+          required String value,
+        }) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 8), // ← gap antar card
             width: double.infinity,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12), // ← rounded per card
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x0A000000),
@@ -155,52 +187,24 @@ class _DetailAkunPageState extends State<DetailAkunPage> {
                 ),
               ],
             ),
-            child: Column(
-              children: [
-                _buildInfoRow(
-                  icon: Icons.person_outline,
-                  value: user.nama,
-                  isFirst: true,
-                ),
-                _buildDivider(),
-                _buildInfoRow(
-                  icon: Icons.email_outlined,
-                  value: _controller.maskEmail(user.email),
-                ),
-                _buildDivider(),
-                _buildInfoRow(
-                  icon: Icons.phone_outlined,
-                  value: user.noHp.isNotEmpty ? user.noHp : '-',
-                ),
-                _buildDivider(),
-                _buildInfoRow(
-                  icon: Icons.location_on_outlined,
-                  value: user.alamat != null && user.alamat!.isNotEmpty
-                      ? user.alamat!
-                      : '-',
-                  isLast: true,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: _buildInfoRow(icon: icon, value: value),
+          );
+        }
 
   // ── Avatar ────────────────────────────────────────────────
   Widget _buildAvatar() {
     return Container(
       width: 90,
-      height: 90,
+      height: 140,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: const Color(0xFFE8F5E9),
-        border: Border.all(color: const Color(0xFF2ECC71), width: 2.5),
+        
       ),
-      child: ClipOval(
+      child: CircleAvatar(
         child: Image.asset(
-          'assets/images/person 1.png',
+          'assets/images/person_1.png',
           width: 90,
           height: 90,
           fit: BoxFit.cover,
@@ -246,12 +250,4 @@ class _DetailAkunPageState extends State<DetailAkunPage> {
     );
   }
 
-  Widget _buildDivider() {
-    return const Divider(
-      height: 1,
-      indent: 46,
-      endIndent: 16,
-      color: Color(0xFFF0F0F0),
-    );
-  }
 }

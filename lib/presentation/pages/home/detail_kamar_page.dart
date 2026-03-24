@@ -411,14 +411,14 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
               return GestureDetector(
                 onTap: () => _controller.goToTulisReview(context),
                 child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  padding: EdgeInsets.symmetric(horizontal: 18),
                   child: Icon(Icons.star_border,
                       color: Color(0xFFFFC107), size: 34),
                 ),
               );
             }),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           TextButton(
             onPressed: () => _controller.goToTulisReview(context),
             style: TextButton.styleFrom(
@@ -866,6 +866,8 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
 
           // Tombol Pesan
           Padding(
+            padding: const EdgeInsets.only(bottom: 35),
+            child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SizedBox(
               width: double.infinity,
@@ -887,6 +889,7 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
+             ),
             ),
           ),
         ],
