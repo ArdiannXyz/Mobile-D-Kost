@@ -8,9 +8,9 @@ class ApiConstants {
   ApiConstants._(); // Prevent instantiation
 
 
-  //static const String baseUrl = 'http://127.0.0.1:8000/api/';        // Browser
+  static const String baseUrl = 'http://127.0.0.1:8000/api/';        // Browser
   //static const String baseUrl = 'http://10.219.106.109/api/';      // Emulator Android
-  static const String baseUrl = 'http://10.105.87.254:8000/api/';   // HP Fisik
+  //static const String baseUrl = 'http://10.51.49.109:8000/api/';   // HP Fisik
 
   // ── Auth Endpoints ─────────────────────────────────────────
   static const String register   = '${baseUrl}register';

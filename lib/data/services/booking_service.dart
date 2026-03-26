@@ -14,22 +14,55 @@ class BookingService {
   BookingService._();
 
   // ── GET: List booking user ─────────────────────────────────
-  static Future<List<BookingModel>> getBookingList(int userId) async {
-    try {
-      final headers = await ApiHelper.authHeaders;
-      final response = await http.get(
-        Uri.parse(ApiConstants.bookingList(userId)),
-        headers: headers,
-      );
-      final data = ApiHelper.handleResponse(response);
-      if (data['success'] == true) {
-        final List list = data['data'];
-        return list.map((e) => BookingModel.fromJson(e)).toList();
+  // static Future<List<BookingModel>> getBookingList(int userId) async {
+  //   try {
+  //     final headers = await ApiHelper.authHeaders;
+  //     final response = await http.get(
+  //       Uri.parse(ApiConstants.bookingList(userId)),
+  //       headers: headers,
+  //     );
+  //     final data = ApiHelper.handleResponse(response);
+  //     if (data['success'] == true) {
+  //       final List list = data['data'];
+  //       return list.map((e) => BookingModel.fromJson(e)).toList();
+  //     }
+  //     return [];
+  //   } on ApiException { rethrow; }
+  //   catch (_) { throw ApiException(message: 'Gagal memuat riwayat booking.', statusCode: 500); }
+  // }
+
+      static Future<List<BookingModel>> getBookingList(int userId) async {
+  try {
+    final headers = await ApiHelper.authHeaders;
+    final response = await http.get(
+      Uri.parse(ApiConstants.bookingList(userId)),
+      headers: headers,
+    );
+
+    final data = ApiHelper.handleResponse(response);
+
+    if (data['success'] == true) {
+      final list = data['data'];
+
+      if (list == null || list is! List) {
+        return [];
       }
-      return [];
-    } on ApiException { rethrow; }
-    catch (_) { throw ApiException(message: 'Gagal memuat riwayat booking.', statusCode: 500); }
+
+      return list
+          .map((e) => BookingModel.fromJson(e))
+          .toList();
+    }
+
+    return [];
+  } on ApiException {
+    rethrow;
+  } catch (_) {
+    throw ApiException(
+      message: 'Gagal memuat riwayat booking.',
+      statusCode: 500,
+    );
   }
+}
 
   // ── GET: Detail booking ────────────────────────────────────
   static Future<BookingModel?> getBookingDetail(int bookingId) async {
