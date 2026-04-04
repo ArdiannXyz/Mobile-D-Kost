@@ -179,7 +179,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
               child: _controller.isDeleting
                   ? const SizedBox(width: 20, height: 20,
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : const Text('Cancel',
+                  : const Text('Hapus Ulasan',
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
             ),
           ),

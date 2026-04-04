@@ -32,6 +32,6 @@ class TagihanModel {
       totalTagihan:  double.parse(json['total_tagihan'].toString()),
       tglJatuhTempo: json['tgl_jatuh_tempo'],
       statusTagihan: json['status_tagihan'],
-    );
+    );  
   }
 }

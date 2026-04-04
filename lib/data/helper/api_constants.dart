@@ -8,9 +8,10 @@ class ApiConstants {
   ApiConstants._(); // Prevent instantiation
 
 
-  //static const String baseUrl = 'http://127.0.0.1:8000/api/';        // Browser
+  static const String baseUrl = 'http://127.0.0.1:8000/api/';   
+  static const String storageUrl = 'http://127.0.0.1:8000/storage/';     // Browser
   //static const String baseUrl = 'http://10.219.106.109/api/';      // Emulator Android
-  static const String baseUrl = 'http://10.105.87.254:8000/api/';   // HP Fisik
+  //static const String baseUrl = 'http://192.168.1.2:8000/api/';   // HP Fisik
 
   // ── Auth Endpoints ─────────────────────────────────────────
   static const String register   = '${baseUrl}register';
@@ -32,7 +33,7 @@ class ApiConstants {
   static const String bookingCreate = '${baseUrl}booking';
   static String bookingList(int userId) => '${baseUrl}booking/user/$userId';
   static String bookingDetail(int id)   => '${baseUrl}booking/$id';
-
+  static String bookingAktif(int userId) => '${baseUrl}booking/aktif/$userId';
   // ── Tagihan Endpoints ──────────────────────────────────────
   static String tagihanList(int bookingId) => '${baseUrl}tagihan/booking/$bookingId';
   static String tagihanDetail(int id)       => '${baseUrl}tagihan/$id';

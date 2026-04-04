@@ -1,10 +1,8 @@
 // ============================================================
-// FRONTEND LAYER — kamarku_page.dart
-// Daftar riwayat booking user — Tab ke-3 bottom nav.
-// Menampilkan: foto kamar, nama, tgl mulai-akhir, status,
-// tombol "Detail" untuk ke detail kamarku.
+// FILE: lib/presentation/pages/kamarku/kamarku_page.dart
 // ============================================================
 
+import 'package:dkost/data/helper/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'kamarku_controller.dart';
 
@@ -40,46 +38,38 @@ class _KamarkuPageState extends State<KamarkuPage> {
     );
   }
 
-  // ── Header ─────────────────────────────────────────────────
- Widget _buildHeader() {
-  return Container(
-    color: const Color(0xFF2ECC71),
-    width: double.infinity,
-    padding: EdgeInsets.only(
-      top: MediaQuery.of(context).padding.top + 12,
-      bottom: 16,
-    ),
-    child: Stack(
-      alignment: Alignment.center,
-      children: [
-        // Tombol Back di kiri
-        Positioned(
-          left: 16,
-          child: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const Icon(
-              Icons.arrow_back_ios_new,
-              color: Colors.white,
-              size: 18,
+  Widget _buildHeader() {
+    return Container(
+      color: const Color(0xFF2ECC71),
+      width: double.infinity,
+      padding: EdgeInsets.only(
+        top   : MediaQuery.of(context).padding.top + 12,
+        bottom: 16,
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            left: 16,
+            child: GestureDetector(
+              onTap : () => Navigator.pop(context),
+              child : const Icon(Icons.arrow_back_ios_new,
+                  color: Colors.white, size: 18),
             ),
           ),
-        ),
-
-        // Text benar-benar di tengah
-        const Text(
-          'Kamarku',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+          const Text(
+            'Kamarku',
+            style: TextStyle(
+              color     : Colors.white,
+              fontSize  : 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
-  // ── Content ────────────────────────────────────────────────
   Widget _buildContent() {
     if (_controller.isLoading) {
       return const Center(
@@ -123,7 +113,7 @@ class _KamarkuPageState extends State<KamarkuPage> {
             const Icon(Icons.bed_outlined,
                 size: 64, color: Color(0xFFB0B0C3)),
             const SizedBox(height: 14),
-            const Text('Belum ada riwayat kos',
+            const Text('Tidak ada kamar aktif',
                 style: TextStyle(
                     color: Color(0xFF9E9E9E), fontSize: 14)),
             const SizedBox(height: 6),
@@ -136,17 +126,17 @@ class _KamarkuPageState extends State<KamarkuPage> {
     }
 
     return RefreshIndicator(
-      color: const Color(0xFF2ECC71),
+      color    : const Color(0xFF2ECC71),
       onRefresh: _controller.loadBookings,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _controller.bookings.length,
+        padding   : const EdgeInsets.all(16),
+        itemCount : _controller.bookings.length,
         itemBuilder: (context, index) {
           final booking = _controller.bookings[index];
           return _BookingCard(
-            booking: booking,
+            booking   : booking,
             controller: _controller,
-            onTap: () => _controller.goToDetail(context, booking.idBooking),
+            onTap     : () => _controller.goToDetail(context, booking.idBooking),
           );
         },
       ),
@@ -168,39 +158,42 @@ class _BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Bangun URL foto yang benar via controller
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin    : const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color       : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
+        boxShadow   : const [
           BoxShadow(
-              color: Color(0x0A000000),
+              color     : Color(0x0A000000),
               blurRadius: 6,
-              offset: Offset(0, 2)),
+              offset    : Offset(0, 2)),
         ],
       ),
       child: Column(
         children: [
-          // ── Foto + Info ──────────────────────────────────
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Foto kamar
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: booking.fotoKamar != null
-                      ? Image.network(
-                          booking.fotoKamar!,
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => _placeholder(),
-                        )
-                      : _placeholder(),
-                ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: booking.fotoKamar != null
+                    ? Image.network(
+                        booking.fotoKamar!.startsWith('http')
+                            ? booking.fotoKamar!
+                            : '${ApiConstants.storageUrl}${booking.fotoKamar!}',
+                        width       : 80,
+                        height      : 80,
+                        fit         : BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _placeholder(),
+                      )
+                    : _placeholder(),
+              ),
                 const SizedBox(width: 12),
 
                 // Info
@@ -208,17 +201,15 @@ class _BookingCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Nama kamar
                       Text(
                         'Kos ${_cap(booking.tipeKamar ?? '')} ${booking.nomorKamar ?? ''}',
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize  : 14,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A1A2E),
+                          color     : Color(0xFF1A1A2E),
                         ),
                       ),
                       const SizedBox(height: 4),
-                      // Tanggal
                       Text(
                         '${controller.formatTanggal(booking.tglMulaiSewa)} - '
                         '${controller.formatTanggal(booking.tglAkhirSewa)}',
@@ -226,17 +217,15 @@ class _BookingCard extends StatelessWidget {
                             fontSize: 12, color: Color(0xFF9E9E9E)),
                       ),
                       const SizedBox(height: 6),
-                      // Total biaya
                       Text(
                         controller.formatHarga(booking.totalBiayaBulanan),
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize  : 14,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A1A2E),
+                          color     : Color(0xFF1A1A2E),
                         ),
                       ),
                       const SizedBox(height: 6),
-                      // Status badge
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
@@ -249,10 +238,9 @@ class _BookingCard extends StatelessWidget {
                         child: Text(
                           controller.statusLabel(booking.statusBooking),
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize  : 11,
                             fontWeight: FontWeight.w600,
-                            color: controller
-                                .statusColor(booking.statusBooking),
+                            color     : controller.statusColor(booking.statusBooking),
                           ),
                         ),
                       ),
@@ -263,12 +251,11 @@ class _BookingCard extends StatelessWidget {
             ),
           ),
 
-          // ── Divider + Tombol Detail ───────────────────────
           const Divider(height: 1, color: Color(0xFFF0F0F0)),
           InkWell(
-            onTap: onTap,
+            onTap       : onTap,
             borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(12),
+              bottomLeft : Radius.circular(12),
               bottomRight: Radius.circular(12),
             ),
             child: const Padding(
@@ -279,9 +266,9 @@ class _BookingCard extends StatelessWidget {
                   Text(
                     'Lihat Detail',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize  : 13,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF2ECC71),
+                      color     : Color(0xFF2ECC71),
                     ),
                   ),
                   SizedBox(width: 4),
@@ -298,10 +285,10 @@ class _BookingCard extends StatelessWidget {
 
   Widget _placeholder() {
     return Container(
-      width: 80,
+      width : 80,
       height: 80,
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
+        color       : const Color(0xFFE8F5E9),
         borderRadius: BorderRadius.circular(10),
       ),
       child: const Icon(Icons.bed_outlined,

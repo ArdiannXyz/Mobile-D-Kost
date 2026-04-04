@@ -1,5 +1,5 @@
 // ============================================================
-// BACKEND LAYER — kamar_detail_controller.dart
+// BACKEND LAYER — kamarku_detail_controller.dart
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -80,7 +80,7 @@ class KamarDetailController {
         _loadKamarDetail(),
         _loadFurnitur(),
       ]);
-      _loadReviews(); // tidak di-await agar tidak block UI
+      _loadReviews();
     } on ApiException catch (e) {
       errorMessage = e.message;
     } catch (_) {
@@ -110,7 +110,6 @@ class KamarDetailController {
       reviewList = await ReviewService.getReviewsByKamar(kamarId);
       displayedReviews = reviewList.take(maxDisplayedReviews).toList();
 
-      // Cek review milik user yang sedang login
       final userId = await ApiHelper.getUserId();
       if (userId != null) {
         _myExistingReview = reviewList
@@ -140,8 +139,20 @@ class KamarDetailController {
     onStateChanged();
   }
 
+  // Tambah furnitur dengan validasi stok
   void tambahFurnitur(int furniturId) {
-    selectedFurnitur[furniturId] = (selectedFurnitur[furniturId] ?? 0) + 1;
+    final furnitur = furniturList.firstWhere(
+      (f) => f.idFurnitur == furniturId,
+      orElse: () => FurniturModel(
+          idFurnitur: 0, namaFurnitur: '', jumlah: 0, hargaSewaTambahan: 0),
+    );
+
+    // Guard: stok habis atau sudah mencapai maksimum stok
+    if (furnitur.jumlah <= 0) return;
+    final currentQty = selectedFurnitur[furniturId] ?? 0;
+    if (currentQty >= furnitur.jumlah) return;
+
+    selectedFurnitur[furniturId] = currentQty + 1;
     onStateChanged();
   }
 
@@ -227,7 +238,6 @@ class KamarDetailController {
     );
   }
 
-  // ← Sudah review → edit, belum review → tulis
   void goToTulisReview(BuildContext context) {
     if (sudahReview && _myExistingReview != null) {
       Navigator.pushNamed(

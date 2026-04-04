@@ -194,17 +194,18 @@ class BookingController {
     }
   }
 
-  String formatHarga(double harga) {
-    if (harga >= 1000000) {
-      final juta = harga / 1000000;
-      return juta == juta.truncateToDouble()
-          ? 'Rp ${juta.toStringAsFixed(0)}.000.000'
-          : 'Rp ${juta.toStringAsFixed(1)}jt';
-    } else if (harga >= 1000) {
-      return 'Rp ${(harga / 1000).toStringAsFixed(0)}.000';
-    }
-    return 'Rp ${harga.toStringAsFixed(0)}';
+String formatHarga(double harga) {
+  // Format angka dengan pemisah titik ribuan
+  final parts = harga.toStringAsFixed(0).split('');
+  String result = '';
+  int counter = 0;
+  for (int i = parts.length - 1; i >= 0; i--) {
+    if (counter > 0 && counter % 3 == 0) result = '.$result';
+    result = parts[i] + result;
+    counter++;
   }
+  return 'Rp $result';
+}
 
   void _showError(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(

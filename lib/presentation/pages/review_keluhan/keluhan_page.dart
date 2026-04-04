@@ -67,7 +67,7 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
             top: MediaQuery.of(context).padding.top + 12,
             left: 16,
             right: 16,
-            bottom: 20,
+            bottom: 16,
           ),
           child: const Center(
             child: Text(

@@ -65,24 +65,33 @@ class _PaymentPageState extends State<PaymentPage> {
     }
   }
 
-  Future<void> _bayarSekarang() async {
-    if (_snapToken == null) return;
-    setState(() => _isPaymentLoading = true);
-    final uri = Uri.parse(_snapUrl);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Tidak bisa membuka halaman pembayaran.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+Future<void> _bayarSekarang() async {
+  if (_snapToken == null) return;
+  setState(() => _isPaymentLoading = true);
+  final uri = Uri.parse(_snapUrl);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    // ← Setelah kembali dari Midtrans, langsung ke home
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/home',
+        (route) => false,
+      );
     }
-    if (mounted) setState(() => _isPaymentLoading = false);
+  } else {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tidak bisa membuka halaman pembayaran.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
+  if (mounted) setState(() => _isPaymentLoading = false);
+}
 
   @override
   Widget build(BuildContext context) {
@@ -328,8 +337,14 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   String _formatHarga(double harga) {
-    if (harga >= 1000000) return 'Rp ${(harga/1000000).toStringAsFixed(0)}.000.000';
-    if (harga >= 1000) return 'Rp ${(harga/1000).toStringAsFixed(0)}.000';
-    return 'Rp ${harga.toStringAsFixed(0)}';
+    final parts = harga.toStringAsFixed(0).split('');
+    String result = '';
+    int counter = 0;
+    for (int i = parts.length - 1; i >= 0; i--) {
+      if (counter > 0 && counter % 3 == 0) result = '.$result';
+      result = parts[i] + result;
+      counter++;
+    }
+    return 'Rp $result';
   }
 }
