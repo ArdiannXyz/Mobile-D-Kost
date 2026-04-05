@@ -36,6 +36,9 @@ import 'presentation/pages/profil_setting/setting_page.dart';
 import 'presentation/pages/profil_setting/detail_akun_page.dart';
 import 'presentation/pages/profil_setting/edit_akun_page.dart';
 import 'presentation/pages/profil_setting/panduan_page.dart' ;
+import 'presentation/pages/chatbot/chatbot_page.dart';
+
+
 // ── Model ──────────────────────────────────────────────────────
 import '../../../data/models/kamar_models.dart';
 import '../../../data/models/furnitur_models.dart';
@@ -118,6 +121,7 @@ class DKostApp extends StatelessWidget {
       '/keluhan-list':   (_) => const KeluhanListPage(),
       '/lapor-keluhan':  (_) => const LaporKeluhanPage(),
       '/setting':        (_) => const SettingPage(),
+      '/chatbot':        (_) => const ChatbotPage(),
       '/detail-akun':    (_) => const DetailAkunPage(),
       '/panduan':        (_) => const PanduanPage(),
       '/kamarku':        (_) => const KamarkuPage(),
