@@ -51,23 +51,25 @@ flutter:
     - assets/images/dkos_1.png              # Logo D'Kost
     - assets/images/dkos_2.png              # Logo D'Kost
     - assets/images/dkos_3.png              # Logo D'Kost
-    - assets/images/home_green.png      # Bottom nav: Dashboard aktif
-    - assets/images/home_black.png      # Bottom nav: Dashboard nonaktif
+    - assets/images/home_green.png          # Bottom nav: Dashboard aktif
+    - assets/images/home_black.png          # Bottom nav: Dashboard nonaktif
     - assets/images/Keluhan_green.png       # Bottom nav: Keluhan aktif
     - assets/images/Keluhan_black.png       # Bottom nav: Keluhan nonaktif
     - assets/images/kamarku_green.png       # Bottom nav: Riwayat Kos aktif
     - assets/images/kamarku_black.png       # Bottom nav: Riwayat Kos nonaktif
     - assets/images/setting_green.png       # Bottom nav: Setting aktif
     - assets/images/setting_black.png       # Bottom nav: Setting nonaktif
+    - assets/images/sinora_icon.png         # Icon chatbot
     - assets/images/person_1.png            # Avatar profil default
     - assets/images/person_2.png            # Avatar profil alternatif
-    - assets/images/picture.png      
-    - assets/images/robot.png           # Placeholder foto kamar
+    - assets/images/picture.png             # Placeholder foto profil 
+    - assets/images/robot.png               # Placeholder foto kamar
+    - assets/images/sinora_icon.png         # Avatar chatbot
     - assets/images/calendar_1.png          # Icon kalender (booking)
     - assets/images/attach_file.png         # Icon lampiran (keluhan)
     - assets/images/detail_informasi_akun.png # Icon info akun
-    - assets/images/change-password-icon.png # Icon ganti password
-    - assets/images/logout.png          # Icon logout
+    - assets/images/change-password-icon.png  # Icon ganti password
+    - assets/images/logout.png                # Icon logout
 
 # ── Splash Screen ───────────────────────────────────────────────
 flutter_native_splash:

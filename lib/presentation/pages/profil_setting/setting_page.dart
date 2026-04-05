@@ -64,7 +64,12 @@ class _SettingPageState extends State<SettingPage> {
                       label: 'Panduan',
                       onTap: () => _controller.goToPanduan(context),
                     ),
-                    _MenuItem(
+                     _MenuItem(
+                      assetIcon: 'assets/images/sinora_icon.png', 
+                      label: 'Sinora AI',
+                      onTap: () => _controller.goToSinora(context),
+                    ),                    
+                     _MenuItem(
                       assetIcon:
                           'assets/images/change-password-icon.png',
                       label: 'Lupa Password',

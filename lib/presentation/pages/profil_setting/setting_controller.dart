@@ -174,4 +174,8 @@ class SettingController {
   void goToPanduan(BuildContext context) {
     Navigator.pushNamed(context, '/panduan');
   }
+
+  void goToSinora(BuildContext context) {
+    Navigator.pushNamed(context, '/chatbot');
+  }
 }
