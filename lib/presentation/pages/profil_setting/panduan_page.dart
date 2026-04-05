@@ -1,11 +1,3 @@
-// ============================================================
-// FRONTEND LAYER — panduan_page.dart
-// Halaman chatbot panduan D'Kost.
-// Warna tema: hijau #2ECC71 (konsisten dengan seluruh app).
-// Quick replies: booking, tagihan, keluhan, furnitur,
-// kontak, tentang.
-// ============================================================
-
 import 'package:flutter/material.dart';
 import 'panduan_controller.dart';
 
