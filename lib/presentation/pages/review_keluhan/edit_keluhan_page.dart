@@ -1,6 +1,5 @@
 // ============================================================
-// FRONTEND LAYER — edit_keluhan_page.dart
-// UI sama seperti lapor_keluhan_page
+// FILE: lib/presentation/pages/keluhan/edit_keluhan_page.dart
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -26,7 +25,6 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
         if (mounted) setState(() {});
       },
     );
-    // Pre-fill data keluhan yang ada
     _controller.initEditForm(widget.keluhan);
   }
 
@@ -58,8 +56,8 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
       title: const Text(
         'Edit Keluhan',
         style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
+            color     : Colors.white,
+            fontSize  : 16,
             fontWeight: FontWeight.w600),
       ),
     );
@@ -76,7 +74,7 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
               children: [
                 _buildLabel('Nomor Kamar'),
                 const SizedBox(height: 8),
-                _buildReadOnlyField(_controller.nomorKamarController),
+                _buildNomorKamarReadOnly(),
 
                 const SizedBox(height: 16),
 
@@ -102,56 +100,100 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
           ),
         ),
 
-        // Tombol simpan sticky bawah
+        // ── Tombol bawah ──────────────────────────────────────
         Container(
           color: Colors.white,
           padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 12,
+            left  : 16,
+            right : 16,
+            top   : 12,
             bottom: MediaQuery.of(context).padding.bottom + 12,
           ),
-          child: SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton(
-              onPressed: _controller.isSubmitting
-                  ? null
-                  : () => _controller.editKeluhan(
-                      context, widget.keluhan.idKeluhan),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2ECC71),
-                disabledBackgroundColor:
-                    const Color(0xFF2ECC71).withOpacity(0.5),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                elevation: 0,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Simpan Perubahan
+              SizedBox(
+                width : double.infinity,
+                height: 48,
+                child : ElevatedButton(
+                  onPressed: _controller.isSubmitting
+                      ? null
+                      : () => _controller.editKeluhan(
+                          context, widget.keluhan.idKeluhan),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor        : const Color(0xFF2ECC71),
+                    disabledBackgroundColor: const Color(0xFF2ECC71).withOpacity(0.5),
+                    foregroundColor        : Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                  ),
+                  child: _controller.isSubmitting
+                      ? const SizedBox(
+                          width : 20,
+                          height: 20,
+                          child : CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Text('Simpan Perubahan',
+                          style: TextStyle(
+                              fontSize  : 15,
+                              fontWeight: FontWeight.w600)),
+                ),
               ),
-              child: _controller.isSubmitting
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2),
-                    )
-                  : const Text('Simpan Perubahan',
+
+              const SizedBox(height: 10),
+
+              // Hapus Keluhan
+              SizedBox(
+                width : double.infinity,
+                height: 48,
+                child : OutlinedButton.icon(
+                  onPressed: _controller.isSubmitting
+                      ? null
+                      : () => _controller.hapusKeluhan(
+                          context, widget.keluhan.idKeluhan),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red,
+                    side : const BorderSide(color: Colors.red),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  icon : const Icon(Icons.delete_outline, size: 18),
+                  label: const Text('Hapus Keluhan',
                       style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600)),
-            ),
+                          fontSize  : 15,
+                          fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  Widget _buildReadOnlyField(TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      readOnly: true,
-      style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
-      decoration: _inputDecoration().copyWith(
-        fillColor: const Color(0xFFF5F5F5),
+  // ── Nomor kamar read-only ──────────────────────────────────
+  Widget _buildNomorKamarReadOnly() {
+    final nomor = widget.keluhan.nomorKamar ?? '-';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: BoxDecoration(
+        color       : const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(10),
+        border      : Border.all(color: const Color(0xFFE0E0E0)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.meeting_room_outlined,
+              color: Color(0xFF9E9E9E), size: 20),
+          const SizedBox(width: 10),
+          Text(
+            'Kamar $nomor',
+            style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
+          ),
+        ],
       ),
     );
   }
@@ -159,9 +201,9 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
   Widget _buildDateField() {
     return TextField(
       controller: _controller.tanggalController,
-      readOnly: true,
-      onTap: () => _controller.pickDate(context),
-      style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
+      readOnly  : true,
+      onTap     : () => _controller.pickDate(context),
+      style     : const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
       decoration: _inputDecoration().copyWith(
         suffixIcon: const Icon(Icons.calendar_month_outlined,
             color: Color(0xFF9E9E9E), size: 20),
@@ -172,23 +214,24 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
   Widget _buildDeskripsiField() {
     return TextField(
       controller: _controller.deskripsiController,
-      maxLines: 5,
-      style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
+      maxLines  : 5,
+      style     : const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
       decoration: _inputDecoration().copyWith(
-        hintText: 'Jelaskan keluhan Anda...',
-        alignLabelWithHint: true,
+        hintText           : 'Jelaskan keluhan Anda...',
+        alignLabelWithHint : true,
       ),
     );
   }
 
   Widget _buildFotoBuktiField() {
+    // Foto baru dipilih user
     if (_controller.fotoBuktiBytes != null) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color       : Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFE0E0E0)),
+          border      : Border.all(color: const Color(0xFFE0E0E0)),
         ),
         child: Row(
           children: [
@@ -196,14 +239,14 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
               borderRadius: BorderRadius.circular(6),
               child: Image.memory(
                 _controller.fotoBuktiBytes!,
-                width: 36,
+                width : 36,
                 height: 36,
-                fit: BoxFit.cover,
+                fit   : BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
-                  width: 36,
+                  width : 36,
                   height: 36,
-                  color: const Color(0xFFE8F5E9),
-                  child: const Icon(Icons.image_outlined,
+                  color : const Color(0xFFE8F5E9),
+                  child : const Icon(Icons.image_outlined,
                       color: Color(0xFF2ECC71), size: 20),
                 ),
               ),
@@ -212,14 +255,14 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
             Expanded(
               child: Text(
                 _controller.fotoBuktiNama ?? 'foto_bukti',
-                style: const TextStyle(
+                style   : const TextStyle(
                     fontSize: 13, color: Color(0xFF1A1A2E)),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             GestureDetector(
-              onTap: _controller.removeFoto,
-              child: const Icon(Icons.close,
+              onTap : _controller.removeFoto,
+              child : const Icon(Icons.close,
                   size: 18, color: Color(0xFF9E9E9E)),
             ),
           ],
@@ -227,15 +270,15 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
       );
     }
 
-    // Tampilkan foto lama jika ada
+    // Ada foto lama dari server
     if (widget.keluhan.fotoBukti != null &&
         widget.keluhan.fotoBukti!.isNotEmpty) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color       : Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFE0E0E0)),
+          border      : Border.all(color: const Color(0xFFE0E0E0)),
         ),
         child: Row(
           children: [
@@ -243,30 +286,35 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
                 color: Color(0xFF2ECC71), size: 20),
             const SizedBox(width: 8),
             const Expanded(
-              child: Text('Foto bukti sebelumnya',
-                  style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E))),
+              child: Text(
+                'Foto bukti sebelumnya',
+                style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
+              ),
             ),
             GestureDetector(
-              onTap: () => _controller.pickFoto(context),
-              child: const Text('Ganti',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF2ECC71),
-                      fontWeight: FontWeight.w500)),
+              onTap : () => _controller.pickFoto(context),
+              child : const Text(
+                'Ganti',
+                style: TextStyle(
+                    fontSize  : 12,
+                    color     : Color(0xFF2ECC71),
+                    fontWeight: FontWeight.w500),
+              ),
             ),
           ],
         ),
       );
     }
 
+    // Belum ada foto
     return GestureDetector(
-      onTap: () => _controller.pickFoto(context),
-      child: Container(
+      onTap : () => _controller.pickFoto(context),
+      child : Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color       : Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFE0E0E0)),
+          border      : Border.all(color: const Color(0xFFE0E0E0)),
         ),
         child: const Row(
           children: [
@@ -274,8 +322,7 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
                 color: Color(0xFF9E9E9E), size: 20),
             SizedBox(width: 8),
             Text('Pilih foto bukti',
-                style:
-                    TextStyle(fontSize: 13, color: Color(0xFFB0B0C3))),
+                style: TextStyle(fontSize: 13, color: Color(0xFFB0B0C3))),
           ],
         ),
       ),
@@ -286,31 +333,29 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
     return Text(
       text,
       style: const TextStyle(
-        fontSize: 13,
+        fontSize  : 13,
         fontWeight: FontWeight.w500,
-        color: Color(0xFF1A1A2E),
+        color     : Color(0xFF1A1A2E),
       ),
     );
   }
 
   InputDecoration _inputDecoration() {
     return InputDecoration(
-      filled: true,
-      fillColor: Colors.white,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      filled      : true,
+      fillColor   : Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+        borderSide  : const BorderSide(color: Color(0xFFE0E0E0)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+        borderSide  : const BorderSide(color: Color(0xFFE0E0E0)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide:
-            const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
+        borderSide  : const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
       ),
     );
   }

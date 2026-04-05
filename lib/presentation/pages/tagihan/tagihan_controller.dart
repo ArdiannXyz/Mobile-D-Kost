@@ -431,17 +431,48 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:dkost/data/helper/api_helper.dart';
 import 'package:dkost/data/helper/api_constants.dart';
-import 'package:dkost/data/models/tagihan_models.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+class TagihanUiModel {
+  final int idTagihan;
+  final int idBooking;
+  final String? namaKamar;
+  final String? fotoKamar;
+  final String periodeAwal;
+  final String periodeAkhir;
+  final String periodeBulan;
+  final double totalTagihan;
+  final double nominalDenda;
+  final String? tglJatuhTempo;
+  final String statusTagihan;
+  final String statusBooking;
+  final String tglBooking;
+
+  const TagihanUiModel({
+    required this.idTagihan,
+    required this.idBooking,
+    this.namaKamar,
+    this.fotoKamar,
+    required this.periodeAwal,
+    required this.periodeAkhir,
+    required this.periodeBulan,
+    required this.totalTagihan,
+    required this.nominalDenda,
+    this.tglJatuhTempo,
+    required this.statusTagihan,
+    required this.statusBooking,
+    required this.tglBooking,
+  });
+}
 
 class TagihanController {
   bool isLoading = true;
   bool isDeleting = false;
   String? errorMessage;
 
-  List<TagihanModel> allTagihan = [];
-  List<TagihanModel> filteredTagihan = [];
+  List<TagihanUiModel> allTagihan = [];
+  List<TagihanUiModel> filteredTagihan = [];
 
   String selectedFilter = 'Belum Bayar';
   final VoidCallback onStateChanged;
@@ -465,33 +496,43 @@ class TagihanController {
       }
 
       final headers = await ApiHelper.authHeaders;
-
       final response = await http.get(
         Uri.parse('${ApiConstants.baseUrl}tagihan/user/$userId'),
         headers: headers,
       );
 
-      print('STATUS TAGIHAN: ${response.statusCode}');
-      print('BODY TAGIHAN: ${response.body}');
-
-      if (response.statusCode != 200) {
-        throw Exception('Server error ${response.statusCode}');
-      }
-
       final data = jsonDecode(response.body);
 
-      if (data['success'] != true) {
-        throw Exception('API gagal');
+      if (response.statusCode != 200 || data['success'] != true) {
+        errorMessage = data['message'] ?? 'Gagal memuat tagihan.';
+        return;
       }
 
-      final list = (data['data'] as List?) ?? [];
+      final List list = data['data'] ?? [];
 
-      allTagihan =
-          list.map((item) => TagihanModel.fromJson(item)).toList();
+      allTagihan = list.map((e) {
+        double parseDouble(dynamic v) =>
+            v == null ? 0.0 : double.tryParse(v.toString()) ?? 0.0;
+
+        return TagihanUiModel(
+          idTagihan: e['id_tagihan'] as int,
+          idBooking: e['id_booking'] as int,
+          namaKamar: e['nama_kamar'] as String?,
+          fotoKamar: e['foto_kamar'] as String?,
+          periodeAwal: e['tgl_mulai_sewa'] as String? ?? '',
+          periodeAkhir: e['tgl_akhir_sewa'] as String? ?? '',
+          periodeBulan: e['periode_bulan'] as String? ?? '',
+          totalTagihan: parseDouble(e['total_tagihan']),
+          nominalDenda: parseDouble(e['nominal_denda']),
+          tglJatuhTempo: e['tgl_jatuh_tempo'] as String?,
+          statusTagihan: e['status_tagihan'] as String,
+          statusBooking: e['status_booking'] as String? ?? 'aktif',
+          tglBooking: e['periode_bulan'] as String? ?? '',
+        );
+      }).toList();
 
       _applyFilter();
     } catch (e) {
-      print('ERROR TAGIHAN: $e');
       errorMessage = 'Gagal memuat tagihan';
     } finally {
       isLoading = false;
@@ -499,89 +540,79 @@ class TagihanController {
     }
   }
 
-  // ── CEK TAGIHAN BULAN INI ─────────────────
-  Future<void> cekTagihanBulanIni(
-      BuildContext context, TagihanModel tagihan) async {
+  // ── HAPUS TAGIHAN ────────────────────────
+  Future<void> hapusTagihan(
+      BuildContext context, TagihanUiModel tagihan) async {
+    final konfirmasi = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Text('Hapus Tagihan?'),
+        content: const Text(
+            'Tagihan yang sudah lunas akan dihapus dari riwayat.'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Batal')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Hapus', style: TextStyle(color: Colors.red))),
+        ],
+      ),
+    );
+
+    if (konfirmasi != true) return;
+
+    isDeleting = true;
+    onStateChanged();
+
     try {
       final headers = await ApiHelper.authHeaders;
-
-      final response = await http.get(
-        Uri.parse(
-            '${ApiConstants.baseUrl}tagihan/bulan-ini/${tagihan.idBooking}'),
+      final response = await http.delete(
+        Uri.parse('${ApiConstants.baseUrl}tagihan/${tagihan.idTagihan}'),
         headers: headers,
       );
 
-      if (response.statusCode != 200) {
-        throw Exception('Server error');
-      }
-
       final data = jsonDecode(response.body);
-      if (!context.mounted) return;
 
-      final sudahAda = data['sudah_ada'] ?? false;
-      final detail = data['data'];
-
-      final bulanIni =
-          DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now());
-
-      double parseDouble(dynamic val) {
-        if (val == null) return 0;
-        return double.tryParse(val.toString()) ?? 0;
+      if (response.statusCode != 200 || data['success'] != true) {
+        throw Exception();
       }
 
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14)),
-          title: Text('Tagihan $bulanIni'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                sudahAda
-                    ? (detail?['status_tagihan'] == 'lunas'
-                        ? Icons.check_circle_outline
-                        : Icons.cancel_outlined)
-                    : Icons.pending_outlined,
-                color: sudahAda
-                    ? (detail?['status_tagihan'] == 'lunas'
-                        ? const Color(0xFF2ECC71)
-                        : const Color(0xFFE74C3C))
-                    : const Color(0xFFF39C12),
-                size: 48,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                sudahAda
-                    ? 'Tagihan sudah ada\nStatus: ${_statusLabel(detail?['status_tagihan'] ?? '')}'
-                    : 'Tagihan bulan ini belum dibuat',
-                textAlign: TextAlign.center,
-              ),
-              if (sudahAda && detail != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  formatHarga(parseDouble(detail['total_tagihan'])),
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
+      final List list = data['data'] ?? [];
+
+      allTagihan = list.map((e) {
+        double parseDouble(dynamic v) =>
+            v == null ? 0.0 : double.tryParse(v.toString()) ?? 0.0;
+
+        return TagihanUiModel(
+          idTagihan: e['id_tagihan'] as int,
+          idBooking: e['id_booking'] as int,
+          namaKamar: e['nama_kamar'] as String?,
+          fotoKamar: e['foto_kamar'] as String?,
+          periodeAwal: e['tgl_mulai_sewa'] as String? ?? '',
+          periodeAkhir: e['tgl_akhir_sewa'] as String? ?? '',
+          periodeBulan: e['periode_bulan'] as String? ?? '',
+          totalTagihan: parseDouble(e['total_tagihan']),
+          nominalDenda: parseDouble(e['nominal_denda']),
+          tglJatuhTempo: e['tgl_jatuh_tempo'] as String?,
+          statusTagihan: e['status_tagihan'] as String,
+          statusBooking: e['status_booking'] as String? ?? 'aktif',
+          tglBooking: e['periode_bulan'] as String? ?? '',
+        );
+      }).toList();
+
+      _applyFilter();
     } catch (e) {
-      _showError(context, 'Gagal cek tagihan: $e');
+      errorMessage = 'Gagal hapus tagihan';
+    } finally {
+      isDeleting = false;
+      onStateChanged();
     }
   }
 
-  // ── FILTER ────────────────────────────────
+  // ── FILTER ───────────────────────────────
   void filterTagihan(String filter) {
     selectedFilter = filter;
     _applyFilter();
@@ -590,16 +621,22 @@ class TagihanController {
   void _applyFilter() {
     switch (selectedFilter) {
       case 'Belum Bayar':
-        filteredTagihan =
-            allTagihan.where((t) => t.statusTagihan == 'belum_bayar').toList();
-        break;
-      case 'Telat':
-        filteredTagihan =
-            allTagihan.where((t) => t.statusTagihan == 'terlambat').toList();
+        filteredTagihan = allTagihan
+            .where((t) =>
+                t.statusBooking != 'batal' &&
+                t.statusTagihan == 'belum_bayar')
+            .toList();
         break;
       case 'Lunas':
+        filteredTagihan = allTagihan
+            .where((t) =>
+                t.statusBooking != 'batal' &&
+                t.statusTagihan == 'lunas')
+            .toList();
+        break;
+      case 'Batal':
         filteredTagihan =
-            allTagihan.where((t) => t.statusTagihan == 'lunas').toList();
+            allTagihan.where((t) => t.statusBooking == 'batal').toList();
         break;
       default:
         filteredTagihan = List.from(allTagihan);
@@ -608,7 +645,7 @@ class TagihanController {
     onStateChanged();
   }
 
-  // ── FORMAT ────────────────────────────────
+  // ── FORMAT ───────────────────────────────
   String formatHarga(double harga) {
     return NumberFormat.currency(
       locale: 'id_ID',
@@ -626,28 +663,6 @@ class TagihanController {
     }
   }
 
-  String _statusLabel(String status) {
-    switch (status) {
-      case 'belum_bayar':
-        return 'Belum Bayar';
-      case 'lunas':
-        return 'Lunas';
-      case 'terlambat':
-        return 'Telat';
-      default:
-        return status;
-    }
-  }
-
-  // ── NAVIGASI ──────────────────────────────
-  void goToDetail(BuildContext context, TagihanModel tagihan) {
-    Navigator.pushNamed(
-      context,
-      '/detail-kamarku',
-      arguments: {'booking_id': tagihan.idBooking},
-    );
-  }
-
   // ── INFO ─────────────────────────────────
   void showInfo(BuildContext context) {
     showDialog(
@@ -659,15 +674,14 @@ class TagihanController {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('• Belum Bayar = tagihan aktif'),
-            Text('• Telat = melewati jatuh tempo'),
             Text('• Lunas = sudah dibayar'),
+            Text('• Batal = booking dibatalkan'),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK')),
         ],
       ),
     );

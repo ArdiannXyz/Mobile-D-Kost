@@ -1,731 +1,375 @@
-// import 'package:flutter/material.dart';
-// import 'tagihan_controller.dart';
-
-// class TagihanPage extends StatefulWidget {
-//   const TagihanPage({super.key});
-
-//   @override
-//   State<TagihanPage> createState() => _TagihanPageState();
-// }
-
-// class _TagihanPageState extends State<TagihanPage> 
-//     with WidgetsBindingObserver {  // ← tambah mixin ini
-//   late final TagihanController _controller;
-  
-// @override
-// void initState() {
-//   super.initState();
-//   _controller = TagihanController(
-//     onStateChanged: () { if (mounted) setState(() {}); },
-//   );
-//   _controller.loadTagihan();
-// }
-
-// // ← tambah ini agar refresh saat balik ke halaman
-// @override
-// void didChangeDependencies() {
-//   super.didChangeDependencies();
-// }
-
-//   @override
-//   void didChangeAppLifecycleState(AppLifecycleState state) {
-//     if (state == AppLifecycleState.resumed) {
-//       _controller.loadTagihan();
-//     }
-//   }
-//     void dispose() {
-//     WidgetsBinding.instance.removeObserver(this); // ← tambah
-//     super.dispose();
-//   }
-
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: const Color(0xFFF5F7FA),
-//       body: Column(
-//         children: [
-//           _buildHeader(),
-//           _buildFilterChips(),
-//           Expanded(child: _buildContent()),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildHeader() {
-//     return Container(
-//       color: const Color(0xFF2ECC71),
-//       width: double.infinity,
-//       padding: EdgeInsets.only(
-//         top: MediaQuery.of(context).padding.top + 12,
-//         bottom: 16,
-//       ),
-//       child: const Center(
-//         child: Text(
-//           'Tagihan',
-//           style: TextStyle(
-//             color: Colors.white,
-//             fontSize: 18,
-//             fontWeight: FontWeight.bold,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildFilterChips() {
-//     const filters = ['Belum Bayar', 'Telat', 'Lunas'];
-//     return Container(
-//       color: Colors.white,
-//       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-//       child: Row(
-//         children: [
-//           ...filters.map((f) {
-//             final isSelected = _controller.selectedFilter == f;
-//             return Padding(
-//               padding: const EdgeInsets.only(right: 8),
-//               child: GestureDetector(
-//                 onTap: () => _controller.filterTagihan(f),
-//                 child: AnimatedContainer(
-//                   duration: const Duration(milliseconds: 150),
-//                   padding: const EdgeInsets.symmetric(
-//                       horizontal: 16, vertical: 8),
-//                   decoration: BoxDecoration(
-//                     color: isSelected
-//                         ? const Color(0xFF2ECC71)
-//                         : Colors.white,
-//                     borderRadius: BorderRadius.circular(20),
-//                     border: Border.all(
-//                       color: isSelected
-//                           ? const Color(0xFF2ECC71)
-//                           : const Color(0xFFE0E0E0),
-//                     ),
-//                   ),
-//                   child: Text(
-//                     f,
-//                     style: TextStyle(
-//                       fontSize: 12,
-//                       fontWeight: FontWeight.w500,
-//                       color: isSelected
-//                           ? Colors.white
-//                           : const Color(0xFF555555),
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             );
-//           }),
-//           const Spacer(),
-//           GestureDetector(
-//             onTap: () => _controller.showInfo(context),
-//             child: const Icon(Icons.info_outline,
-//                 color: Color(0xFF9E9E9E), size: 20),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildContent() {
-//     if (_controller.isLoading) {
-//       return const Center(
-//           child: CircularProgressIndicator(color: Color(0xFF2ECC71)));
-//     }
-
-//     if (_controller.errorMessage != null) {
-//       return Center(
-//         child: Padding(
-//           padding: const EdgeInsets.all(32),
-//           child: Column(
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               const Icon(Icons.wifi_off_rounded,
-//                   size: 56, color: Color(0xFFB0B0C3)),
-//               const SizedBox(height: 12),
-//               Text(_controller.errorMessage!,
-//                   style: const TextStyle(color: Color(0xFF9E9E9E))),
-//               const SizedBox(height: 16),
-//               ElevatedButton(
-//                 onPressed: _controller.loadTagihan,
-//                 style: ElevatedButton.styleFrom(
-//                   backgroundColor: const Color(0xFF2ECC71),
-//                   foregroundColor: Colors.white,
-//                   shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.circular(10)),
-//                 ),
-//                 child: const Text('Coba Lagi'),
-//               ),
-//             ],
-//           ),
-//         ),
-//       );
-//     }
-
-//     if (_controller.filteredTagihan.isEmpty) {
-//       return Center(
-//         child: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             const Icon(Icons.receipt_long_outlined,
-//                 size: 64, color: Color(0xFFB0B0C3)),
-//             const SizedBox(height: 14),
-//             Text(
-//               'Tidak ada tagihan ${_controller.selectedFilter.toLowerCase()}',
-//               style: const TextStyle(
-//                   color: Color(0xFF9E9E9E), fontSize: 14),
-//             ),
-//           ],
-//         ),
-//       );
-//     }
-
-//     return RefreshIndicator(
-//       color: const Color(0xFF2ECC71),
-//       onRefresh: _controller.loadTagihan,
-//       child: ListView.builder(
-//         padding: const EdgeInsets.all(16),
-//         itemCount: _controller.filteredTagihan.length,
-//         itemBuilder: (context, index) {
-//           final tagihan = _controller.filteredTagihan[index];
-//           return _TagihanCard(
-//             tagihan: tagihan,
-//             controller: _controller,
-//             onTap: () => _controller.goToDetail(context, tagihan),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-
-// // ── Tagihan Card ───────────────────────────────────────────────
-// class _TagihanCard extends StatelessWidget {
-//   final TagihanUiModel tagihan;
-//   final TagihanController controller;
-//   final VoidCallback onTap;
-
-//   const _TagihanCard({
-//     required this.tagihan,
-//     required this.controller,
-//     required this.onTap,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return GestureDetector(
-//       onTap: onTap,
-//       child: Container(
-//         margin: const EdgeInsets.only(bottom: 12),
-//         decoration: BoxDecoration(
-//           color: Colors.white,
-//           borderRadius: BorderRadius.circular(12),
-//           boxShadow: const [
-//             BoxShadow(
-//                 color: Color(0x0A000000),
-//                 blurRadius: 6,
-//                 offset: Offset(0, 2)),
-//           ],
-//         ),
-//         child: Column(
-//           children: [
-//             Padding(
-//               padding: const EdgeInsets.all(12),
-//               child: Row(
-//                 children: [
-//                   // Foto kamar
-//                   ClipRRect(
-//                     borderRadius: BorderRadius.circular(10),
-//                     child: tagihan.fotoKamar != null
-//                         ? Image.network(
-//                             tagihan.fotoKamar!,
-//                             width: 72,
-//                             height: 72,
-//                             fit: BoxFit.cover,
-//                             errorBuilder: (_, __, ___) => _placeholder(),
-//                           )
-//                         : _placeholder(),
-//                   ),
-//                   const SizedBox(width: 12),
-
-//                   Expanded(
-//                     child: Column(
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: [
-//                         Text(
-//                           tagihan.namaKamar ?? 'Kamar',
-//                           style: const TextStyle(
-//                             fontSize: 14,
-//                             fontWeight: FontWeight.bold,
-//                             color: Color(0xFF1A1A2E),
-//                           ),
-//                         ),
-//                         const SizedBox(height: 4),
-//                         Text(
-//                           'Sewa : ${controller.formatTanggal(tagihan.periodeAwal)}',
-//                           style: const TextStyle(
-//                               fontSize: 12, color: Color(0xFF9E9E9E)),
-//                         ),
-//                         Text(
-//                           'Berakhir : ${controller.formatTanggal(tagihan.periodeAkhir)}',
-//                           style: const TextStyle(
-//                               fontSize: 12, color: Color(0xFF9E9E9E)),
-//                         ),
-//                         const SizedBox(height: 6),
-//                         Text(
-//                           controller.formatHarga(tagihan.totalTagihan),
-//                           style: const TextStyle(
-//                             fontSize: 14,
-//                             fontWeight: FontWeight.bold,
-//                             color: Color(0xFF1A1A2E),
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-
-//                   // Status badge
-//                   _StatusBadge(status: tagihan.statusTagihan),
-//                 ],
-//               ),
-//             ),
-
-//             // ── Action buttons ────────────────────────────
-//             Container(
-//               decoration: const BoxDecoration(
-//                 border: Border(
-//                   top: BorderSide(color: Color(0xFFF0F0F0)),
-//                 ),
-//               ),
-//               child: Row(
-//                 children: [
-//                   // Cek tagihan bulan ini
-//                   Expanded(
-//                     child: TextButton.icon(
-//                       onPressed: () =>
-//                           controller.cekTagihanBulanIni(context, tagihan),
-//                       icon: const Icon(Icons.calendar_month_outlined,
-//                           size: 14, color: Color(0xFF2ECC71)),
-//                       label: const Text(
-//                         'Cek Bulan Ini',
-//                         style: TextStyle(
-//                             fontSize: 12, color: Color(0xFF2ECC71)),
-//                       ),
-//                       style: TextButton.styleFrom(
-//                         padding: const EdgeInsets.symmetric(vertical: 8),
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _placeholder() {
-//     return Container(
-//       width: 72,
-//       height: 72,
-//       decoration: BoxDecoration(
-//         color: const Color(0xFFE8F5E9),
-//         borderRadius: BorderRadius.circular(10),
-//       ),
-//       child: const Icon(Icons.bed_outlined,
-//           color: Color(0xFF2ECC71), size: 28),
-//     );
-//   }
-// }
-
-// // ── Status Badge ───────────────────────────────────────────────
-// class _StatusBadge extends StatelessWidget {
-//   final String status;
-//   const _StatusBadge({required this.status});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     Color color;
-//     String label;
-//     switch (status) {
-//       case 'lunas':
-//         color = const Color(0xFF2ECC71);
-//         label = 'Lunas';
-//         break;
-//       case 'terlambat':
-//         color = const Color(0xFFE74C3C);
-//         label = 'Telat';
-//         break;
-//       default:
-//         color = const Color(0xFFF39C12);
-//         label = 'Belum Bayar';
-//     }
-
-//     return Container(
-//       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-//       decoration: BoxDecoration(
-//         color: color.withOpacity(0.1),
-//         borderRadius: BorderRadius.circular(8),
-//         border: Border.all(color: color.withOpacity(0.3)),
-//       ),
-//       child: Text(
-//         label,
-//         style: TextStyle(
-//           fontSize: 10,
-//           fontWeight: FontWeight.w600,
-//           color: color,
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-
+import 'package:dkost/data/helper/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'tagihan_controller.dart';
 import 'package:dkost/data/models/tagihan_models.dart';
 
-class TagihanPage extends StatefulWidget {
-  const TagihanPage({super.key});
 
-  @override
-  State<TagihanPage> createState() => _TagihanPageState();
-}
+    class TagihanPage extends StatefulWidget {
+      const TagihanPage({super.key});
 
-class _TagihanPageState extends State<TagihanPage>
-    with WidgetsBindingObserver {
-  late final TagihanController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-
-    _controller = TagihanController(
-      onStateChanged: () {
-        if (mounted) setState(() {});
-      },
-    );
-
-    _controller.loadTagihan();
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _controller.loadTagihan();
+      @override
+      State<TagihanPage> createState() => _TagihanPageState();
     }
-  }
+    // ← with WidgetsBindingObserver dihapus — penyebab reload loop
+    class _TagihanPageState extends State<TagihanPage> {
+      late final TagihanController _controller;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      body: Column(
-        children: [
-          _buildHeader(),
-          _buildFilterChips(),
-          Expanded(child: _buildContent()),
-        ],
-      ),
-    );
-  }
+      @override
+      void initState() {
+        super.initState();
+        _controller = TagihanController(
+          onStateChanged: () { if (mounted) setState(() {}); },
+        );
+        _controller.loadTagihan();
+      }
 
-  Widget _buildHeader() {
-    return Container(
-      color: const Color(0xFF2ECC71),
-      width: double.infinity,
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 12,
-        bottom: 16,
-      ),
-      child: const Center(
-        child: Text(
-          'Tagihan',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+      @override
+      void dispose() {
+        super.dispose();
+      }
+
+      @override
+      Widget build(BuildContext context) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF5F7FA),
+          body: Column(
+            children: [
+              _buildHeader(),
+              _buildFilterChips(),
+              Expanded(child: _buildContent()),
+            ],
           ),
-        ),
-      ),
-    );
-  }
+        );
+      }
 
-  Widget _buildFilterChips() {
-    const filters = ['Belum Bayar', 'Telat', 'Lunas'];
-
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Row(
-        children: [
-          ...filters.map((f) {
-            final isSelected = _controller.selectedFilter == f;
-
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: GestureDetector(
-                onTap: () => _controller.filterTagihan(f),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? const Color(0xFF2ECC71)
-                        : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFF2ECC71)
-                          : const Color(0xFFE0E0E0),
-                    ),
-                  ),
-                  child: Text(
-                    f,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: isSelected
-                          ? Colors.white
-                          : const Color(0xFF555555),
-                    ),
-                  ),
-                ),
+      Widget _buildHeader() {
+        return Container(
+          color: const Color(0xFF2ECC71),
+          width: double.infinity,
+          padding: EdgeInsets.only(
+            top   : MediaQuery.of(context).padding.top + 12,
+            bottom: 16,
+          ),
+          child: const Center(
+            child: Text(
+              'Tagihan',
+              style: TextStyle(
+                color     : Colors.white,
+                fontSize  : 18,
+                fontWeight: FontWeight.bold,
               ),
-            );
-          }),
-          const Spacer(),
-          GestureDetector(
-            onTap: () => _controller.showInfo(context),
-            child: const Icon(Icons.info_outline,
-                color: Color(0xFF9E9E9E), size: 20),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContent() {
-    if (_controller.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF2ECC71)),
-      );
-    }
-
-    if (_controller.errorMessage != null) {
-      return Center(
-        child: Text(_controller.errorMessage!),
-      );
-    }
-
-    if (_controller.filteredTagihan.isEmpty) {
-      return const Center(child: Text('Tidak ada tagihan'));
-    }
-
-    return RefreshIndicator(
-      onRefresh: _controller.loadTagihan,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _controller.filteredTagihan.length,
-        itemBuilder: (context, index) {
-          final tagihan = _controller.filteredTagihan[index];
-
-          return _TagihanCard(
-            tagihan: tagihan,
-            controller: _controller,
-            onTap: () =>
-                _controller.goToDetail(context, tagihan),
-          );
-        },
-      ),
-    );
-  }
-}
-
-// ── CARD ─────────────────────────────────────────────
-class _TagihanCard extends StatelessWidget {
-  final TagihanModel tagihan;
-  final TagihanController controller;
-  final VoidCallback onTap;
-
-  const _TagihanCard({
-    required this.tagihan,
-    required this.controller,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x0A000000),
-              blurRadius: 6,
-              offset: Offset(0, 2),
             ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  // FOTO
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: tagihan.fotoKamar != null
-                        ? Image.network(
-                            tagihan.fotoKamar!,
-                            width: 72,
-                            height: 72,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
-                                _placeholder(),
-                          )
-                        : _placeholder(),
+          ),
+        );
+      }
+
+      Widget _buildFilterChips() {
+        const filters = ['Belum Bayar', 'Batal', 'Lunas'];
+        return Container(
+          color  : Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            children: [
+              ...filters.map((f) {
+                final isSelected = _controller.selectedFilter == f;
+
+                Color activeColor;
+                switch (f) {
+                  case 'Batal':
+                    activeColor = const Color(0xFF9E9E9E);
+                    break;
+                  case 'Lunas':
+                    activeColor = const Color(0xFF2ECC71);
+                    break;
+                  default:
+                    activeColor = const Color(0xFFF39C12);
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: GestureDetector(
+                    onTap: () => _controller.filterTagihan(f),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected ? activeColor : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isSelected ? activeColor : const Color(0xFFE0E0E0),
+                        ),
+                      ),
+                      child: Text(
+                        f,
+                        style: TextStyle(
+                          fontSize  : 12,
+                          fontWeight: FontWeight.w500,
+                          color     : isSelected ? Colors.white : const Color(0xFF555555),
+                        ),
+                      ),
+                    ),
                   ),
+                );
+              }),
+              const Spacer(),
+              GestureDetector(
+                onTap : () => _controller.showInfo(context),
+                child : const Icon(Icons.info_outline,
+                    color: Color(0xFF9E9E9E), size: 20),
+              ),
+            ],
+          ),
+        );
+      }
 
-                  const SizedBox(width: 12),
+      Widget _buildContent() {
+        if (_controller.isLoading) {
+          return const Center(
+              child: CircularProgressIndicator(color: Color(0xFF2ECC71)));
+        }
 
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+        if (_controller.errorMessage != null) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.wifi_off_rounded,
+                      size: 56, color: Color(0xFFB0B0C3)),
+                  const SizedBox(height: 12),
+                  Text(_controller.errorMessage!,
+                      style: const TextStyle(color: Color(0xFF9E9E9E))),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _controller.loadTagihan,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2ECC71),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text('Coba Lagi'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        if (_controller.filteredTagihan.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.receipt_long_outlined,
+                    size: 64, color: Color(0xFFB0B0C3)),
+                const SizedBox(height: 14),
+                Text(
+                  'Tidak ada tagihan ${_controller.selectedFilter.toLowerCase()}',
+                  style: const TextStyle(color: Color(0xFF9E9E9E), fontSize: 14),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding    : const EdgeInsets.all(16),
+          itemCount  : _controller.filteredTagihan.length,
+          itemBuilder: (context, index) {
+            final tagihan = _controller.filteredTagihan[index];
+            return _TagihanCard(
+              tagihan   : tagihan,
+              controller: _controller,
+              onTap     : () => _controller.goToDetail(context, tagihan),
+            );
+          },
+        );
+      }
+    }
+
+    // ── Tagihan Card ───────────────────────────────────────────────
+    class _TagihanCard extends StatelessWidget {
+      final TagihanUiModel tagihan;
+      final TagihanController controller;
+      final VoidCallback onTap;
+
+      const _TagihanCard({
+        required this.tagihan,
+        required this.controller,
+        required this.onTap,
+      });
+
+      @override
+      Widget build(BuildContext context) {
+        final isBatal = tagihan.statusBooking == 'batal';
+        return GestureDetector(
+          onTap: isBatal ? null : onTap,
+          child: Opacity(
+            opacity: isBatal ? 0.75 : 1.0,
+            child: Container(
+              margin    : const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color       : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow   : const [
+                  BoxShadow(
+                      color    : Color(0x0A000000),
+                      blurRadius: 6,
+                      offset   : Offset(0, 2)),
+                ],
+              ),
+              child: Column(
+                children: [
+                  if (isBatal)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 6, horizontal: 12),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFEEEEEE),
+                        borderRadius: BorderRadius.only(
+                          topLeft : Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.cancel_outlined,
+                              size: 14, color: Color(0xFF9E9E9E)),
+                          SizedBox(width: 6),
+                          Text('Booking ini telah dibatalkan',
+                              style: TextStyle(
+                                  fontSize: 11, color: Color(0xFF9E9E9E))),
+                        ],
+                      ),
+                    ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
                       children: [
-                        Text(
-                          tagihan.namaKamar ?? 'Kamar',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: tagihan.fotoKamar != null
+                              ? Image.network(
+                                '${ApiConstants.storageUrl}${tagihan.fotoKamar!}',
+                                  width       : 72,
+                                  height      : 72,
+                                  fit         : BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => _placeholder(),
+                                )
+                              : _placeholder(),
+                        ),
+                        const SizedBox(width: 12),
+
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                tagihan.namaKamar ?? 'Kamar',
+                                style: const TextStyle(
+                                  fontSize  : 14,
+                                  fontWeight: FontWeight.bold,
+                                  color     : Color(0xFF1A1A2E),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Sewa : ${controller.formatTanggal(tagihan.periodeAwal)}',
+                                style: const TextStyle(
+                                    fontSize: 12, color: Color(0xFF9E9E9E)),
+                              ),
+                              Text(
+                                'Berakhir : ${controller.formatTanggal(tagihan.periodeAkhir)}',
+                                style: const TextStyle(
+                                    fontSize: 12, color: Color(0xFF9E9E9E)),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                controller.formatHarga(tagihan.totalTagihan),
+                                style: const TextStyle(
+                                  fontSize  : 14,
+                                  fontWeight: FontWeight.bold,
+                                  color     : Color(0xFF1A1A2E),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 4),
 
-                        Text(
-                          'Sewa : ${controller.formatTanggal(tagihan.periodeAwal)}',
-                        ),
-                        Text(
-                          'Berakhir : ${controller.formatTanggal(tagihan.periodeAkhir)}',
-                        ),
-
-                        const SizedBox(height: 6),
-
-                        Text(
-                          controller.formatHarga(
-                              tagihan.totalTagihan),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        _StatusBadge(
+                          statusTagihan: tagihan.statusTagihan,
+                          statusBooking: tagihan.statusBooking,
                         ),
                       ],
                     ),
                   ),
-
-                  _StatusBadge(status: tagihan.statusTagihan),
                 ],
               ),
             ),
+          ),
+        );
+      }
 
-            // BUTTON
-            Container(
-              width: double.infinity,
-  decoration: const BoxDecoration(
-    border: Border(
-      top: BorderSide(color: Color(0xFFF0F0F0)),
-    ),
-  ),
-  child: TextButton.icon(
-    onPressed: () =>
-        controller.cekTagihanBulanIni(context, tagihan),
-    icon: const Icon(
-      Icons.calendar_month_outlined,
-      size: 16,
-      color: Color(0xFF2ECC71),
-    ),
-    label: const Text(
-      'Cek Bulan Ini',
-      style: TextStyle(
-        fontSize: 13,
-        color: Color(0xFF2ECC71),
-        fontWeight: FontWeight.w500,
-      ),
-    ),
-    style: TextButton.styleFrom(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-    ),
-  ),
-)
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _placeholder() {
-    return Container(
-      width: 72,
-      height: 72,
-      color: Colors.grey[200],
-      child: const Icon(Icons.bed),
-    );
-  }
-}
-
-// ── STATUS Tagihan───────────────────────────────────────────
-class _StatusBadge extends StatelessWidget {
-  final String status;
-  const _StatusBadge({required this.status});
-
-  @override
-  Widget build(BuildContext context) {
-    Color color;
-    String label;
-
-    switch (status) {
-      case 'lunas':
-        color = const Color(0xFF2ECC71);
-        label = 'Lunas';
-        break;
-      case 'terlambat':
-        color = const Color(0xFFE74C3C);
-        label = 'Telat';
-        break;
-      default:
-        color = const Color(0xFFF39C12);
-        label = 'Belum Bayar';
+      Widget _placeholder() {
+        return Container(
+          width : 72,
+          height: 72,
+          decoration: BoxDecoration(
+            color       : const Color(0xFFE8F5E9),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(Icons.bed_outlined,
+              color: Color(0xFF2ECC71), size: 28),
+        );
+      }
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.4)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: color,
-        ),
-      ),
-    );
-  }
-}
+    // ── Status Badge ───────────────────────────────────────────────
+    class _StatusBadge extends StatelessWidget {
+      final String statusTagihan;
+      final String statusBooking;
+
+      const _StatusBadge({
+        required this.statusTagihan,
+        required this.statusBooking,
+      });
+
+      @override
+      Widget build(BuildContext context) {
+        if (statusBooking == 'batal') {
+          return _badge(const Color(0xFF9E9E9E), 'Batal');
+        }
+        switch (statusTagihan) {
+          case 'lunas':
+            return _badge(const Color(0xFF2ECC71), 'Lunas');
+          case 'terlambat':
+            return _badge(const Color(0xFFE74C3C), 'Telat');
+          default:
+            return _badge(const Color(0xFFF39C12), 'Belum Bayar');
+        }
+      }
+
+      Widget _badge(Color color, String label) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color       : color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+            border      : Border.all(color: color.withOpacity(0.3)),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize  : 10,
+              fontWeight: FontWeight.w600,
+              color     : color,
+            ),
+          ),
+        );
+      }
+    }

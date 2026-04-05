@@ -81,22 +81,22 @@ class TagihanModel {
 
   factory TagihanModel.fromJson(Map<String, dynamic> json) {
     return TagihanModel(
-      idTagihan: _parseInt(json['id_tagihan']),
+
+//       idTagihan: _parseInt(json['id_tagihan']),
+      idTagihan:     json['id_tagihan'],
       idBooking: _parseInt(json['id_booking']),
-
-      namaKamar: json['nama_kamar'] ?? 'Kamar',
-      fotoKamar: json['foto_kamar'],
-
+      namaPenyewa:   json['nama_penyewa'],
+      nomorKamar:    json['nomor_kamar'],
+      fotoKamar:     json['foto_kamar'],
       periodeAwal: json['tgl_mulai_sewa'] ?? '',
       periodeAkhir: json['tgl_akhir_sewa'] ?? '',
-      periodeBulan: json['periode_bulan'] ?? '',
-
-      nominalDasar: _parseDouble(json['nominal_dasar']),
-      nominalDenda: _parseDouble(json['nominal_denda']),
-      totalTagihan: _parseDouble(json['total_tagihan']),
-
-      tglJatuhTempo: json['tgl_jatuh_tempo'] ?? '',
-      statusTagihan: json['status_tagihan'] ?? '',
-    );
+      periodeBulan:  json['periode_bulan'],
+      tglJatuhTempo: json['tgl_jatuh_tempo'],
+      statusTagihan: json['status_tagihan'],
+      nominalDasar:  double.parse(json['nominal_dasar'].toString()),
+      nominalDenda:  double.parse(json['nominal_denda'].toString()),
+      totalTagihan:  double.parse(json['total_tagihan'].toString()),
+      
+    );  
   }
 }

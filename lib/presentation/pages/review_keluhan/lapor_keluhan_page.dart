@@ -37,7 +37,11 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: _buildAppBar(),
-      body: _buildBody(),
+      body: switch (_controller.pageState) {
+        KeluhanPageState.loading    => _buildLoadingState(),
+        KeluhanPageState.noBooking  => _buildNoBookingState(),
+        KeluhanPageState.hasBooking => _buildBody(),
+      },
     );
   }
 
@@ -62,7 +66,90 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
     );
   }
 
-  // ── Body ──────────────────────────────────────────────────
+  // ── State: Loading ────────────────────────────────────────
+  Widget _buildLoadingState() {
+    return const Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircularProgressIndicator(color: Color(0xFF2ECC71)),
+          SizedBox(height: 16),
+          Text(
+            'Memeriksa status kamar...',
+            style: TextStyle(fontSize: 14, color: Color(0xFF9E9E9E)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── State: Tidak punya kamar aktif ───────────────────────
+  Widget _buildNoBookingState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 96,
+              height: 96,
+              decoration: const BoxDecoration(
+                color: Color(0xFFE8F5E9),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.meeting_room_outlined,
+                size: 48,
+                color: Color(0xFF2ECC71),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Belum Memiliki Kamar',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A1A2E),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Anda perlu memiliki kamar aktif terlebih dahulu '
+              'sebelum dapat melaporkan keluhan.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.5,
+                color: Color(0xFF6B7280),
+              ),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: OutlinedButton(
+                onPressed: () => Navigator.pop(context),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF2ECC71),
+                  side: const BorderSide(color: Color(0xFF2ECC71)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text(
+                  'Kembali',
+                  style: TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── State: Punya kamar aktif → form ──────────────────────
   Widget _buildBody() {
     return Column(
       children: [
@@ -72,9 +159,9 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildLabel('Nomor Kamar'),
+                _buildLabel('Pilih Kamar'),
                 const SizedBox(height: 8),
-                _buildReadOnlyField(_controller.nomorKamarController),
+                _buildKamarDropdown(),   // ← dropdown ganti read-only field
 
                 const SizedBox(height: 16),
 
@@ -90,7 +177,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
 
                 const SizedBox(height: 16),
 
-                _buildLabel('Foto Bukti'),
+                _buildLabel('Foto Bukti (opsional)'),
                 const SizedBox(height: 8),
                 _buildFotoBuktiField(),
 
@@ -100,7 +187,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
           ),
         ),
 
-        // ── Tombol Laporkan (sticky bawah) ─────────────────
+        // Tombol Laporkan sticky bawah
         Container(
           color: Colors.white,
           padding: EdgeInsets.only(
@@ -142,14 +229,68 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
     );
   }
 
-  // ── Field: Nomor Kamar (read-only) ────────────────────────
-  Widget _buildReadOnlyField(TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      readOnly: true,
-      style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
-      decoration: _inputDecoration().copyWith(
-        fillColor: const Color(0xFFF5F5F5),
+  // ── Dropdown pilih kamar ──────────────────────────────────
+  Widget _buildKamarDropdown() {
+    final list = _controller.bookingAktifList;
+
+    // Hanya satu kamar → tampil read-only seperti sebelumnya
+    if (list.length == 1) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5F5F5),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: const Color(0xFFE0E0E0)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.meeting_room_outlined,
+                color: Color(0xFF9E9E9E), size: 20),
+            const SizedBox(width: 10),
+            Text(
+              'Kamar ${list.first.nomorKamar ?? list.first.idKamar}',
+              style: const TextStyle(
+                  fontSize: 14, color: Color(0xFF1A1A2E)),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Lebih dari satu kamar → dropdown
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFE0E0E0)),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          value: _controller.bookingAktif?.idBooking,
+          isExpanded: true,
+          icon: const Icon(Icons.keyboard_arrow_down,
+              color: Color(0xFF9E9E9E)),
+          style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
+          items: list.map((b) {
+            return DropdownMenuItem<int>(
+              value: b.idBooking,
+              child: Row(
+                children: [
+                  const Icon(Icons.meeting_room_outlined,
+                      color: Color(0xFF2ECC71), size: 18),
+                  const SizedBox(width: 8),
+                  Text('Kamar ${b.nomorKamar ?? b.idKamar}'),
+                ],
+              ),
+            );
+          }).toList(),
+          onChanged: (idBooking) {
+            if (idBooking == null) return;
+            final selected = list.firstWhere((b) => b.idBooking == idBooking);
+            _controller.selectBooking(selected);
+          },
+        ),
       ),
     );
   }
@@ -175,7 +316,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
       maxLines: 5,
       style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
       decoration: _inputDecoration().copyWith(
-        hintText: 'Jelaskan keluhan Anda...',
+        hintText: 'Jelaskan keluhan Anda... (minimal 10 karakter)',
         alignLabelWithHint: true,
       ),
     );
@@ -183,7 +324,6 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
 
   // ── Field: Foto Bukti ─────────────────────────────────────
   Widget _buildFotoBuktiField() {
-    // Sudah ada foto dipilih
     if (_controller.fotoBuktiBytes != null) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -194,11 +334,10 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
         ),
         child: Row(
           children: [
-            // Preview foto — Image.memory (support Web & Mobile)
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: Image.memory(
-                _controller.fotoBuktiBytes!,  // ← bytes, bukan File
+                _controller.fotoBuktiBytes!,
                 width: 36,
                 height: 36,
                 fit: BoxFit.cover,
@@ -212,7 +351,6 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
               ),
             ),
             const SizedBox(width: 10),
-            // Nama file
             Expanded(
               child: Text(
                 _controller.fotoBuktiNama ?? 'foto_bukti',
@@ -221,7 +359,6 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Hapus foto
             GestureDetector(
               onTap: _controller.removeFoto,
               child: const Icon(Icons.close,
@@ -232,11 +369,11 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
       );
     }
 
-    // Belum ada foto → tampil tombol pilih
     return GestureDetector(
       onTap: () => _controller.pickFoto(context),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
@@ -248,7 +385,8 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
                 color: Color(0xFF9E9E9E), size: 20),
             SizedBox(width: 8),
             Text('Pilih foto bukti',
-                style: TextStyle(fontSize: 13, color: Color(0xFFB0B0C3))),
+                style:
+                    TextStyle(fontSize: 13, color: Color(0xFFB0B0C3))),
           ],
         ),
       ),

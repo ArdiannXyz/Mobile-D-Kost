@@ -162,7 +162,6 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Nama + Harga
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,10 +201,8 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
           const Divider(height: 1, color: Color(0xFFF0F0F0)),
           const SizedBox(height: 14),
 
-          // ── Row: Lama Sewa + Mulai Sewa ──────────────────
           Row(
             children: [
-              // Dropdown Lama Sewa
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,7 +253,6 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
 
               const SizedBox(width: 12),
 
-              // Date Picker Mulai Sewa
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,7 +281,6 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
                         ),
                         child: Row(
                           children: [
-                            // Icon kalender dari assets
                             Image.asset(
                               'assets/images/kalender_1.png',
                               width: 16,
@@ -329,7 +324,6 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
             ],
           ),
 
-          // ── Tanggal Akhir Sewa (otomatis) ────────────────
           if (_controller.tglAkhirSewa != null) ...[
             const SizedBox(height: 10),
             Container(
@@ -361,42 +355,41 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
     );
   }
 
-  // ── Date Picker Handler ───────────────────────────────────
-      Future<void> _pickTanggalMulai(BuildContext context) async {
-        final now = DateTime.now();
-        final maxDate = now.add(const Duration(days: 3)); // ← maksimal 3 hari
-        
-        final picked = await showDatePicker(
-          context: context,
-          initialDate: _controller.tglMulaiSewa ?? now,
-          firstDate: now,
-          lastDate: maxDate, // ← ganti ini
-          helpText: 'Pilih Tanggal Mulai Sewa',
-          confirmText: 'Pilih',
-          cancelText: 'Batal',
-          builder: (context, child) {
-            return Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: const ColorScheme.light(
-                  primary: Color(0xFF2ECC71),
-                  onPrimary: Colors.white,
-                  onSurface: Color(0xFF1A1A2E),
-                ),
-                textButtonTheme: TextButtonThemeData(
-                  style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF2ECC71),
-                  ),
-                ),
-              ),
-              child: child!,
-            );
-          },
-        );
+  Future<void> _pickTanggalMulai(BuildContext context) async {
+    final now = DateTime.now();
+    final maxDate = now.add(const Duration(days: 3));
 
-        if (picked != null) {
-          _controller.setTglMulai(picked);
-        }
-      }
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _controller.tglMulaiSewa ?? now,
+      firstDate: now,
+      lastDate: maxDate,
+      helpText: 'Pilih Tanggal Mulai Sewa',
+      confirmText: 'Pilih',
+      cancelText: 'Batal',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF2ECC71),
+              onPrimary: Colors.white,
+              onSurface: Color(0xFF1A1A2E),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF2ECC71),
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      _controller.setTglMulai(picked);
+    }
+  }
 
   // ── Rating Section ────────────────────────────────────────
   Widget _buildRatingSection() {
@@ -591,7 +584,6 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
   }
 
   void _onPesanSekarang() {
-    // Validasi tanggal mulai sebelum buka bottom sheet
     final error = _controller.validateBooking();
     if (error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -609,7 +601,6 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
     _showBookingBottomSheet();
   }
 
-  // ── Bottom Sheet Booking + Furnitur ───────────────────────
   void _showBookingBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -619,7 +610,6 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
     );
   }
 
-  // ── Helper: Section wrapper ───────────────────────────────
   Widget _buildSection({
     required String title,
     required Widget child,
@@ -697,6 +687,12 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final kamar = c.kamar!;
+
+    // Pisahkan furnitur tersedia dan habis
+    final furniturTersedia = c.furniturList.where((f) => f.jumlah > 0).toList();
+    final furniturHabis    = c.furniturList.where((f) => f.jumlah <= 0).toList();
+    final allFurnitur      = [...furniturTersedia, ...furniturHabis];
+
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -755,7 +751,6 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                         style: const TextStyle(
                             fontSize: 12, color: Color(0xFF9E9E9E)),
                       ),
-                      // Tampilkan range tanggal di bottom sheet
                       if (c.tglMulaiSewa != null) ...[
                         const SizedBox(height: 2),
                         Text(
@@ -787,53 +782,83 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
 
           const Divider(height: 24),
 
-          // Judul tambah furnitur
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Penambahan Furnitur',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A2E),
+          // Judul + info stok
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                const Text(
+                  'Penambahan Furnitur',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1A2E),
+                  ),
                 ),
-              ),
+                const Spacer(),
+                // Badge jumlah item tersedia
+                if (furniturTersedia.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '${furniturTersedia.length} tersedia',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF2ECC71),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
 
           const SizedBox(height: 10),
 
           // List furnitur
-          if (c.furniturList.isEmpty)
+          if (allFurnitur.isEmpty)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Center(
                 child: Text('Tidak ada furnitur tersedia',
-                    style:
-                        TextStyle(color: Color(0xFF9E9E9E), fontSize: 13)),
+                    style: TextStyle(
+                        color: Color(0xFF9E9E9E), fontSize: 13)),
               ),
             )
           else
             SizedBox(
-              height: 160,
+              height: 180,
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: c.furniturList.length,
-                itemBuilder: (_, index) => _FurniturItem(
-                  furnitur: c.furniturList[index],
-                  qty: c.getFurniturQty(c.furniturList[index].idFurnitur),
-                  onTambah: () {
-                    c.tambahFurnitur(c.furniturList[index].idFurnitur);
-                    setState(() {});
-                  },
-                  onKurang: () {
-                    c.kurangFurnitur(c.furniturList[index].idFurnitur);
-                    setState(() {});
-                  },
-                  formatHarga: c.formatHarga,
-                ),
+                itemCount: allFurnitur.length,
+                itemBuilder: (_, index) {
+                  final f    = allFurnitur[index];
+                  final habis = f.jumlah <= 0;
+                  final qty  = c.getFurniturQty(f.idFurnitur);
+                  return _FurniturItem(
+                    furnitur   : f,
+                    qty        : qty,
+                    isHabis    : habis,
+                    onTambah   : habis || qty >= f.jumlah
+                        ? null
+                        : () {
+                            c.tambahFurnitur(f.idFurnitur);
+                            setState(() {});
+                          },
+                    onKurang   : qty > 0
+                        ? () {
+                            c.kurangFurnitur(f.idFurnitur);
+                            setState(() {});
+                          }
+                        : null,
+                    formatHarga: c.formatHarga,
+                  );
+                },
               ),
             ),
 
@@ -868,28 +893,29 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
           Padding(
             padding: const EdgeInsets.only(bottom: 35),
             child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  c.goToBookingForm(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2ECC71),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Pesan Sekarang',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    c.goToBookingForm(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2ECC71),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Pesan Sekarang',
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
-             ),
             ),
           ),
         ],
@@ -913,18 +939,20 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
 }
 
 // ══════════════════════════════════════════════════════════════
-// Furnitur Item Row
+// Furnitur Item Row — dengan info stok & disable jika habis
 // ══════════════════════════════════════════════════════════════
 class _FurniturItem extends StatelessWidget {
   final FurniturModel furnitur;
   final int qty;
-  final VoidCallback onTambah;
-  final VoidCallback onKurang;
+  final bool isHabis;
+  final VoidCallback? onTambah;
+  final VoidCallback? onKurang;
   final String Function(double) formatHarga;
 
   const _FurniturItem({
     required this.furnitur,
     required this.qty,
+    required this.isHabis,
     required this.onTambah,
     required this.onKurang,
     required this.formatHarga,
@@ -932,58 +960,106 @@ class _FurniturItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE8F5E9),
-              borderRadius: BorderRadius.circular(8),
+    return Opacity(
+      opacity: isHabis ? 0.45 : 1.0,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Row(
+          children: [
+            // Icon furnitur
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: isHabis
+                    ? const Color(0xFFF5F5F5)
+                    : const Color(0xFFE8F5E9),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.chair_outlined,
+                color: isHabis
+                    ? const Color(0xFFBDBDBD)
+                    : const Color(0xFF2ECC71),
+                size: 20,
+              ),
             ),
-            child: const Icon(Icons.chair_outlined,
-                color: Color(0xFF2ECC71), size: 20),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(furnitur.namaFurnitur,
+            const SizedBox(width: 10),
+
+            // Nama + harga + stok
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(furnitur.namaFurnitur,
+                      style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF1A1A2E))),
+                  const SizedBox(height: 1),
+                  Text(
+                    '${formatHarga(furnitur.hargaSewaTambahan)}/bulan',
                     style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF1A1A2E))),
-                Text(
-                  '${formatHarga(furnitur.hargaSewaTambahan)}/bulan',
-                  style:
-                      const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
+                        fontSize: 11, color: Color(0xFF9E9E9E)),
+                  ),
+                  const SizedBox(height: 2),
+                  // ── Info stok ──────────────────────────────
+                  Row(
+                    children: [
+                      Icon(
+                        isHabis
+                            ? Icons.do_not_disturb_alt_outlined
+                            : Icons.inventory_2_outlined,
+                        size: 10,
+                        color: isHabis
+                            ? const Color(0xFFE74C3C)
+                            : const Color(0xFF2ECC71),
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        isHabis
+                            ? 'Stok habis'
+                            : 'Tersedia: ${furnitur.jumlah}',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: isHabis
+                              ? const Color(0xFFE74C3C)
+                              : const Color(0xFF2ECC71),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Qty counter — disabled jika habis
+            Row(
+              children: [
+                _CounterBtn(
+                  icon: Icons.remove,
+                  onTap: onKurang,
+                ),
+                SizedBox(
+                  width: 28,
+                  child: Text(
+                    qty.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1A1A2E)),
+                  ),
+                ),
+                _CounterBtn(
+                  icon: Icons.add,
+                  onTap: onTambah, // null jika habis atau sudah max
                 ),
               ],
             ),
-          ),
-          Row(
-            children: [
-              _CounterBtn(icon: Icons.remove, onTap: qty > 0 ? onKurang : null),
-              SizedBox(
-                width: 28,
-                child: Text(
-                  qty.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A2E)),
-                ),
-              ),
-              _CounterBtn(
-                  icon: Icons.add,
-                  onTap: qty < furnitur.jumlah ? onTambah : null),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
