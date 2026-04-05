@@ -57,8 +57,8 @@ class TagihanModel {
   TagihanModel({
     required this.idTagihan,
     required this.idBooking,
-    this.namaKamar,
-    this.fotoKamar,
+    this.namaKamar, 
+    this.fotoKamar, 
     required this.periodeAwal,
     required this.periodeAkhir,
     required this.periodeBulan,
@@ -81,22 +81,20 @@ class TagihanModel {
 
   factory TagihanModel.fromJson(Map<String, dynamic> json) {
     return TagihanModel(
-
 //       idTagihan: _parseInt(json['id_tagihan']),
-      idTagihan:     json['id_tagihan'],
+      idTagihan: json['id_tagihan'],
       idBooking: _parseInt(json['id_booking']),
-      namaPenyewa:   json['nama_penyewa'],
-      nomorKamar:    json['nomor_kamar'],
-      fotoKamar:     json['foto_kamar'],
+      // namaPenyewa:   json['nama_penyewa'],
+      // nomorKamar:    json['nomor_kamar'],
+      fotoKamar: json['foto_kamar'],
       periodeAwal: json['tgl_mulai_sewa'] ?? '',
       periodeAkhir: json['tgl_akhir_sewa'] ?? '',
-      periodeBulan:  json['periode_bulan'],
+      periodeBulan: json['periode_bulan'],
       tglJatuhTempo: json['tgl_jatuh_tempo'],
       statusTagihan: json['status_tagihan'],
-      nominalDasar:  double.parse(json['nominal_dasar'].toString()),
-      nominalDenda:  double.parse(json['nominal_denda'].toString()),
-      totalTagihan:  double.parse(json['total_tagihan'].toString()),
-      
-    );  
+      nominalDasar: double.parse(json['nominal_dasar'].toString()),
+      nominalDenda: double.parse(json['nominal_denda'].toString()),
+      totalTagihan: double.parse(json['total_tagihan'].toString()),
+    );
   }
 }

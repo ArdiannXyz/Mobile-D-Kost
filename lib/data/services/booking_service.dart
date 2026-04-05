@@ -1,7 +1,3 @@
-// ============================================================
-// FILE: lib/data/services/booking_service.dart
-// ============================================================
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../helper/api_constants.dart';
@@ -65,10 +61,10 @@ class BookingService {
       );
     }
   }
-}
+
   // ── GET: Detail booking ────────────────────────────────────
   static Future<BookingModel?> getBookingDetail(int id) async {
-    final headers  = await ApiHelper.authHeaders;
+    final headers = await ApiHelper.authHeaders;
     final response = await http.get(
       Uri.parse('${ApiConstants.baseUrl}booking/$id'),
       headers: headers,
@@ -79,7 +75,7 @@ class BookingService {
     }
     if (response.statusCode == 404) return null;
     throw ApiException(
-      message   : data['message'] ?? 'Gagal memuat detail booking.',
+      message: data['message'] ?? 'Gagal memuat detail booking.',
       statusCode: response.statusCode,
     );
   }
@@ -92,7 +88,7 @@ class BookingService {
     required Map<int, int> selectedFurnitur,
   }) async {
     final headers = await ApiHelper.authHeaders;
-    final userId  = await ApiHelper.getUserId();
+    final userId = await ApiHelper.getUserId();
 
     final furniturList = selectedFurnitur.entries
         .map((e) => {'id_furnitur': e.key, 'jumlah': e.value})
@@ -102,11 +98,11 @@ class BookingService {
       Uri.parse('${ApiConstants.baseUrl}booking'),
       headers: headers,
       body: jsonEncode({
-        'id_user'          : userId,
-        'id_kamar'         : idKamar,
-        'tgl_mulai_sewa'   : tglMulaiSewa,
+        'id_user': userId,
+        'id_kamar': idKamar,
+        'tgl_mulai_sewa': tglMulaiSewa,
         'durasi_sewa_bulan': durasiSewaBulan,
-        'furnitur'         : furniturList,
+        'furnitur': furniturList,
       }),
     );
 
@@ -115,7 +111,7 @@ class BookingService {
 
   // ── PUT: Batalkan booking ──────────────────────────────────
   static Future<Map<String, dynamic>> batalBooking(int id) async {
-    final headers  = await ApiHelper.authHeaders;
+    final headers = await ApiHelper.authHeaders;
     final response = await http.put(
       Uri.parse('${ApiConstants.baseUrl}booking/$id/batal'),
       headers: headers,
@@ -145,14 +141,14 @@ class BookingService {
       return data as Map<String, dynamic>;
     }
     throw ApiException(
-      message   : data['message'] ?? 'Gagal menambah furnitur.',
+      message: data['message'] ?? 'Gagal menambah furnitur.',
       statusCode: response.statusCode,
     );
   }
 
   // ── POST: Akhiri sewa sekarang ─────────────────────────────
   static Future<Map<String, dynamic>> akhiriSewa(int idBooking) async {
-    final headers  = await ApiHelper.authHeaders;
+    final headers = await ApiHelper.authHeaders;
     final response = await http.post(
       Uri.parse('${ApiConstants.baseUrl}booking/$idBooking/selesai'),
       headers: headers,
@@ -163,7 +159,7 @@ class BookingService {
       return data as Map<String, dynamic>;
     }
     throw ApiException(
-      message   : data['message'] ?? 'Gagal mengakhiri sewa.',
+      message: data['message'] ?? 'Gagal mengakhiri sewa.',
       statusCode: response.statusCode,
     );
   }

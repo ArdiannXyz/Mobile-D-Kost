@@ -687,6 +687,12 @@ class TagihanController {
     );
   }
 
+  // ── GO TO DETAIL ─────────────────────────
+  void goToDetail(BuildContext context, TagihanUiModel tagihan) {
+    Navigator.pushNamed(context, '/detail-kamarku',
+        arguments: {'booking_id': tagihan.idBooking});
+  }
+
   // ── ERROR ────────────────────────────────
   void _showError(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
