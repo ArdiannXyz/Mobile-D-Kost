@@ -10,46 +10,62 @@ import '../helper/api_exception.dart';
 import '../models/booking_models.dart';
 
 class BookingService {
-  // ── GET: List booking by user ──────────────────────────────
+  BookingService._();
+
   static Future<List<BookingModel>> getBookingList(int userId) async {
-    final headers  = await ApiHelper.authHeaders;
-    final response = await http.get(
-      Uri.parse('${ApiConstants.baseUrl}booking/user/$userId'),
-      headers: headers,
-    );
-    final data = jsonDecode(response.body);
-    if (response.statusCode == 200 && data['success'] == true) {
-      return (data['data'] as List)
-          .map((e) => BookingModel.fromJson(e))
-          .toList();
+    try {
+      final headers = await ApiHelper.authHeaders;
+      final response = await http.get(
+        Uri.parse(ApiConstants.bookingList(userId)),
+        headers: headers,
+      );
+
+      final data = ApiHelper.handleResponse(response);
+
+      if (data['success'] == true) {
+        final list = data['data'];
+        if (list == null || list is! List) return [];
+
+        return list.map((e) => BookingModel.fromJson(e)).toList();
+      }
+
+      return [];
+    } on ApiException {
+      rethrow;
+    } catch (_) {
+      throw ApiException(
+        message: 'Gagal memuat riwayat booking.',
+        statusCode: 500,
+      );
     }
-    throw ApiException(
-      message   : data['message'] ?? 'Gagal memuat booking.',
-      statusCode: response.statusCode,
-    );
   }
 
-  // ── GET: List booking aktif by user ───────────────────────
-  // Digunakan oleh KeluhanController untuk dropdown kamar
   static Future<List<BookingModel>> getBookingAktif(int userId) async {
-    final headers  = await ApiHelper.authHeaders;
-    final response = await http.get(
-      Uri.parse('${ApiConstants.baseUrl}booking/aktif/$userId'),
-      headers: headers,
-    );
-    print('BOOKING AKTIF BODY: ${response.body}');
-    final data = jsonDecode(response.body);
-    if (response.statusCode == 200 && data['success'] == true) {
-      return (data['data'] as List)
-          .map((e) => BookingModel.fromJson(e))
-          .toList();
-    }
-    throw ApiException(
-      message   : data['message'] ?? 'Gagal memuat booking aktif.',
-      statusCode: response.statusCode,
-    );
-  }
+    try {
+      final headers = await ApiHelper.authHeaders;
+      final response = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}booking/aktif/$userId'),
+        headers: headers,
+      );
 
+      final data = ApiHelper.handleResponse(response);
+
+      if (data['success'] == true) {
+        final list = data['data'];
+        if (list == null || list is! List) return [];
+
+        return list.map((e) => BookingModel.fromJson(e)).toList();
+      }
+
+      return [];
+    } catch (_) {
+      throw ApiException(
+        message: 'Gagal memuat booking aktif.',
+        statusCode: 500,
+      );
+    }
+  }
+}
   // ── GET: Detail booking ────────────────────────────────────
   static Future<BookingModel?> getBookingDetail(int id) async {
     final headers  = await ApiHelper.authHeaders;

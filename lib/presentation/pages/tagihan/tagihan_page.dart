@@ -1,6 +1,8 @@
-    import 'package:dkost/data/helper/api_constants.dart';
-  import 'package:flutter/material.dart';
-    import 'tagihan_controller.dart';
+import 'package:dkost/data/helper/api_constants.dart';
+import 'package:flutter/material.dart';
+import 'tagihan_controller.dart';
+import 'package:dkost/data/models/tagihan_models.dart';
+
 
     class TagihanPage extends StatefulWidget {
       const TagihanPage({super.key});
@@ -8,7 +10,6 @@
       @override
       State<TagihanPage> createState() => _TagihanPageState();
     }
-
     // ← with WidgetsBindingObserver dihapus — penyebab reload loop
     class _TagihanPageState extends State<TagihanPage> {
       late final TagihanController _controller;
@@ -40,7 +41,6 @@
           ),
         );
       }
-
 
       Widget _buildHeader() {
         return Container(
@@ -205,7 +205,6 @@
       @override
       Widget build(BuildContext context) {
         final isBatal = tagihan.statusBooking == 'batal';
-
         return GestureDetector(
           onTap: isBatal ? null : onTap,
           child: Opacity(
