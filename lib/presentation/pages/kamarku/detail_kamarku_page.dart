@@ -3,9 +3,10 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'booking_controller.dart';
+import 'detail_kamarku_controller.dart';
 import '../../../data/models/kamar_models.dart';
 import '../../../data/models/furnitur_models.dart';
+import '../../../data/models/payment_model.dart';
 
 // ══════════════════════════════════════════════════════════════
 // 1. DETAIL KAMARKU PAGE
@@ -121,6 +122,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
   Widget _buildInfoPemesanan() {
     final b          = _controller.booking!;
     final isMenunggu = b.statusBooking == 'menunggu_pembayaran';
+    final isLunas = b.tagihan?.statusTagihan == 'lunas';
 
     return _card(
       child: Column(
@@ -145,7 +147,9 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
           ),
 
           // ── Countdown — hanya saat menunggu_pembayaran ──
-          if (isMenunggu) ...[
+          // ── Countdown — hanya saat menunggu_pembayaran DAN belum lunas ──
+            
+            if (isMenunggu && !isLunas) ...[
             const SizedBox(height: 12),
             Container(
               width  : double.infinity,
@@ -252,7 +256,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
   Widget _buildFurniturSection() {
     final b       = _controller.booking!;
     final isAktif = b.statusBooking == 'aktif';
-
+  
     return _card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,12 +456,19 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => _controller.goToPayment(
-                  context,
-                  idTagihan : tagihan.idTagihan,
-                  totalBayar: tagihan.totalTagihan,
-                  namaKamar : namaKamar,
-                ),
+                    onPressed: () => _controller.goToPayment(
+                      context,
+                      idTagihan : tagihan.idTagihan,
+                      totalBayar: tagihan.totalTagihan,
+                      namaKamar : namaKamar,
+                      onNeedMethod: () => showModalBottomSheet<PaymentMethodType>(
+                        context: context,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                        ),
+                        builder: (_) => const _PilihMetodeSheet(),
+                      ),
+                    ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2ECC71),
                   foregroundColor: Colors.white,
@@ -484,12 +495,14 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
     if (b == null || _controller.isLoading) return null;
 
     // ── Status menunggu_pembayaran: Batal + Bayar (asli) ──
-    if (b.statusBooking == 'menunggu_pembayaran') {
-      final idTagihan  = b.tagihan?.idTagihan;
-      final totalBayar = _controller.totalBiaya;
-      final namaKamar  =
-          'Kos ${_cap(b.tipeKamar ?? '')} ${b.nomorKamar ?? ''}';
+      if (b.statusBooking == 'menunggu_pembayaran') {
+    final idTagihan  = b.tagihan?.idTagihan;
+    final totalBayar = _controller.totalBiaya;
+    final namaKamar  = 'Kos ${_cap(b.tipeKamar ?? '')} ${b.nomorKamar ?? ''}';
 
+    // ── Jika tagihan sudah lunas, sembunyikan bottom bar ──
+    final isLunas = b.tagihan?.statusTagihan == 'lunas';
+    if (isLunas) return null;
       return Container(
         color  : Colors.white,
         padding: EdgeInsets.only(
@@ -521,14 +534,21 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
               child: SizedBox(
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: (idTagihan == null || _controller.isExpired)
-                      ? null
-                      : () => _controller.goToPayment(
-                            context,
-                            idTagihan : idTagihan,
-                            totalBayar: totalBayar,
-                            namaKamar : namaKamar,
+                 onPressed: (idTagihan == null || _controller.isExpired)
+                    ? null
+                    : () => _controller.goToPayment(
+                          context,
+                          idTagihan : idTagihan,
+                          totalBayar: totalBayar,
+                          namaKamar : namaKamar,
+                          onNeedMethod: () => showModalBottomSheet<PaymentMethodType>(
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                            ),
+                            builder: (_) => const _PilihMetodeSheet(),
                           ),
+                        ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor        : const Color(0xFF2ECC71),
                     disabledBackgroundColor: const Color(0xFF9E9E9E),
@@ -696,6 +716,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   fontWeight: FontWeight.bold,
                   color     : Color(0xFF1A1A2E))),
           const SizedBox(height: 10),
+          
           _infoRow('Tanggal Booking',
               _controller.formatTanggal(DateTime.now().toIso8601String())),
           _infoRow('Mulai Sewa',
@@ -1042,3 +1063,221 @@ Widget _errorView(String message, VoidCallback onRetry) {
 
 String _cap(String s) =>
     s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+
+    class _PilihMetodeSheet extends StatefulWidget {
+  const _PilihMetodeSheet();
+
+  @override
+  State<_PilihMetodeSheet> createState() => _PilihMetodeSheetState();
+}
+
+class _PilihMetodeSheetState extends State<_PilihMetodeSheet> {
+  PaymentMethodType? _selected;
+
+  String _logoPath(PaymentMethodType type) {
+    switch (type) {
+      case PaymentMethodType.bcaVa:     return 'assets/banks/bca.png';
+      case PaymentMethodType.bniVa:     return 'assets/banks/bni.png';
+      case PaymentMethodType.briVa:     return 'assets/banks/bri.png';
+      case PaymentMethodType.mandiriVa: return 'assets/banks/mandiri.png';
+      case PaymentMethodType.qris:      return 'assets/payment/qris.png';
+      case PaymentMethodType.gopay:     return 'assets/payment/gopay.png';
+      case PaymentMethodType.shopeepay: return 'assets/payment/shopeepay.png';
+    }
+  }
+
+  Widget _buildGroup(String label, List<PaymentMethodType> methods) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Colors.black38,
+                letterSpacing: 0.4)),
+        const SizedBox(height: 6),
+        ...methods.map((method) {
+          final isSelected = _selected == method;
+          return GestureDetector(
+            onTap: () => setState(() => _selected = method),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              margin: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? const Color(0xFFE8F5E9)
+                    : const Color(0xFFF5F7FA),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFF2ECC71)
+                      : Colors.transparent,
+                  width: 1.5,
+                ),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 44,
+                    height: 28,
+                    child: Image.asset(
+                      _logoPath(method),
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => const Icon(
+                          Icons.account_balance, size: 20, color: Colors.grey),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      method.label,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                        color: isSelected
+                            ? const Color(0xFF1A1A2E)
+                            : const Color(0xFF4A4A4A),
+                      ),
+                    ),
+                  ),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected
+                            ? const Color(0xFF2ECC71)
+                            : Colors.grey.shade300,
+                        width: 2,
+                      ),
+                      color: isSelected
+                          ? const Color(0xFF2ECC71)
+                          : Colors.white,
+                    ),
+                    child: isSelected
+                        ? const Icon(Icons.check, size: 12, color: Colors.white)
+                        : null,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+@override
+Widget build(BuildContext context) {
+  return DraggableScrollableSheet(
+    initialChildSize: 0.6,
+    minChildSize    : 0.4,
+    maxChildSize    : 0.92,
+    expand          : false,
+    builder: (_, scrollController) => Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // ── Handle bar ─────────────────────────────────
+          Container(
+            width : 40, height: 4,
+            margin: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE0E0E0),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: const Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Pilih Metode Pembayaran',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1A1A2E))),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // ── Scrollable list ────────────────────────────
+          Expanded(
+            child: SingleChildScrollView(
+              controller: scrollController,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildGroup('Transfer Bank', [
+                    PaymentMethodType.bcaVa,
+                    PaymentMethodType.bniVa,
+                    PaymentMethodType.briVa,
+                    PaymentMethodType.mandiriVa,
+                  ]),
+                  const SizedBox(height: 10),
+                  const Divider(height: 1),
+                  const SizedBox(height: 10),
+                  _buildGroup('QRIS', [PaymentMethodType.qris]),
+                  const SizedBox(height: 10),
+                  const Divider(height: 1),
+                  const SizedBox(height: 10),
+                  _buildGroup('Dompet Digital', [
+                    PaymentMethodType.gopay,
+                    PaymentMethodType.shopeepay,
+                  ]),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+
+          // ── Tombol fixed di bawah ──────────────────────
+          Container(
+            padding: EdgeInsets.fromLTRB(
+                16, 12, 16, MediaQuery.of(context).padding.bottom + 16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                    color: Color(0x15000000),
+                    blurRadius: 8,
+                    offset: Offset(0, -3)),
+              ],
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: _selected == null
+                    ? null
+                    : () => Navigator.pop(context, _selected),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2ECC71),
+                  disabledBackgroundColor:
+                      const Color(0xFF2ECC71).withOpacity(0.5),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                child: const Text('Lanjut Bayar',
+                    style: TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w600)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+}

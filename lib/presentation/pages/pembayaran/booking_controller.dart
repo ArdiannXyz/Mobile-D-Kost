@@ -1,5 +1,6 @@
 // ============================================================
-// BACKEND LAYER — booking_controller.dart
+// booking_controller.dart  (updated)
+// Tambahan: method konfirmasiReturnTagihan()
 // Letakkan di: lib/presentation/pages/pembayaran/
 // ============================================================
 
@@ -11,7 +12,6 @@ import 'package:dkost/data/helper/api_exception.dart';
 import 'package:dkost/data/models/kamar_models.dart';
 import 'package:dkost/data/models/furnitur_models.dart';
 
-// Nama class disesuaikan dengan import di booking_page.dart
 class BookingController {
   // ── Args dari halaman sebelumnya ───────────────────────────
   final Map<String, dynamic> args;
@@ -135,21 +135,20 @@ class BookingController {
     furniturList = await FurniturService.getFurniturList();
   }
 
-  // ── Konfirmasi & Submit Booking ────────────────────────────
+  // ── [LAMA] Konfirmasi → navigasi ke /pembayaran ────────────
+  // Dipertahankan jika masih ada halaman lain yang pakai
   Future<void> konfirmasi(BuildContext context) async {
     isSubmitting = true;
     onStateChanged();
 
     try {
-      // Format tanggal ke yyyy-MM-dd
       final tglMulaiDate = _toDateString(tglMulaiIso);
 
-      // Sesuai signature BookingService.createBooking
       final result = await BookingService.createBooking(
         idKamar         : kamarId,
         tglMulaiSewa    : tglMulaiDate,
         durasiSewaBulan : durasi,
-        selectedFurnitur: selectedFurnitur, // Map<int, int> langsung
+        selectedFurnitur: selectedFurnitur,
       );
 
       if (!context.mounted) return;
@@ -159,7 +158,6 @@ class BookingController {
         final idTagihan  = result['data']['id_tagihan'];
         final totalBayar = (result['data']['total_biaya'] as num).toDouble();
 
-        // Navigasi ke halaman pembayaran (booking_page.dart yang sudah ada)
         Navigator.pushReplacementNamed(
           context,
           '/pembayaran',
@@ -183,6 +181,52 @@ class BookingController {
     }
   }
 
+  // ── [BARU] Konfirmasi → return idTagihan untuk bayar langsung
+  // Dipanggil dari BookingFormPage setelah user pilih metode bayar
+  Future<int?> konfirmasiReturnTagihan(BuildContext context) async {
+    isSubmitting = true;
+    onStateChanged();
+
+    try {
+      final tglMulaiDate = _toDateString(tglMulaiIso);
+
+      final result = await BookingService.createBooking(
+        idKamar         : kamarId,
+        tglMulaiSewa    : tglMulaiDate,
+        durasiSewaBulan : durasi,
+        selectedFurnitur: selectedFurnitur,
+      );
+
+      if (result['success'] == true) {
+        // Ambil id_tagihan dari response backend
+        // Pastikan Laravel return: { "success": true, "data": { "id_tagihan": 1, ... } }
+        final idTagihan = result['data']['id_tagihan'];
+        if (idTagihan == null) {
+          if (context.mounted) {
+            _showError(context, 'id_tagihan tidak ditemukan di response.');
+          }
+          return null;
+        }
+        return idTagihan as int;
+      } else {
+        if (context.mounted) {
+          _showError(context, result['message'] ?? 'Gagal membuat booking.');
+        }
+        return null;
+      }
+    } on ApiException catch (e) {
+      if (context.mounted) _showError(context, e.message);
+      return null;
+    } catch (e) {
+      if (context.mounted) _showError(context, 'Terjadi kesalahan: $e');
+      return null;
+    } finally {
+      isSubmitting = false;
+      onStateChanged();
+    }
+  }
+
+  // ── Helpers ────────────────────────────────────────────────
   String _toDateString(String iso) {
     try {
       final dt = DateTime.parse(iso);
@@ -194,18 +238,17 @@ class BookingController {
     }
   }
 
-String formatHarga(double harga) {
-  // Format angka dengan pemisah titik ribuan
-  final parts = harga.toStringAsFixed(0).split('');
-  String result = '';
-  int counter = 0;
-  for (int i = parts.length - 1; i >= 0; i--) {
-    if (counter > 0 && counter % 3 == 0) result = '.$result';
-    result = parts[i] + result;
-    counter++;
+  String formatHarga(double harga) {
+    final parts = harga.toStringAsFixed(0).split('');
+    String result = '';
+    int counter = 0;
+    for (int i = parts.length - 1; i >= 0; i--) {
+      if (counter > 0 && counter % 3 == 0) result = '.$result';
+      result = parts[i] + result;
+      counter++;
+    }
+    return 'Rp $result';
   }
-  return 'Rp $result';
-}
 
   void _showError(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
