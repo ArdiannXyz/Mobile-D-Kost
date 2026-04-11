@@ -21,7 +21,7 @@ import '../presentation/pages/auth/ganti_password_page.dart';
 import '../presentation/pages/home/home_page.dart';
 
 // ── Booking ────────────────────────────────────────────────────
-import '../presentation/pages/booking/booking_page.dart';
+import 'presentation/pages/kamarku/detail_kamarku_page.dart';
 
 // ── Keluhan ────────────────────────────────────────────────────
 import 'presentation/pages/review_keluhan/keluhan_page.dart';

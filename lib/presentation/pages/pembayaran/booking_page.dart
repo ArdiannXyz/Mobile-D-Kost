@@ -1,10 +1,13 @@
 // ============================================================
-// FRONTEND LAYER — booking_form_page.dart
-// Halaman konfirmasi checkout setelah pilih kamar + furnitur
+// booking_form_page.dart  (updated)
+// Tambahan: selector metode pembayaran + integrasi ke PaymentService
 // ============================================================
 
 import 'package:flutter/material.dart';
 import 'booking_controller.dart';
+import '../../../data/models/payment_model.dart';
+import '../../../data/services/payment_service.dart';
+import '../pembayaran/pembayaran_instruksi_page.dart';
 
 class BookingFormPage extends StatefulWidget {
   const BookingFormPage({super.key});
@@ -14,8 +17,12 @@ class BookingFormPage extends StatefulWidget {
 }
 
 class _BookingFormPageState extends State<BookingFormPage> {
-late final BookingController _controller;
+  late final BookingController _controller;
   bool _initialized = false;
+
+  // ── State metode pembayaran ────────────────────────────────
+  PaymentMethodType? _selectedMethod;
+  bool _isProcessingPayment = false;
 
   @override
   void didChangeDependencies() {
@@ -34,6 +41,58 @@ late final BookingController _controller;
     }
   }
 
+  // ── Aksi: Konfirmasi + langsung bayar ─────────────────────
+  Future<void> _konfirmasiDanBayar() async {
+    if (_selectedMethod == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Pilih metode pembayaran terlebih dahulu'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isProcessingPayment = true);
+
+    try {
+      // 1. Buat booking dulu (pakai method konfirmasi yang sudah ada)
+      //    konfirmasi() harus return idTagihan — lihat catatan di bawah
+      final idTagihan = await _controller.konfirmasiReturnTagihan(context);
+
+      if (idTagihan == null || !mounted) return;
+
+      // 2. Langsung charge ke Midtrans dengan metode yang dipilih
+      final paymentResult = await PaymentService.createPayment(
+        idTagihan : idTagihan,
+        method    : _selectedMethod!,
+      );
+
+      if (!mounted) return;
+
+      // 3. Navigasi ke halaman instruksi pembayaran
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PaymentInstructionPage(
+            result    : paymentResult,
+            idTagihan : idTagihan,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isProcessingPayment = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +102,8 @@ late final BookingController _controller;
           ? const Center(
               child: CircularProgressIndicator(color: Color(0xFF2ECC71)))
           : _buildBody(),
-      bottomNavigationBar: _controller.isLoading ? null : _buildBottomBar(),
+      bottomNavigationBar:
+          _controller.isLoading ? null : _buildBottomBar(),
     );
   }
 
@@ -114,7 +174,8 @@ late final BookingController _controller;
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            _controller.formatHarga(_controller.hargaPerBulan),
+                            _controller.formatHarga(
+                                _controller.hargaPerBulan),
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -265,7 +326,49 @@ late final BookingController _controller;
 
           const SizedBox(height: 12),
 
-          // ── Info ─────────────────────────────────────────
+          // ════════════════════════════════════════════════
+          // ── METODE PEMBAYARAN (BARU) ─────────────────────
+          // ════════════════════════════════════════════════
+          _buildCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Metode Pembayaran'),
+                const SizedBox(height: 12),
+
+                // ── Group: Transfer Bank ─────────────────
+                _buildGroupLabel('Transfer Bank'),
+                const SizedBox(height: 6),
+                _buildMethodRow(PaymentMethodType.bcaVa),
+                _buildMethodRow(PaymentMethodType.bniVa),
+                _buildMethodRow(PaymentMethodType.briVa),
+                _buildMethodRow(PaymentMethodType.mandiriVa),
+
+                const SizedBox(height: 10),
+                const Divider(height: 1, color: Color(0xFFF0F0F0)),
+                const SizedBox(height: 10),
+
+                // ── Group: QRIS ──────────────────────────
+                _buildGroupLabel('QRIS'),
+                const SizedBox(height: 6),
+                _buildMethodRow(PaymentMethodType.qris),
+
+                const SizedBox(height: 10),
+                const Divider(height: 1, color: Color(0xFFF0F0F0)),
+                const SizedBox(height: 10),
+
+                // ── Group: Dompet Digital ────────────────
+                _buildGroupLabel('Dompet Digital'),
+                const SizedBox(height: 6),
+                _buildMethodRow(PaymentMethodType.gopay),
+                _buildMethodRow(PaymentMethodType.shopeepay),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // ── Info syarat ──────────────────────────────────
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -298,8 +401,110 @@ late final BookingController _controller;
     );
   }
 
+  // ── Widget: Group label ────────────────────────────────────
+  Widget _buildGroupLabel(String label) {
+    return Text(
+      label,
+      style: const TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+        color: Colors.black38,
+        letterSpacing: 0.4,
+      ),
+    );
+  }
+
+  // ── Widget: Satu baris metode pembayaran ───────────────────
+  Widget _buildMethodRow(PaymentMethodType method) {
+    final isSelected = _selectedMethod == method;
+
+    return GestureDetector(
+      onTap: () => setState(() => _selectedMethod = method),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        margin: const EdgeInsets.only(bottom: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFFE8F5E9)
+              : const Color(0xFFF5F7FA),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF2ECC71)
+                : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            // Logo bank/metode
+            SizedBox(
+              width: 44,
+              height: 28,
+              child: Image.asset(
+                _logoPath(method),
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Icon(Icons.account_balance,
+                      size: 16, color: Colors.grey),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+
+            // Label
+            Expanded(
+              child: Text(
+                method.label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: isSelected
+                      ? FontWeight.w600
+                      : FontWeight.normal,
+                  color: isSelected
+                      ? const Color(0xFF1A1A2E)
+                      : const Color(0xFF4A4A4A),
+                ),
+              ),
+            ),
+
+            // Radio indicator
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFF2ECC71)
+                      : Colors.grey[350]!,
+                  width: 2,
+                ),
+                color: isSelected
+                    ? const Color(0xFF2ECC71)
+                    : Colors.white,
+              ),
+              child: isSelected
+                  ? const Icon(Icons.check, size: 12, color: Colors.white)
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ── Bottom Bar ────────────────────────────────────────────
   Widget _buildBottomBar() {
+    final isLoading =
+        _controller.isSubmitting || _isProcessingPayment;
+
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -316,40 +521,96 @@ late final BookingController _controller;
         top: 12,
         bottom: MediaQuery.of(context).padding.bottom + 12,
       ),
-      child: SizedBox(
-        width: double.infinity,
-        height: 52,
-        child: ElevatedButton(
-          onPressed: _controller.isSubmitting
-              ? null
-              : () => _controller.konfirmasi(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF2ECC71),
-            disabledBackgroundColor:
-                const Color(0xFF2ECC71).withOpacity(0.5),
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14)),
-            elevation: 0,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Hint jika belum pilih metode
+          if (_selectedMethod == null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.touch_app_outlined,
+                      size: 14, color: Colors.grey[400]),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Pilih metode pembayaran di atas',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                  ),
+                ],
+              ),
+            ),
+
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: isLoading ? null : _konfirmasiDanBayar,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2ECC71),
+                disabledBackgroundColor:
+                    const Color(0xFF2ECC71).withOpacity(0.5),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+                elevation: 0,
+              ),
+              child: isLoading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Konfirmasi & Bayar',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
+                        ),
+                        if (_selectedMethod != null) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              _selectedMethod!.label
+                                  .replaceAll(' Virtual Account', ' VA'),
+                              style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+            ),
           ),
-          child: _controller.isSubmitting
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                      color: Colors.white, strokeWidth: 2),
-                )
-              : const Text(
-                  'Konfirmasi & Bayar',
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-        ),
+        ],
       ),
     );
   }
 
-  // ── Widget Helpers ────────────────────────────────────────
+  // ── Helpers ───────────────────────────────────────────────
+  String _logoPath(PaymentMethodType type) {
+    switch (type) {
+      case PaymentMethodType.bcaVa:     return 'assets/banks/bca.png';
+      case PaymentMethodType.bniVa:     return 'assets/banks/bni.png';
+      case PaymentMethodType.briVa:     return 'assets/banks/bri.png';
+      case PaymentMethodType.mandiriVa: return 'assets/banks/mandiri.png';
+      case PaymentMethodType.qris:      return 'assets/payment/qris.png';
+      case PaymentMethodType.gopay:     return 'assets/payment/gopay.png';
+      case PaymentMethodType.shopeepay: return 'assets/payment/shopeepay.png';
+    }
+  }
+
   Widget _buildCard({required Widget child}) {
     return Container(
       width: double.infinity,
@@ -408,7 +669,8 @@ late final BookingController _controller;
             style:
                 const TextStyle(fontSize: 13, color: Color(0xFF9E9E9E))),
         Text(value,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A2E))),
+            style:
+                const TextStyle(fontSize: 13, color: Color(0xFF1A1A2E))),
       ],
     );
   }
