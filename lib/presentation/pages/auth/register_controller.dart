@@ -123,7 +123,7 @@ class _RegisterSuccessDialog extends StatelessWidget {
             Container(
               width: 72, height: 72,
               decoration: const BoxDecoration(
-                  color: Color(0xFF2ECC71), shape: BoxShape.circle),
+                  color: Color(0xFF1BBA8A), shape: BoxShape.circle),
               child: const Icon(Icons.check, color: Colors.white, size: 40),
             ),
             const SizedBox(height: 20),
@@ -140,7 +140,7 @@ class _RegisterSuccessDialog extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onContinue,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2ECC71),
+                  backgroundColor: const Color(0xFF1BBA8A),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   padding: const EdgeInsets.symmetric(vertical: 14),

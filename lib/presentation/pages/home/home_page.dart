@@ -597,7 +597,7 @@ class _HomePageState extends State<HomePage> {
           width: 65,
           height: 65,
           decoration: const BoxDecoration(
-            color: Color(0xFF2ECC71),
+            color: Color(0xFF1BBA8A),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -612,10 +612,10 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildBottomNav() {
     const items = [
-      ['assets/images/home_green.png', 'assets/images/home_black.png'],
-      ['assets/images/Keluhan_green.png', 'assets/images/Keluhan_black.png'],
-      ['assets/images/kamarku_green.png', 'assets/images/kamarku_black.png'],
-      ['assets/images/setting_green.png', 'assets/images/setting_black.png'],
+      ['assets/images/home_green.png', 'assets/images/home_black.png', 'Dashboard'],
+      ['assets/images/Keluhan_green.png', 'assets/images/Keluhan_black.png', 'Keluhan'],
+      ['assets/images/kamarku_green.png', 'assets/images/kamarku_black.png', 'Kamarku'],
+      ['assets/images/setting_green.png', 'assets/images/setting_black.png', 'Setting'],
     ];
 
     return Container(
@@ -632,7 +632,7 @@ class _HomePageState extends State<HomePage> {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 58,
+          height: 64,
           child: Row(
             children: List.generate(4, (index) {
               final isActive = _currentNavIndex == index;
@@ -641,22 +641,44 @@ class _HomePageState extends State<HomePage> {
                   onTap: () => _onTabTapped(index),
                   behavior: HitTestBehavior.opaque,
                   child: Center(
-                    child: Image.asset(
-                      isActive ? items[index][0] : items[index][1],
-                      width: 24,
-                      height: 24,
-                      errorBuilder: (_, __, ___) => Icon(
-                        [
-                          Icons.home_outlined,
-                          Icons.report_problem_outlined,
-                          Icons.receipt_long_outlined,
-                          Icons.settings_outlined,
-                        ][index],
-                        color: isActive
-                            ? const Color(0xFF2ECC71)
-                            : const Color(0xFF9E9E9E),
-                        size: 24,
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          isActive ? items[index][0] : items[index][1],
+                          width: 24,
+                          height: 24,
+                          errorBuilder: (_, __, ___) => Icon(
+                            [
+                              Icons.home_outlined,
+                              Icons.report_problem_outlined,
+                              Icons.receipt_long_outlined,
+                              Icons.settings_outlined,
+                            ][index],
+                            color: isActive
+                                ? const Color(0xFF1BBA8A)
+                                : const Color(0xFF9E9E9E),
+                            size: 24,
+                          ),
+                        ),
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 200),
+                          curve: Curves.easeInOut,
+                          child: isActive
+                              ? Padding(
+                                  padding: const EdgeInsets.only(top: 3),
+                                  child: Text(
+                                    items[index][2],
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF1BBA8A),
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -668,6 +690,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
 
 // ── Wrapper Keluhan dengan refresh ────────────────────────────
 class _KeluhanListPageRefresh extends StatefulWidget {
@@ -769,7 +792,7 @@ class _DashboardTabState extends State<_DashboardTab> {
   Widget build(BuildContext context) {
     if (widget.controller.isLoading) {
       return const Center(
-          child: CircularProgressIndicator(color: Color(0xFF2ECC71)));
+          child: CircularProgressIndicator(color: Color(0xFF1BBA8A)));
     }
     if (widget.controller.errorMessage != null) {
       return Center(
@@ -785,7 +808,7 @@ class _DashboardTabState extends State<_DashboardTab> {
             ElevatedButton(
               onPressed: widget.controller.refresh,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2ECC71),
+                backgroundColor: const Color(0xFF1BBA8A),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
@@ -798,7 +821,7 @@ class _DashboardTabState extends State<_DashboardTab> {
     }
 
     return RefreshIndicator(
-      color: const Color(0xFF2ECC71),
+      color: const Color(0xFF1BBA8A),
       onRefresh: widget.controller.refresh,
       child: CustomScrollView(
         slivers: [
@@ -839,7 +862,7 @@ class _DashboardTabState extends State<_DashboardTab> {
 
   Widget _buildSearchBar(BuildContext context) {
     return Container(
-      color: const Color(0xFF2ECC71),
+      color: const Color(0xFF1BBA8A),
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 12,
         left: 16,
@@ -894,7 +917,7 @@ class _DashboardTabState extends State<_DashboardTab> {
                       height: 140,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Container(
-                        color: const Color(0xFF2ECC71),
+                        color: const Color(0xFF1BBA8A),
                         child: const Center(
                           child: Icon(Icons.image_not_supported,
                               color: Colors.white54),
@@ -919,7 +942,7 @@ class _DashboardTabState extends State<_DashboardTab> {
                 height: 8,
                 decoration: BoxDecoration(
                   color:
-                      isActive ? const Color(0xFF2ECC71) : Colors.grey[300],
+                      isActive ? const Color(0xFF1BBA8A) : Colors.grey[300],
                   borderRadius: BorderRadius.circular(4),
                 ),
               );
@@ -989,7 +1012,7 @@ class _DashboardTabState extends State<_DashboardTab> {
               label: Text(filters[i]),
               selected: isSelected,
               onSelected: (_) => widget.controller.applyFilter(filters[i]),
-              selectedColor: const Color(0xFF2ECC71),
+              selectedColor: const Color(0xFF1BBA8A),
               backgroundColor: Colors.white,
               checkmarkColor: Colors.white,
               labelStyle: TextStyle(
@@ -999,7 +1022,7 @@ class _DashboardTabState extends State<_DashboardTab> {
               ),
               side: BorderSide(
                 color: isSelected
-                    ? const Color(0xFF2ECC71)
+                    ? const Color(0xFF1BBA8A)
                     : const Color(0xFFE0E0E0),
               ),
               shape: RoundedRectangleBorder(

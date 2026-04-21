@@ -48,7 +48,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
   // ── AppBar ────────────────────────────────────────────────
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: const Color(0xFF2ECC71),
+      backgroundColor: const Color(0xFF1BBA8A),
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new,
@@ -72,7 +72,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CircularProgressIndicator(color: Color(0xFF2ECC71)),
+          CircularProgressIndicator(color: Color(0xFF1BBA8A)),
           SizedBox(height: 16),
           Text(
             'Memeriksa status kamar...',
@@ -101,7 +101,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
               child: const Icon(
                 Icons.meeting_room_outlined,
                 size: 48,
-                color: Color(0xFF2ECC71),
+                color: Color(0xFF1BBA8A),
               ),
             ),
             const SizedBox(height: 24),
@@ -131,8 +131,8 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
               child: OutlinedButton(
                 onPressed: () => Navigator.pop(context),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF2ECC71),
-                  side: const BorderSide(color: Color(0xFF2ECC71)),
+                  foregroundColor: const Color(0xFF1BBA8A),
+                  side: const BorderSide(color: Color(0xFF1BBA8A)),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                 ),
@@ -204,9 +204,9 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
                   ? null
                   : () => _controller.laporkan(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2ECC71),
+                backgroundColor: const Color(0xFF1BBA8A),
                 disabledBackgroundColor:
-                    const Color(0xFF2ECC71).withOpacity(0.5),
+                    const Color(0xFF1BBA8A).withOpacity(0.5),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
@@ -278,7 +278,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
               child: Row(
                 children: [
                   const Icon(Icons.meeting_room_outlined,
-                      color: Color(0xFF2ECC71), size: 18),
+                      color: Color(0xFF1BBA8A), size: 18),
                   const SizedBox(width: 8),
                   Text('Kamar ${b.nomorKamar ?? b.idKamar}'),
                 ],
@@ -346,7 +346,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
                   height: 36,
                   color: const Color(0xFFE8F5E9),
                   child: const Icon(Icons.image_outlined,
-                      color: Color(0xFF2ECC71), size: 20),
+                      color: Color(0xFF1BBA8A), size: 20),
                 ),
               ),
             ),
@@ -422,7 +422,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide:
-            const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
+            const BorderSide(color: Color(0xFF1BBA8A), width: 1.5),
       ),
     );
   }

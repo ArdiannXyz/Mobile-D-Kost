@@ -38,7 +38,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) => const Icon(
                   Icons.smart_toy_outlined,
-                  color: Color(0xFF2ECC71),
+                  color: Color(0xFF1BBA8A),
                   size: 100,
                 ),
               ),
@@ -110,7 +110,7 @@ class _WelcomeButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF2ECC71),
+        backgroundColor: const Color(0xFF1BBA8A),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(

@@ -104,7 +104,7 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
                                             ? 'akun Anda'
                                             : _controller.email,
                                         style: const TextStyle(
-                                          color: Color(0xFF2ECC71),
+                                          color: Color(0xFF1BBA8A),
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -124,7 +124,7 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
                             ),
                             child: const Icon(
                               Icons.lock_open_rounded,
-                              color: Color(0xFF2ECC71),
+                              color: Color(0xFF1BBA8A),
                               size: 30,
                             ),
                           ),
@@ -191,8 +191,8 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
                               ? null
                               : () => _controller.gantiPassword(context),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF2ECC71),
-                            disabledBackgroundColor: const Color(0xFF2ECC71)
+                            backgroundColor: const Color(0xFF1BBA8A),
+                            disabledBackgroundColor: const Color(0xFF1BBA8A)
                                 .withValues(alpha: 0.5),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
@@ -299,7 +299,7 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
         children: [
           const Icon(
             Icons.check_circle_outline,
-            color: Color(0xFF2ECC71),
+            color: Color(0xFF1BBA8A),
             size: 14,
           ),
           const SizedBox(width: 6),

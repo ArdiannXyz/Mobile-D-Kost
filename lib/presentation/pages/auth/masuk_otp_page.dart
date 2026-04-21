@@ -152,7 +152,7 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
                             ),
                             child: const Icon(
                               Icons.mark_email_read_outlined,
-                              color: Color(0xFF2ECC71),
+                              color: Color(0xFF1BBA8A),
                               size: 30,
                             ),
                           ),
@@ -205,7 +205,7 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(
-                                      color: Color(0xFF2ECC71),
+                                      color: Color(0xFF1BBA8A),
                                       width: 2,
                                     ),
                                   ),
@@ -225,7 +225,7 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
                           child: const Text(
                             'Kirim ulang kode OTP',
                             style: TextStyle(
-                              color: Color(0xFF2ECC71),
+                              color: Color(0xFF1BBA8A),
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
                             ),
@@ -243,9 +243,9 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
                               ? null
                               : () => _controller.submitOtp(context),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF2ECC71),
+                            backgroundColor: const Color(0xFF1BBA8A),
                             disabledBackgroundColor:
-                                const Color(0xFF2ECC71).withValues(alpha: 0.5),
+                                const Color(0xFF1BBA8A).withValues(alpha: 0.5),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),

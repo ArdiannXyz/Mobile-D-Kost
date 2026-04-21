@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
             width: 64,
             height: 64,
             decoration: const BoxDecoration(
-              color: Color(0xFF2ECC71),
+              color: Color(0xFF1BBA8A),
               shape: BoxShape.circle,
             ),
             child: const Center(
@@ -189,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
         child: const Text(
           'Lupa Password Kamu?',
           style: TextStyle(
-            color: Color(0xFF2ECC71),
+            color: Color(0xFF1BBA8A),
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
@@ -206,8 +206,8 @@ class _LoginPageState extends State<LoginPage> {
             ? null
             : () => _controller.loginUser(context),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2ECC71),
-          disabledBackgroundColor: const Color(0xFF2ECC71).withValues(alpha: 0.5),
+          backgroundColor: const Color(0xFF1BBA8A),
+          disabledBackgroundColor: const Color(0xFF1BBA8A).withValues(alpha: 0.5),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -244,7 +244,7 @@ class _LoginPageState extends State<LoginPage> {
             child: const Text(
               'Daftar sekarang!',
               style: TextStyle(
-                color: Color(0xFF2ECC71),
+                color: Color(0xFF1BBA8A),
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
               ),
@@ -271,7 +271,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
+        borderSide: const BorderSide(color: Color(0xFF1BBA8A), width: 1.5),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );

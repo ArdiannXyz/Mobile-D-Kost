@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../data/services/user_service.dart';
-import '../../../data/services/midtrans_service.dart';  
+import '../../../data/services/midtrans_service.dart';
 import '../../../data/helper/api_helper.dart';
 import '../../../data/helper/api_exception.dart';
 import 'register_page.dart';
@@ -57,7 +57,16 @@ class LoginController {
       if (!context.mounted) return;
 
       if (data['error'] == false) {
-        // ← BARU — set token ke MidtransService
+        // ✅ Cek role dari data['user']['role']
+        final String role = data['user']?['role'] ?? '';
+
+        if (role == 'admin') {
+          // ❌ Admin tidak diizinkan masuk ke aplikasi mobile
+          _showAdminDeniedDialog(context);
+          return;
+        }
+
+        // ✅ Hanya penyewa yang boleh lanjut
         final token = await ApiHelper.getToken();
         if (token != null) {
           MidtransService.setToken(token);
@@ -101,6 +110,75 @@ class LoginController {
     );
   }
 
+  void _showAdminDeniedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.block_rounded,
+                  color: Colors.red.shade600,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Akses Ditolak',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A1A2E),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Akun admin tidak dapat masuk\nke aplikasi mobile ini.\nGunakan dashboard web untuk admin.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF9E9E9E),
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade600,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Mengerti',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showErrorSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Row(children: [
@@ -116,6 +194,7 @@ class LoginController {
   }
 }
 
+// ── Dialog Login Berhasil ──────────────────────────────────────
 class _LoginSuccessDialog extends StatelessWidget {
   final VoidCallback onContinue;
   const _LoginSuccessDialog({required this.onContinue});
@@ -134,7 +213,7 @@ class _LoginSuccessDialog extends StatelessWidget {
               width: 72,
               height: 72,
               decoration: const BoxDecoration(
-                color: Color(0xFF2ECC71),
+                color: Color(0xFF1BBA8A),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.check, color: Colors.white, size: 40),
@@ -163,7 +242,7 @@ class _LoginSuccessDialog extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onContinue,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2ECC71),
+                  backgroundColor: const Color(0xFF1BBA8A),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),

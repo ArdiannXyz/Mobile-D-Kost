@@ -40,7 +40,7 @@ class _KamarkuPageState extends State<KamarkuPage> {
 
   Widget _buildHeader() {
     return Container(
-      color: const Color(0xFF2ECC71),
+      color: const Color(0xFF1BBA8A),
       width: double.infinity,
       padding: EdgeInsets.only(
         top   : MediaQuery.of(context).padding.top + 12,
@@ -73,7 +73,7 @@ class _KamarkuPageState extends State<KamarkuPage> {
   Widget _buildContent() {
     if (_controller.isLoading) {
       return const Center(
-          child: CircularProgressIndicator(color: Color(0xFF2ECC71)));
+          child: CircularProgressIndicator(color: Color(0xFF1BBA8A)));
     }
 
     if (_controller.errorMessage != null) {
@@ -92,7 +92,7 @@ class _KamarkuPageState extends State<KamarkuPage> {
               ElevatedButton(
                 onPressed: _controller.loadBookings,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2ECC71),
+                  backgroundColor: const Color(0xFF1BBA8A),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
@@ -126,7 +126,7 @@ class _KamarkuPageState extends State<KamarkuPage> {
     }
 
     return RefreshIndicator(
-      color    : const Color(0xFF2ECC71),
+      color    : const Color(0xFF1BBA8A),
       onRefresh: _controller.loadBookings,
       child: ListView.builder(
         padding   : const EdgeInsets.all(16),
@@ -268,12 +268,12 @@ class _BookingCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize  : 13,
                       fontWeight: FontWeight.w600,
-                      color     : Color(0xFF2ECC71),
+                      color     : Color(0xFF1BBA8A),
                     ),
                   ),
                   SizedBox(width: 4),
                   Icon(Icons.arrow_forward_ios_rounded,
-                      size: 12, color: Color(0xFF2ECC71)),
+                      size: 12, color: Color(0xFF1BBA8A)),
                 ],
               ),
             ),
@@ -292,7 +292,7 @@ class _BookingCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: const Icon(Icons.bed_outlined,
-          color: Color(0xFF2ECC71), size: 32),
+          color: Color(0xFF1BBA8A), size: 32),
     );
   }
 

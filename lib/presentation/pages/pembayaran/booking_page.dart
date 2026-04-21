@@ -100,7 +100,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
       appBar: _buildAppBar(),
       body: _controller.isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF2ECC71)))
+              child: CircularProgressIndicator(color: Color(0xFF1BBA8A)))
           : _buildBody(),
       bottomNavigationBar:
           _controller.isLoading ? null : _buildBottomBar(),
@@ -179,7 +179,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF2ECC71),
+                              color: Color(0xFF1BBA8A),
                             ),
                           ),
                           const Text(
@@ -315,7 +315,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF2ECC71),
+                        color: Color(0xFF1BBA8A),
                       ),
                     ),
                   ],
@@ -431,7 +431,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFF2ECC71)
+                ? const Color(0xFF1BBA8A)
                 : Colors.transparent,
             width: 1.5,
           ),
@@ -447,11 +447,11 @@ class _BookingFormPageState extends State<BookingFormPage> {
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) => Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: Color(0xFF1BBA8A),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: const Icon(Icons.account_balance,
-                      size: 16, color: Colors.grey),
+                      size: 16, color: Colors.white),
                 ),
               ),
             ),
@@ -482,12 +482,12 @@ class _BookingFormPageState extends State<BookingFormPage> {
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isSelected
-                      ? const Color(0xFF2ECC71)
+                      ? const Color(0xFF1BBA8A)
                       : Colors.grey[350]!,
                   width: 2,
                 ),
                 color: isSelected
-                    ? const Color(0xFF2ECC71)
+                    ? const Color(0xFF1BBA8A)
                     : Colors.white,
               ),
               child: isSelected
@@ -548,9 +548,9 @@ class _BookingFormPageState extends State<BookingFormPage> {
             child: ElevatedButton(
               onPressed: isLoading ? null : _konfirmasiDanBayar,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2ECC71),
+                backgroundColor: const Color(0xFF1BBA8A),
                 disabledBackgroundColor:
-                    const Color(0xFF2ECC71).withOpacity(0.5),
+                    const Color(0xFF1BBA8A).withOpacity(0.5),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14)),
@@ -646,7 +646,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
   }) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: const Color(0xFF2ECC71)),
+        Icon(icon, size: 16, color: const Color(0xFF1BBA8A)),
         const SizedBox(width: 8),
         Text(label,
             style:
@@ -685,13 +685,13 @@ class _BookingFormPageState extends State<BookingFormPage> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 11, color: const Color(0xFF2ECC71)),
+          Icon(icon, size: 11, color: const Color(0xFF1BBA8A)),
           const SizedBox(width: 4),
           Text(
             label,
             style: const TextStyle(
                 fontSize: 11,
-                color: Color(0xFF2ECC71),
+                color: Color(0xFF1BBA8A),
                 fontWeight: FontWeight.w500),
           ),
         ],

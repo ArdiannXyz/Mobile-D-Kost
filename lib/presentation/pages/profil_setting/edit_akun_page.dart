@@ -58,7 +58,7 @@ class _EditProfilPageState extends State<EditProfilPage> {
   // ── AppBar hijau ──────────────────────────────────────────
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: const Color(0xFF2ECC71),
+      backgroundColor: const Color(0xFF1BBA8A),
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new,
@@ -145,9 +145,9 @@ class _EditProfilPageState extends State<EditProfilPage> {
                   ? null
                   : () => _controller.simpan(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2ECC71),
+                backgroundColor: const Color(0xFF1BBA8A),
                 disabledBackgroundColor:
-                    const Color(0xFF2ECC71).withOpacity(0.5),
+                    const Color(0xFF1BBA8A).withOpacity(0.5),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
@@ -230,7 +230,7 @@ class _EditProfilPageState extends State<EditProfilPage> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(
-                  color: Color(0xFF2ECC71), width: 1.5),
+                  color: Color(0xFF1BBA8A), width: 1.5),
             ),
           ),
         ),

@@ -60,8 +60,8 @@ class _SettingPageState extends State<SettingPage> {
                       onTap: () => _controller.goToDetailAkun(context),
                     ),
                     _MenuItem(
-                      assetIcon: 'assets/images/keluhan_black.png',
-                      label: 'Panduan',
+                      assetIcon: 'assets/images/guidebook.png',
+                      label: 'FAQ',
                       onTap: () => _controller.goToPanduan(context),
                     ), 
                      _MenuItem(
@@ -96,7 +96,7 @@ class _SettingPageState extends State<SettingPage> {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        color: Color(0xFF2ECC71),
+        color: Color(0xFF1BBA8A),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(18),  // ← sesuaikan angkanya
           bottomRight: Radius.circular(18),
@@ -133,7 +133,7 @@ class _SettingPageState extends State<SettingPage> {
                 errorBuilder: (_, __, ___) => const Icon(
                   Icons.person,
                   size: 50,
-                  color: Color(0xFF2ECC71),
+                  color: Color(0xFF1BBA8A),
                 ),
               ),
             ),

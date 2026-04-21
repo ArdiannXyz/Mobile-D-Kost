@@ -162,7 +162,7 @@ class TulisReviewController {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2ECC71),
+              backgroundColor: const Color(0xFF1BBA8A),
               foregroundColor: Colors.white,
               elevation: 0,
               padding:
@@ -231,7 +231,7 @@ class TulisReviewController {
                     fontSize: 13, fontWeight: FontWeight.w500)),
           ),
         ]),
-        backgroundColor: const Color(0xFF1DB954),
+        backgroundColor: const Color(0xFF1BBA8A),
         behavior: SnackBarBehavior.floating,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
