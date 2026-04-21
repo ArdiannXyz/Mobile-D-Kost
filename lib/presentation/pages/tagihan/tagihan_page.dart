@@ -44,7 +44,7 @@ import 'package:dkost/data/models/tagihan_models.dart';
 
       Widget _buildHeader() {
         return Container(
-          color: const Color(0xFF2ECC71),
+          color: const Color(0xFF1BBA8A),
           width: double.infinity,
           padding: EdgeInsets.only(
             top   : MediaQuery.of(context).padding.top + 12,
@@ -63,27 +63,30 @@ import 'package:dkost/data/models/tagihan_models.dart';
         );
       }
 
-      Widget _buildFilterChips() {
-        const filters = ['Belum Bayar', 'Batal', 'Lunas'];
-        return Container(
-          color  : Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          child: Row(
-            children: [
-              ...filters.map((f) {
-                final isSelected = _controller.selectedFilter == f;
+Widget _buildFilterChips() {
+  const filters = ['Belum Bayar', 'Batal', 'Lunas', 'Selesai']; // ← tambah
+  return Container(
+    color  : Colors.white,
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    child: Row(
+      children: [
+        ...filters.map((f) {
+          final isSelected = _controller.selectedFilter == f;
 
-                Color activeColor;
-                switch (f) {
-                  case 'Batal':
-                    activeColor = const Color(0xFF9E9E9E);
-                    break;
-                  case 'Lunas':
-                    activeColor = const Color(0xFF2ECC71);
-                    break;
-                  default:
-                    activeColor = const Color(0xFFF39C12);
-                }
+          Color activeColor;
+          switch (f) {
+            case 'Batal':
+              activeColor = const Color(0xFF9E9E9E);
+              break;
+            case 'Lunas':
+              activeColor = const Color(0xFF1BBA8A);
+              break;
+            case 'Selesai':                        // ← tambah
+              activeColor = const Color(0xFF3498DB);
+              break;
+            default:
+              activeColor = const Color(0xFFF39C12);
+          }
 
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
@@ -126,7 +129,7 @@ import 'package:dkost/data/models/tagihan_models.dart';
       Widget _buildContent() {
         if (_controller.isLoading) {
           return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF2ECC71)));
+              child: CircularProgressIndicator(color: Color(0xFF1BBA8A)));
         }
 
         if (_controller.errorMessage != null) {
@@ -145,7 +148,7 @@ import 'package:dkost/data/models/tagihan_models.dart';
                   ElevatedButton(
                     onPressed: _controller.loadTagihan,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2ECC71),
+                      backgroundColor: const Color(0xFF1BBA8A),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)),
@@ -204,106 +207,167 @@ import 'package:dkost/data/models/tagihan_models.dart';
 
       @override
       Widget build(BuildContext context) {
-        final isBatal = tagihan.statusBooking == 'batal';
+        final isBatal   = tagihan.statusBooking == 'batal';
+        final isSelesai = tagihan.statusBooking == 'selesai';
+
         return GestureDetector(
-          onTap: isBatal ? null : onTap,
-          child: Opacity(
-            opacity: isBatal ? 0.75 : 1.0,
-            child: Container(
-              margin    : const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color       : Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow   : const [
-                  BoxShadow(
-                      color    : Color(0x0A000000),
-                      blurRadius: 6,
-                      offset   : Offset(0, 2)),
-                ],
-              ),
-              child: Column(
-                children: [
-                  if (isBatal)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 6, horizontal: 12),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFEEEEEE),
-                        borderRadius: BorderRadius.only(
-                          topLeft : Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.cancel_outlined,
-                              size: 14, color: Color(0xFF9E9E9E)),
-                          SizedBox(width: 6),
-                          Text('Booking ini telah dibatalkan',
-                              style: TextStyle(
-                                  fontSize: 11, color: Color(0xFF9E9E9E))),
-                        ],
+          onTap: onTap,  // semua bisa diklik
+          child: Container(
+            margin    : const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color       : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow   : const [
+                BoxShadow(
+                    color    : Color(0x0A000000),
+                    blurRadius: 6,
+                    offset   : Offset(0, 2)),
+              ],
+            ),
+            child: Column(
+              children: [
+                // ── Banner Batal ──────────────────────────────
+                if (isBatal)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFEEEEEE),
+                      borderRadius: BorderRadius.only(
+                        topLeft : Radius.circular(12),
+                        topRight: Radius.circular(12),
                       ),
                     ),
-
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
+                    child: const Row(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: tagihan.fotoKamar != null
-                              ? Image.network(
+                        Icon(Icons.cancel_outlined, size: 14, color: Color(0xFF9E9E9E)),
+                        SizedBox(width: 6),
+                        Text('Booking ini telah dibatalkan',
+                            style: TextStyle(fontSize: 11, color: Color(0xFF9E9E9E))),
+                      ],
+                    ),
+                  ),
+
+                // ── Banner Selesai ────────────────────────────
+                if (isSelesai)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFE3F2FD),
+                      borderRadius: BorderRadius.only(
+                        topLeft : Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.check_circle_outline, size: 14, color: Color(0xFF3498DB)),
+                        SizedBox(width: 6),
+                        Text('Sewa telah selesai',
+                            style: TextStyle(fontSize: 11, color: Color(0xFF3498DB))),
+                      ],
+                    ),
+                  ),
+
+                // ── Banner Lunas ──────────────────────────────
+                if (!isBatal && !isSelesai && tagihan.statusTagihan == 'lunas')
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.only(
+                        topLeft : Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.check_circle_outline, size: 14, color: Color(0xFF1BBA8A)),
+                        SizedBox(width: 6),
+                        Text('Tagihan telah lunas',
+                            style: TextStyle(fontSize: 11, color: Color(0xFF1BBA8A))),
+                      ],
+                    ),
+                  ),
+
+                // ── Banner Belum Bayar ────────────────────────
+                if (!isBatal && !isSelesai && tagihan.statusTagihan == 'belum_bayar')
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFFF8E1),
+                      borderRadius: BorderRadius.only(
+                        topLeft : Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.access_time_outlined, size: 14, color: Color(0xFFF39C12)),
+                        SizedBox(width: 6),
+                        Text('Menunggu pembayaran',
+                            style: TextStyle(fontSize: 11, color: Color(0xFFF39C12))),
+                      ],
+                    ),
+                  ),
+
+                // ── Konten Kartu ──────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: tagihan.fotoKamar != null
+                            ? Image.network(
                                 '${ApiConstants.storageUrl}${tagihan.fotoKamar!}',
-                                  width       : 72,
-                                  height      : 72,
-                                  fit         : BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => _placeholder(),
-                                )
-                              : _placeholder(),
+                                width       : 72,
+                                height      : 72,
+                                fit         : BoxFit.cover,
+                                errorBuilder: (_, __, ___) => _placeholder(),
+                              )
+                            : _placeholder(),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              tagihan.namaKamar ?? 'Kamar',
+                              style: const TextStyle(
+                                fontSize  : 14,
+                                fontWeight: FontWeight.bold,
+                                color     : Color(0xFF1A1A2E),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Sewa : ${controller.formatTanggal(tagihan.periodeAwal)}',
+                              style: const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
+                            ),
+                            Text(
+                              'Berakhir : ${controller.formatTanggal(tagihan.periodeAkhir)}',
+                              style: const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              controller.formatHarga(tagihan.totalTagihan),
+                              style: const TextStyle(
+                                fontSize  : 14,
+                                fontWeight: FontWeight.bold,
+                                color     : Color(0xFF1A1A2E),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                tagihan.namaKamar ?? 'Kamar',
-                                style: const TextStyle(
-                                  fontSize  : 14,
-                                  fontWeight: FontWeight.bold,
-                                  color     : Color(0xFF1A1A2E),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Sewa : ${controller.formatTanggal(tagihan.periodeAwal)}',
-                                style: const TextStyle(
-                                    fontSize: 12, color: Color(0xFF9E9E9E)),
-                              ),
-                              Text(
-                                'Berakhir : ${controller.formatTanggal(tagihan.periodeAkhir)}',
-                                style: const TextStyle(
-                                    fontSize: 12, color: Color(0xFF9E9E9E)),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                controller.formatHarga(tagihan.totalTagihan),
-                                style: const TextStyle(
-                                  fontSize  : 14,
-                                  fontWeight: FontWeight.bold,
-                                  color     : Color(0xFF1A1A2E),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        _StatusBadge(
-                          statusTagihan: tagihan.statusTagihan,
-                          statusBooking: tagihan.statusBooking,
+                      ),
+                      _StatusBadge(
+                        statusTagihan: tagihan.statusTagihan,
+                        statusBooking: tagihan.statusBooking,
                         ),
                       ],
                     ),
@@ -311,7 +375,6 @@ import 'package:dkost/data/models/tagihan_models.dart';
                 ],
               ),
             ),
-          ),
         );
       }
 
@@ -324,7 +387,7 @@ import 'package:dkost/data/models/tagihan_models.dart';
             borderRadius: BorderRadius.circular(10),
           ),
           child: const Icon(Icons.bed_outlined,
-              color: Color(0xFF2ECC71), size: 28),
+              color: Color(0xFF1BBA8A), size: 28),
         );
       }
     }
@@ -339,14 +402,16 @@ import 'package:dkost/data/models/tagihan_models.dart';
         required this.statusBooking,
       });
 
-      @override
       Widget build(BuildContext context) {
         if (statusBooking == 'batal') {
           return _badge(const Color(0xFF9E9E9E), 'Batal');
         }
+        if (statusBooking == 'selesai') {              // ← tambah ini
+          return _badge(const Color(0xFF3498DB), 'Selesai');
+        }
         switch (statusTagihan) {
           case 'lunas':
-            return _badge(const Color(0xFF2ECC71), 'Lunas');
+            return _badge(const Color(0xFF1BBA8A), 'Lunas');
           case 'terlambat':
             return _badge(const Color(0xFFE74C3C), 'Telat');
           default:

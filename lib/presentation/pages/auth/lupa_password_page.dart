@@ -105,7 +105,7 @@ class _LupaPasswordPageState extends State<LupaPasswordPage> {
                             ),
                             child: const Icon(
                               Icons.lock_reset_rounded,
-                              color: Color(0xFF2ECC71),
+                              color: Color(0xFF1BBA8A),
                               size: 30,
                             ),
                           ),
@@ -161,8 +161,8 @@ class _LupaPasswordPageState extends State<LupaPasswordPage> {
                               ? null
                               : () => _controller.submitReset(context),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF2ECC71),
-                            disabledBackgroundColor: const Color(0xFF2ECC71)
+                            backgroundColor: const Color(0xFF1BBA8A),
+                            disabledBackgroundColor: const Color(0xFF1BBA8A)
                                 .withValues(alpha: 0.5),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
@@ -204,7 +204,7 @@ class _LupaPasswordPageState extends State<LupaPasswordPage> {
                               child: const Text(
                                 'Masuk sekarang!',
                                 style: TextStyle(
-                                  color: Color(0xFF2ECC71),
+                                  color: Color(0xFF1BBA8A),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                 ),
@@ -243,7 +243,7 @@ class _LupaPasswordPageState extends State<LupaPasswordPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
+        borderSide: const BorderSide(color: Color(0xFF1BBA8A), width: 1.5),
       ),
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

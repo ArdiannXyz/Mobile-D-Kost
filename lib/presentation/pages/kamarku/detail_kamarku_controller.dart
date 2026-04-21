@@ -128,7 +128,7 @@ class DetailKamarkuController {
   }
 
   // ── Batalkan booking ───────────────────────────────────────
-  Future<void> batalBooking(BuildContext context) async {
+Future<void> batalBooking(BuildContext context) async {
     final konfirmasi = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -139,15 +139,25 @@ class DetailKamarkuController {
             'Booking akan dibatalkan dan kamar kembali tersedia.',
             style: TextStyle(fontSize: 13)),
         actions: [
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Tidak',
-                style: TextStyle(color: Color(0xFF9E9E9E))),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1BBA8A),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Tidak'),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Ya, Batalkan',
-                style: TextStyle(color: Colors.red)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Ya, Batalkan'),
           ),
         ],
       ),

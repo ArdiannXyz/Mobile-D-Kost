@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../data/models/payment_model.dart';
 
+
 class VaWidget extends StatelessWidget {
   final VaPaymentResult result;
 
@@ -117,22 +118,22 @@ class VaWidget extends StatelessWidget {
               const SizedBox(height: 8),
 
               // VA Number + tombol salin
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    result.vaNumber,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: _bankColor,
-                      letterSpacing: 2,
+                Column(
+                  children: [
+                    Text(
+                      result.vaNumber,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: _bankColor,
+                        letterSpacing: 2,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  _CopyButton(text: result.vaNumber),
-                ],
-              ),
+                    const SizedBox(height: 8),
+                    _CopyButton(text: result.vaNumber),
+                  ],
+                ),
               const SizedBox(height: 16),
 
               // Total bayar
@@ -214,25 +215,26 @@ class _CopyButton extends StatefulWidget {
 
 class _CopyButtonState extends State<_CopyButton> {
   bool _copied = false;
+  // Hapus: Future<void> _copy() async { ... } yang lama
+  
 
-  Future<void> _copy() async {
+    Future<void> _copy() async {
     await Clipboard.setData(ClipboardData(text: widget.text));
+    if (!mounted) return;
     setState(() => _copied = true);
     await Future.delayed(const Duration(seconds: 2));
-    if (mounted) setState(() => _copied = false);
+    if (!mounted) return;
+    setState(() => _copied = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: _copy,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: _copied
-              ? const Color(0xFF22C55E).withOpacity(0.1)
-              : const Color(0xFF2563EB).withOpacity(0.1),
+          color: const Color(0xFF2563EB).withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -241,14 +243,14 @@ class _CopyButtonState extends State<_CopyButton> {
             Icon(
               _copied ? Icons.check : Icons.copy,
               size: 14,
-              color: _copied ? const Color(0xFF22C55E) : const Color(0xFF2563EB),
+              color: const Color(0xFF2563EB),
             ),
             const SizedBox(width: 4),
             Text(
               _copied ? 'Tersalin' : 'Salin',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
-                color: _copied ? const Color(0xFF22C55E) : const Color(0xFF2563EB),
+                color: Color(0xFF1BBA8A),
                 fontWeight: FontWeight.w600,
               ),
             ),

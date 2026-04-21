@@ -118,7 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
             width: 64,
             height: 64,
             decoration: const BoxDecoration(
-              color: Color(0xFF2ECC71),
+              color: Color(0xFF1BBA8A),
               shape: BoxShape.circle,
             ),
             child: const Center(
@@ -204,9 +204,9 @@ class _RegisterPageState extends State<RegisterPage> {
             ? null
             : () => _controller.registerUser(context),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2ECC71),
+          backgroundColor: const Color(0xFF1BBA8A),
           disabledBackgroundColor:
-              const Color(0xFF2ECC71).withValues(alpha: 0.5),
+              const Color(0xFF1BBA8A).withValues(alpha: 0.5),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12)),
@@ -237,7 +237,7 @@ class _RegisterPageState extends State<RegisterPage> {
             onTap: () => _controller.goToLogin(context),
             child: const Text('Masuk sekarang!',
                 style: TextStyle(
-                    color: Color(0xFF2ECC71),
+                    color: Color(0xFF1BBA8A),
                     fontWeight: FontWeight.bold,
                     fontSize: 13)),
           ),
@@ -261,7 +261,7 @@ class _RegisterPageState extends State<RegisterPage> {
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide:
-              const BorderSide(color: Color(0xFF2ECC71), width: 1.5)),
+              const BorderSide(color: Color(0xFF1BBA8A), width: 1.5)),
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );

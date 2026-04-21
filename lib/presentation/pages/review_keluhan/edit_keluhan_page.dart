@@ -45,7 +45,7 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: const Color(0xFF2ECC71),
+      backgroundColor: const Color(0xFF1BBA8A),
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new,
@@ -122,8 +122,8 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
                       : () => _controller.editKeluhan(
                           context, widget.keluhan.idKeluhan),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor        : const Color(0xFF2ECC71),
-                    disabledBackgroundColor: const Color(0xFF2ECC71).withOpacity(0.5),
+                    backgroundColor        : const Color(0xFF1BBA8A),
+                    disabledBackgroundColor: const Color(0xFF1BBA8A).withOpacity(0.5),
                     foregroundColor        : Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
@@ -247,7 +247,7 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
                   height: 36,
                   color : const Color(0xFFE8F5E9),
                   child : const Icon(Icons.image_outlined,
-                      color: Color(0xFF2ECC71), size: 20),
+                      color: Color(0xFF1BBA8A), size: 20),
                 ),
               ),
             ),
@@ -283,7 +283,7 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
         child: Row(
           children: [
             const Icon(Icons.image_outlined,
-                color: Color(0xFF2ECC71), size: 20),
+                color: Color(0xFF1BBA8A), size: 20),
             const SizedBox(width: 8),
             const Expanded(
               child: Text(
@@ -297,7 +297,7 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
                 'Ganti',
                 style: TextStyle(
                     fontSize  : 12,
-                    color     : Color(0xFF2ECC71),
+                    color     : Color(0xFF1BBA8A),
                     fontWeight: FontWeight.w500),
               ),
             ),
@@ -355,7 +355,7 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide  : const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
+        borderSide  : const BorderSide(color: Color(0xFF1BBA8A), width: 1.5),
       ),
     );
   }

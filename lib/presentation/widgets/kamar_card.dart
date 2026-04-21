@@ -84,7 +84,7 @@ class KamarCard extends StatelessWidget {
                         'Learn more',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Color(0xFF2ECC71),
+                          color: Color(0xFF1BBA8A),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -117,7 +117,7 @@ class KamarCard extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: onTap,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2ECC71),
+                          backgroundColor: const Color(0xFF1BBA8A),
                           foregroundColor: Colors.white,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(vertical: 7),
@@ -168,7 +168,7 @@ class KamarCard extends StatelessWidget {
     return Container(
       color: const Color(0xFFE8F5E9),
       child: const Center(
-        child: Icon(Icons.bed_outlined, color: Color(0xFF2ECC71), size: 32),
+        child: Icon(Icons.bed_outlined, color: Color(0xFF1BBA8A), size: 32),
       ),
     );
   }
@@ -181,7 +181,7 @@ class KamarCard extends StatelessWidget {
           width: 18,
           height: 18,
           child: CircularProgressIndicator(
-            color: Color(0xFF2ECC71),
+            color: Color(0xFF1BBA8A),
             strokeWidth: 2,
           ),
         ),

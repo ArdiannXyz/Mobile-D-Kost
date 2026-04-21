@@ -59,7 +59,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        color: Color(0xFF2ECC71),
+        color: Color(0xFFFFFFFF),
         borderRadius: BorderRadius.only(
           bottomLeft:  Radius.circular(18),
           bottomRight: Radius.circular(18),
@@ -76,7 +76,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
           GestureDetector(
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back_ios_new,
-                color: Colors.white, size: 20),
+                color: Color(0xFF1BBA8A), size: 20),
           ),
           const SizedBox(width: 12),
 
@@ -87,6 +87,10 @@ class _ChatbotPageState extends State<ChatbotPage> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white,
+              image: DecorationImage(
+                image: AssetImage('assets/images/sinora_icon.png'),
+                fit: BoxFit.cover,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -94,17 +98,6 @@ class _ChatbotPageState extends State<ChatbotPage> {
                   offset: const Offset(0, 2),
                 ),
               ],
-            ),
-            child: ClipOval(
-              child: Image.asset(
-                'assets/images/sinora_icon.png', // ← sinora_icon.png
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(
-                  Icons.smart_toy_rounded,
-                  color: Color(0xFF2ECC71),
-                  size: 26,
-                ),
-              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -116,7 +109,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                 const Text(
                   'Sinora',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color.fromARGB(255, 0, 0, 0),
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -135,7 +128,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                     Text(
                       _controller.isTyping ? 'Sedang mengetik...' : 'Online',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: const Color(0xFF1BBA8A).withOpacity(0.9),
                         fontSize: 12,
                       ),
                     ),
@@ -153,7 +146,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
   Widget _buildMessageList() {
     if (_controller.messages.isEmpty) {
       return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF2ECC71)),
+        child: CircularProgressIndicator(color: Color(0xFF1BBA8A)),
       );
     }
 
@@ -188,7 +181,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                   'assets/images/sinora_icon.png',
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    color: const Color(0xFF2ECC71),
+                    color: const Color(0xFF1BBA8A),
                     child: const Icon(Icons.smart_toy_rounded,
                         color: Colors.white, size: 16),
                   ),
@@ -206,7 +199,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
               padding: const EdgeInsets.symmetric(
                   horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isUser ? const Color(0xFF2ECC71) : Colors.white,
+                color: isUser ? const Color(0xFF1BBA8A) : Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft:     const Radius.circular(16),
                   topRight:    const Radius.circular(16),
@@ -278,7 +271,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
         border: Border.all(
           color: isUser
               ? Colors.white.withOpacity(0.3)
-              : const Color(0xFF2ECC71).withOpacity(0.3),
+              : const Color(0xFF1BBA8A).withOpacity(0.3),
         ),
       ),
       child: Column(
@@ -324,7 +317,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
           width: 7,
           height: 7,
           decoration: BoxDecoration(
-            color: const Color(0xFF2ECC71).withOpacity(0.6),
+            color: const Color(0xFF1BBA8A).withOpacity(0.6),
             shape: BoxShape.circle,
           ),
         );
@@ -416,7 +409,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
               Icons.send, 
               color: _controller.isTyping
                   ? const Color(0xFFB0B0C3)
-                  : const Color(0xFF2ECC71),
+                  : const Color(0xFF1BBA8A),
               size: 28,
             ),
           ),

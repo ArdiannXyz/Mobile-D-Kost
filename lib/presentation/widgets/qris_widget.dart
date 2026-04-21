@@ -1,10 +1,11 @@
 // ============================================================
 // qris_widget.dart
-// Widget instruksi QRIS
+// Widget instruksi QRIS — QR generate lokal pakai qr_flutter
 // Letakkan di: lib/presentation/payment/widgets/qris_widget.dart
 // ============================================================
  
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../../data/models/payment_model.dart';
  
 class QrisWidget extends StatelessWidget {
@@ -47,42 +48,14 @@ class QrisWidget extends StatelessWidget {
               ),
               const SizedBox(height: 16),
  
-              // QR Image
+              // ── QR Code ────────────────────────────────────
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey[200]!),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: result.qrCodeUrl.isNotEmpty
-                    ? Image.network(
-                        result.qrCodeUrl,
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.contain,
-                        loadingBuilder: (_, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return const SizedBox(
-                            width: 200,
-                            height: 200,
-                            child: Center(child: CircularProgressIndicator()),
-                          );
-                        },
-                        errorBuilder: (_, __, ___) => const SizedBox(
-                          width: 200,
-                          height: 200,
-                          child: Center(
-                            child: Icon(Icons.qr_code, size: 80, color: Colors.grey),
-                          ),
-                        ),
-                      )
-                    : const SizedBox(
-                        width: 200,
-                        height: 200,
-                        child: Center(
-                          child: Icon(Icons.qr_code, size: 80, color: Colors.grey),
-                        ),
-                      ),
+                child: _buildQrCode(),
               ),
               const SizedBox(height: 16),
  
@@ -157,9 +130,7 @@ class QrisWidget extends StatelessWidget {
               _buildStep('3', 'Arahkan kamera ke QR Code di atas'),
               _buildStep('4', 'Periksa nominal dan konfirmasi pembayaran'),
               _buildStep('5', 'Pembayaran akan terkonfirmasi otomatis'),
- 
               const SizedBox(height: 12),
-              // Supported apps
               Text(
                 'Didukung oleh: GoPay, OVO, DANA, ShopeePay, LinkAja, semua m-banking',
                 style: TextStyle(
@@ -175,6 +146,46 @@ class QrisWidget extends StatelessWidget {
     );
   }
  
+  // ── Generate QR dari qrString (lokal, tidak butuh internet) ─
+  Widget _buildQrCode() {
+    // Prioritas: qrString (generate lokal) → fallback placeholder
+    if (result.qrString.isNotEmpty) {
+      return QrImageView(
+        data           : result.qrString,
+        version        : QrVersions.auto,
+        size           : 200,
+        eyeStyle       : const QrEyeStyle(
+          eyeShape : QrEyeShape.square,
+          color    : Colors.black,
+        ),
+        dataModuleStyle: const QrDataModuleStyle(
+          dataModuleShape: QrDataModuleShape.square,
+          color          : Colors.black,
+        ),
+        errorCorrectionLevel: QrErrorCorrectLevel.M,
+      );
+    }
+ 
+    // Fallback jika qrString kosong
+    return const SizedBox(
+      width : 200,
+      height: 200,
+      child : Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.qr_code, size: 64, color: Colors.grey),
+            SizedBox(height: 8),
+            Text(
+              'QR tidak tersedia',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+ 
   Widget _buildStep(String num, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -182,7 +193,7 @@ class QrisWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 20,
+            width : 20,
             height: 20,
             decoration: const BoxDecoration(
               color: Color(0xFF2563EB),
@@ -192,8 +203,8 @@ class QrisWidget extends StatelessWidget {
               child: Text(
                 num,
                 style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
+                  color     : Colors.white,
+                  fontSize  : 10,
                   fontWeight: FontWeight.bold,
                 ),
               ),

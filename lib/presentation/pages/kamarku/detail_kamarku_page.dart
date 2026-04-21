@@ -53,11 +53,11 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
       appBar: _buildAppBar(),
       body: _controller.isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF2ECC71)))
+              child: CircularProgressIndicator(color: Color(0xFF1BBA8A)))
           : _controller.errorMessage != null
               ? _errorView(_controller.errorMessage!, _controller.loadDetail)
               : RefreshIndicator(
-                  color    : const Color(0xFF2ECC71),
+                  color    : const Color(0xFF1BBA8A),
                   onRefresh: _controller.refresh,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -91,7 +91,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
   PreferredSizeWidget _buildAppBar() {
     final isAktif = _controller.booking?.statusBooking == 'aktif';
     return AppBar(
-      backgroundColor: const Color(0xFF2ECC71),
+      backgroundColor: const Color(0xFF1BBA8A),
       elevation      : 0,
       leading: IconButton(
         icon     : const Icon(Icons.arrow_back_ios_new,
@@ -285,12 +285,12 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.add, size: 14, color: Color(0xFF2ECC71)),
+                        Icon(Icons.add, size: 14, color: Color(0xFF1BBA8A)),
                         SizedBox(width: 4),
                         Text('Tambah',
                             style: TextStyle(
                                 fontSize  : 12,
-                                color     : Color(0xFF2ECC71),
+                                color     : Color(0xFF1BBA8A),
                                 fontWeight: FontWeight.w500)),
                       ],
                     ),
@@ -311,7 +311,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(Icons.chair_outlined,
-                          color: Color(0xFF2ECC71), size: 24),
+                          color: Color(0xFF1BBA8A), size: 24),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -359,7 +359,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
             style: const TextStyle(
                 fontSize  : 14,
                 fontWeight: FontWeight.bold,
-                color     : Color(0xFF2ECC71)),
+                color     : Color(0xFF1BBA8A)),
           ),
         ],
       ),
@@ -376,7 +376,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
 
     final isLunas = tagihan.statusTagihan == 'lunas';
     final color   = isLunas
-        ? const Color(0xFF2ECC71)
+        ? const Color(0xFF1BBA8A)
         : const Color(0xFFF39C12);
     final b       = _controller.booking!;
     final namaKamar =
@@ -470,7 +470,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
                       ),
                     ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2ECC71),
+                  backgroundColor: const Color(0xFF1BBA8A),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
@@ -514,11 +514,11 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
         child: Row(
           children: [
             // ── Tombol Batal ─────────────────────────────
-            OutlinedButton(
+            ElevatedButton(
               onPressed: () => _controller.batalBooking(context),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.red,
-                side : const BorderSide(color: Colors.red),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
                 padding: const EdgeInsets.symmetric(
@@ -550,7 +550,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
                           ),
                         ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor        : const Color(0xFF2ECC71),
+                    backgroundColor        : const Color(0xFF1BBA8A),
                     disabledBackgroundColor: const Color(0xFF9E9E9E),
                     foregroundColor        : Colors.white,
                     shape: RoundedRectangleBorder(
@@ -590,8 +590,8 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
                     size: 18),
                 label: const Text('+ Furnitur'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF2ECC71),
-                  side : const BorderSide(color: Color(0xFF2ECC71)),
+                  foregroundColor: const Color(0xFF1BBA8A),
+                  side : const BorderSide(color: Color(0xFF1BBA8A)),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                   padding: const EdgeInsets.symmetric(vertical: 13),
@@ -769,7 +769,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   style: const TextStyle(
                       fontSize  : 14,
                       fontWeight: FontWeight.bold,
-                      color     : Color(0xFF2ECC71)),
+                      color     : Color(0xFF1BBA8A)),
                 ),
               ],
             ),
@@ -802,7 +802,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(Icons.chair_outlined,
-                          color: Color(0xFF2ECC71), size: 24),
+                          color: Color(0xFF1BBA8A), size: 24),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -900,9 +900,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ? null
                   : () => _controller.buatPesanan(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor        : const Color(0xFF2ECC71),
+                backgroundColor        : const Color(0xFF1BBA8A),
                 disabledBackgroundColor:
-                    const Color(0xFF2ECC71).withOpacity(0.5),
+                    const Color(0xFF1BBA8A).withOpacity(0.5),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
@@ -933,7 +933,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
 PreferredSizeWidget _appBar(String title) {
   return AppBar(
-    backgroundColor: const Color(0xFF2ECC71),
+    backgroundColor: const Color(0xFF1BBA8A),
     elevation      : 0,
     leading: Builder(
       builder: (ctx) => IconButton(
@@ -1027,7 +1027,7 @@ Widget _kamarPlaceholder() {
       borderRadius: BorderRadius.circular(10),
     ),
     child: const Icon(Icons.bed_outlined,
-        color: Color(0xFF2ECC71), size: 32),
+        color: Color(0xFF1BBA8A), size: 32),
   );
 }
 
@@ -1048,7 +1048,7 @@ Widget _errorView(String message, VoidCallback onRetry) {
           ElevatedButton(
             onPressed: onRetry,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2ECC71),
+              backgroundColor: const Color(0xFF1BBA8A),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
@@ -1112,7 +1112,7 @@ class _PilihMetodeSheetState extends State<_PilihMetodeSheet> {
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color: isSelected
-                      ? const Color(0xFF2ECC71)
+                      ? const Color(0xFF1BBA8A)
                       : Colors.transparent,
                   width: 1.5,
                 ),
@@ -1152,12 +1152,12 @@ class _PilihMetodeSheetState extends State<_PilihMetodeSheet> {
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isSelected
-                            ? const Color(0xFF2ECC71)
+                            ? const Color(0xFF1BBA8A)
                             : Colors.grey.shade300,
                         width: 2,
                       ),
                       color: isSelected
-                          ? const Color(0xFF2ECC71)
+                          ? const Color(0xFF1BBA8A)
                           : Colors.white,
                     ),
                     child: isSelected
@@ -1263,7 +1263,7 @@ Widget build(BuildContext context) {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2ECC71),
                   disabledBackgroundColor:
-                      const Color(0xFF2ECC71).withOpacity(0.5),
+                      const Color(0xFF1BBA8A).withOpacity(0.5),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),

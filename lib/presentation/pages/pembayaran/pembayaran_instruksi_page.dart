@@ -111,7 +111,7 @@ class _PaymentInstructionPageState extends State<PaymentInstructionPage> {
               width: 64,
               height: 64,
               decoration: const BoxDecoration(
-                color: Color(0xFF22C55E),
+                color: Color(0xFF1BBA8A),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.check, color: Colors.white, size: 36),
@@ -138,7 +138,7 @@ class _PaymentInstructionPageState extends State<PaymentInstructionPage> {
                 Navigator.of(context).pop('success'); // kembali ke halaman tagihan
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF22C55E),
+                backgroundColor: const Color(0xFF1BBA8A),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -218,7 +218,7 @@ class _StatusBanner extends StatelessWidget {
 
     switch (status) {
       case 'settlement':
-        color   = const Color(0xFF22C55E);
+        color   = const Color(0xFF1BBA8A);
         icon    = Icons.check_circle;
         message = 'Pembayaran berhasil!';
         break;
