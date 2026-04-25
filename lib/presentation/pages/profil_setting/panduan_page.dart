@@ -1,11 +1,3 @@
-// ============================================================
-// FRONTEND LAYER — panduan_page.dart
-// Halaman chatbot panduan D'Kost.
-// Warna tema: hijau #2ECC71 (konsisten dengan seluruh app).
-// Quick replies: booking, tagihan, keluhan, furnitur,
-// kontak, tentang.
-// ============================================================
-
 import 'package:flutter/material.dart';
 import 'panduan_controller.dart';
 
@@ -78,7 +70,7 @@ class _PanduanPageState extends State<PanduanPage> {
   // ── AppBar ────────────────────────────────────────────────
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: const Color(0xFF2ECC71),
+      backgroundColor: const Color(0xFF1BBA8A),
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new,
@@ -205,7 +197,7 @@ class _PanduanPageState extends State<PanduanPage> {
               width: 40,
               height: 40,
               decoration: const BoxDecoration(
-                color: Color(0xFF2ECC71),
+                color: Color(0xFF1BBA8A),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.send_rounded,
@@ -241,7 +233,7 @@ class _ChatBubble extends StatelessWidget {
               height: 32,
               margin: const EdgeInsets.only(right: 8, bottom: 2),
               decoration: const BoxDecoration(
-                color: Color(0xFF2ECC71),
+                color: Color(0xFF1BBA8A),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.support_agent,
@@ -254,7 +246,7 @@ class _ChatBubble extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: data.isBot ? Colors.white : const Color(0xFF2ECC71),
+                color: data.isBot ? Colors.white : const Color(0xFF1BBA8A),
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(16),
                   topRight: const Radius.circular(16),
@@ -330,7 +322,7 @@ class _ChatBubble extends StatelessWidget {
                                         margin: const EdgeInsets.only(
                                             right: 8, top: 1),
                                         decoration: const BoxDecoration(
-                                          color: Color(0xFF2ECC71),
+                                          color: Color(0xFF1BBA8A),
                                           shape: BoxShape.circle,
                                         ),
                                         child: Center(
@@ -411,11 +403,11 @@ class _ChatBubble extends StatelessWidget {
               height: 32,
               margin: const EdgeInsets.only(left: 8, bottom: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFF2ECC71).withOpacity(0.2),
+                color: const Color(0xFF1BBA8A).withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.person,
-                  color: Color(0xFF2ECC71), size: 18),
+                  color: Color(0xFF1BBA8A), size: 18),
             ),
           ],
         ],
@@ -428,7 +420,7 @@ class _ChatBubble extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(
         children: [
-          Icon(icon, size: 14, color: const Color(0xFF2ECC71)),
+          Icon(icon, size: 14, color: const Color(0xFF1BBA8A)),
           const SizedBox(width: 6),
           Expanded(
             child: Text(text,
@@ -485,7 +477,7 @@ class _TypingIndicatorState extends State<_TypingIndicator>
                 height: 8,
                 margin: const EdgeInsets.only(right: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2ECC71)
+                  color: const Color(0xFF1BBA8A)
                       .withOpacity(opacity),
                   shape: BoxShape.circle,
                 ),

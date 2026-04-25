@@ -145,7 +145,7 @@ class MasukOtpController {
             Expanded(child: Text(message)),
           ],
         ),
-        backgroundColor: const Color(0xFF2ECC71),
+        backgroundColor: const Color(0xFF1BBA8A),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),

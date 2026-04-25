@@ -52,7 +52,7 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
         Container(
           width: double.infinity,
           decoration: const BoxDecoration(
-            color: Color(0xFF2ECC71),
+            color: Color(0xFF1BBA8A),
             borderRadius: BorderRadius.only(
             ),
             boxShadow: [
@@ -102,7 +102,7 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2ECC71),
+                    color: const Color(0xFF1BBA8A),
                     borderRadius: BorderRadius.circular(11),
                   ),
                   child: const Text(
@@ -125,7 +125,7 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
 
   Widget _buildContent() {
     if (_controller.isLoadingList) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFF2ECC71)));
+      return const Center(child: CircularProgressIndicator(color: Color(0xFF1BBA8A)));
     }
     if (_controller.errorList != null) {
       return Center(
@@ -141,7 +141,7 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
               ElevatedButton(
                 onPressed: _controller.loadKeluhanList,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2ECC71),
+                  backgroundColor: const Color(0xFF1BBA8A),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
@@ -157,7 +157,7 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.report_problem_outlined, size: 64, color: Color(0xFFB0B0C3)),
+            const Icon(Icons.hourglass_empty, size: 64, color: Color(0xFFB0B0C3)),
             const SizedBox(height: 14),
             const Text('Belum ada keluhan', style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 14)),
             const SizedBox(height: 16),
@@ -165,7 +165,7 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
               onTap: () => _controller.goToLaporKeluhan(context),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(color: const Color(0xFF2ECC71), borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(color: const Color(0xFF1BBA8A), borderRadius: BorderRadius.circular(20)),
                 child: const Text('Lapor Sekarang', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
               ),
             ),
@@ -174,7 +174,7 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
       );
     }
     return RefreshIndicator(
-      color: const Color(0xFF2ECC71),
+      color: const Color(0xFF1BBA8A),
       onRefresh: _controller.loadKeluhanList,
       child: ListView.builder(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
@@ -281,7 +281,7 @@ class _KeluhanCard extends StatelessWidget {
       width: 80,
       height: 80,
       color: const Color(0xFFE8F5E9),
-      child: const Icon(Icons.image_outlined, color: Color(0xFF2ECC71), size: 28),
+      child: const Icon(Icons.image_outlined, color: Color(0xFF1BBA8A), size: 28),
     );
   }
 

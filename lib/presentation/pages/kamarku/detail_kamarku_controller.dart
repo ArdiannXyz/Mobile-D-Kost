@@ -1,5 +1,5 @@
 // ============================================================
-// FILE: lib/presentation/pages/kamarku/booking_controller.dart
+// FILE: lib/presentation/pages/kamarku/detail_kamarku_controller.dart
 // ============================================================
 
 import 'dart:async';
@@ -16,6 +16,10 @@ import '../../../data/models/booking_models.dart';
 import '../../../data/models/kamar_models.dart';
 import '../../../data/models/furnitur_models.dart';
 import '../../../data/services/kamar_service.dart';
+// Tambah import ini di bagian atas file
+import '../pembayaran/pembayaran_instruksi_page.dart';
+import '../../../data/models/payment_model.dart';
+import '../../../data/services/payment_service.dart';
 
 // ── Controller: Detail Kamarku ────────────────────────────────
 class DetailKamarkuController {
@@ -124,7 +128,7 @@ class DetailKamarkuController {
   }
 
   // ── Batalkan booking ───────────────────────────────────────
-  Future<void> batalBooking(BuildContext context) async {
+Future<void> batalBooking(BuildContext context) async {
     final konfirmasi = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -135,15 +139,25 @@ class DetailKamarkuController {
             'Booking akan dibatalkan dan kamar kembali tersedia.',
             style: TextStyle(fontSize: 13)),
         actions: [
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Tidak',
-                style: TextStyle(color: Color(0xFF9E9E9E))),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1BBA8A),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Tidak'),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Ya, Batalkan',
-                style: TextStyle(color: Colors.red)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Ya, Batalkan'),
           ),
         ],
       ),
@@ -347,23 +361,69 @@ class DetailKamarkuController {
     }
   }
 
-  void goToPayment(
-    BuildContext context, {
-    required int idTagihan,
-    required double totalBayar,
-    required String namaKamar,
-  }) {
-    Navigator.pushNamed(
+// Ganti method goToPayment yang lama
+// Hapus _showPilihMetode dari controller
+// Ubah goToPayment jadi terima parameter onNeedMethod
+
+void goToPayment(
+  BuildContext context, {
+  required int idTagihan,
+  required double totalBayar,
+  required String namaKamar,
+  required Future<PaymentMethodType?> Function() onNeedMethod, // ← tambah ini
+}) async {
+  isSubmitting = true;
+  onStateChanged();
+
+  try {
+    PaymentResult paymentResult;
+
+    try {
+      paymentResult = await PaymentService.getExistingPayment(idTagihan);
+    } on ApiException catch (e) {
+      if (e.message == 'no_previous_method') {
+        isSubmitting = false;
+        onStateChanged();
+
+        final method = await onNeedMethod(); // ← panggil dari page
+        if (method == null || !context.mounted) return;
+
+        isSubmitting = true;
+        onStateChanged();
+
+        paymentResult = await PaymentService.createPayment(
+          idTagihan: idTagihan,
+          method   : method,
+        );
+      } else {
+        rethrow;
+      }
+    }
+
+    if (!context.mounted) return;
+
+    Navigator.push(
       context,
-      '/pembayaran',
-      arguments: {
-        'id_tagihan' : idTagihan,
-        'total_biaya': totalBayar,
-        'nama_kamar' : namaKamar,
-        'expired_at' : booking?.expiredAt,
-      },
-    );
+      MaterialPageRoute(
+        builder: (_) => PaymentInstructionPage(
+          result    : paymentResult,
+          idTagihan : idTagihan,
+        ),
+      ),
+    ).then((_) async {
+      await loadDetail();
+    });
+  } on ApiException catch (e) {
+    if (context.mounted) _snack(context, e.message, Colors.red);
+  } catch (e) {
+    if (context.mounted) _snack(context, 'Gagal memuat pembayaran: $e', Colors.red);
+  } finally {
+    isSubmitting = false;
+    onStateChanged();
   }
+}
+
+
 
   void _snack(BuildContext ctx, String msg, Color color) {
     ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(

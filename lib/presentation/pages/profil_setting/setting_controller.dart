@@ -52,7 +52,7 @@ class SettingController {
       context: context,
       barrierDismissible: false,
       builder: (_) => const Center(
-        child: CircularProgressIndicator(color: Color(0xFF2ECC71)),
+        child: CircularProgressIndicator(color: Color(0xFF1BBA8A)),
       ),
     );
 
@@ -74,7 +74,7 @@ class SettingController {
               Text('Berhasil logout'),
             ],
           ),
-          backgroundColor: const Color(0xFF2ECC71),
+          backgroundColor: const Color(0xFF1BBA8A),
           behavior: SnackBarBehavior.floating,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

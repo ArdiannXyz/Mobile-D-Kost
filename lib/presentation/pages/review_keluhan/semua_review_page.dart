@@ -40,7 +40,7 @@ class _SemuaReviewPageState extends State<SemuaReviewPage> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: const Color(0xFF2ECC71),
+      backgroundColor: const Color(0xFF1BBA8A),
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
@@ -54,7 +54,7 @@ class _SemuaReviewPageState extends State<SemuaReviewPage> {
 
   Widget _buildBody() {
     if (_controller.isLoading) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFF2ECC71)));
+      return const Center(child: CircularProgressIndicator(color: Color(0xFF1BBA8A)));
     }
     if (_controller.errorMessage != null) {
       return Center(child: Text(_controller.errorMessage!,
@@ -138,7 +138,7 @@ class _SemuaReviewPageState extends State<SemuaReviewPage> {
           color: isSelected ? const Color(0xFF2ECC71) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFF2ECC71) : const Color(0xFFE0E0E0),
+            color: isSelected ? const Color(0xFF1BBA8A) : const Color(0xFFE0E0E0),
           ),
         ),
         child: Text(label,
@@ -171,10 +171,10 @@ class _ReviewCard extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 20,
-            backgroundColor: const Color(0xFF2ECC71).withOpacity(0.15),
+            backgroundColor: const Color(0xFF1BBA8A).withOpacity(0.15),
             child: Text(
               review.namaUser.isNotEmpty ? review.namaUser[0].toUpperCase() : 'U',
-              style: const TextStyle(color: Color(0xFF2ECC71), fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Color(0xFF1BBA8A), fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(width: 10),

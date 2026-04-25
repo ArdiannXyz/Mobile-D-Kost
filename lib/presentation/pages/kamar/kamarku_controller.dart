@@ -91,7 +91,7 @@ Future<void> loadBookings() async {
   Color statusColor(String status) {
     switch (status) {
       case 'menunggu_pembayaran': return const Color(0xFFF39C12);
-      case 'aktif':               return const Color(0xFF2ECC71);
+      case 'aktif':               return const Color(0xFF1BBA8A);
       case 'selesai':             return const Color(0xFF3498DB);
       case 'batal':               return const Color(0xFFE74C3C);
       case 'expired':             return const Color(0xFF9E9E9E);

@@ -1,7 +1,5 @@
 // ============================================================
 // FRONTEND LAYER — chatbot_page.dart
-// Chatbot AI Sinora untuk D'Kost
-// Style: hijau 0xFF2ECC71, sesuai design system D'Kost
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -49,19 +47,19 @@ class _ChatbotPageState extends State<ChatbotPage> {
         children: [
           _buildHeader(),
           Expanded(child: _buildMessageList()),
-          _buildQuickReplies(),
+          // _buildQuickReplies(),
           _buildInputBar(),
         ],
       ),
     );
   }
 
-  // ── Header (sama style dengan SettingPage) ─────────────────
+  // ── Header ─────────────────────────────────────────────────
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        color: Color(0xFF2ECC71),
+        color: Color(0xFFFFFFFF),
         borderRadius: BorderRadius.only(
           bottomLeft:  Radius.circular(18),
           bottomRight: Radius.circular(18),
@@ -75,21 +73,24 @@ class _ChatbotPageState extends State<ChatbotPage> {
       ),
       child: Row(
         children: [
-          // Tombol back
           GestureDetector(
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back_ios_new,
-                color: Colors.white, size: 20),
+                color: Color(0xFF1BBA8A), size: 20),
           ),
           const SizedBox(width: 12),
 
-          // Avatar bot
+          // ── Avatar pakai sinora_icon.png ──────────────────
           Container(
             width: 42,
             height: 42,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white,
+              image: DecorationImage(
+                image: AssetImage('assets/images/sinora_icon.png'),
+                fit: BoxFit.cover,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -98,21 +99,9 @@ class _ChatbotPageState extends State<ChatbotPage> {
                 ),
               ],
             ),
-            child: ClipOval(
-              child: Image.asset(
-                'assets/images/sinora_icon.png',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(
-                  Icons.smart_toy_rounded,
-                  color: Color(0xFF2ECC71),
-                  size: 26,
-                ),
-              ),
-            ),
           ),
           const SizedBox(width: 12),
 
-          // Nama & status
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,7 +109,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                 const Text(
                   'Sinora',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color.fromARGB(255, 0, 0, 0),
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -139,7 +128,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                     Text(
                       _controller.isTyping ? 'Sedang mengetik...' : 'Online',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: const Color(0xFF1BBA8A).withOpacity(0.9),
                         fontSize: 12,
                       ),
                     ),
@@ -157,7 +146,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
   Widget _buildMessageList() {
     if (_controller.messages.isEmpty) {
       return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF2ECC71)),
+        child: CircularProgressIndicator(color: Color(0xFF1BBA8A)),
       );
     }
 
@@ -166,8 +155,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
       padding:     const EdgeInsets.fromLTRB(16, 12, 16, 8),
       itemCount:   _controller.messages.length,
       itemBuilder: (context, index) {
-        final msg = _controller.messages[index];
-        return _buildBubble(msg);
+        return _buildBubble(_controller.messages[index]);
       },
     );
   }
@@ -182,25 +170,27 @@ class _ChatbotPageState extends State<ChatbotPage> {
             isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // Avatar bot (kiri)
+          // Avatar bot pakai sinora_icon.png
           if (!isUser) ...[
             Container(
               width: 30,
               height: 30,
-              decoration: const BoxDecoration(
-                color: Color(0xFF2ECC71),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.smart_toy_rounded,
-                color: Colors.white,
-                size: 16,
+              decoration: const BoxDecoration(shape: BoxShape.circle),
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/images/sinora_icon.png',
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: const Color(0xFF1BBA8A),
+                    child: const Icon(Icons.smart_toy_rounded,
+                        color: Colors.white, size: 16),
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 8),
           ],
 
-          // Bubble
           Flexible(
             child: Container(
               constraints: BoxConstraints(
@@ -209,14 +199,12 @@ class _ChatbotPageState extends State<ChatbotPage> {
               padding: const EdgeInsets.symmetric(
                   horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isUser
-                    ? const Color(0xFF2ECC71)
-                    : Colors.white,
+                color: isUser ? const Color(0xFF1BBA8A) : Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft:     const Radius.circular(16),
                   topRight:    const Radius.circular(16),
                   bottomLeft:  Radius.circular(isUser ? 16 : 4),
-                  bottomRight: Radius.circular(isUser ? 4  : 16),
+                  bottomRight: Radius.circular(isUser ? 4 : 16),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -232,7 +220,6 @@ class _ChatbotPageState extends State<ChatbotPage> {
             ),
           ),
 
-          // Space kanan untuk bot (biar simetris)
           if (!isUser) const SizedBox(width: 38),
         ],
       ),
@@ -243,7 +230,6 @@ class _ChatbotPageState extends State<ChatbotPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Teks utama
         Text(
           msg.text,
           style: TextStyle(
@@ -252,14 +238,10 @@ class _ChatbotPageState extends State<ChatbotPage> {
             height: 1.4,
           ),
         ),
-
-        // Data dari DB (list kamar, harga, dll)
         if (msg.dataList != null && msg.dataList!.isNotEmpty) ...[
           const SizedBox(height: 8),
           ...msg.dataList!.map((item) => _buildDataItem(item, isUser)),
         ],
-
-        // Timestamp
         const SizedBox(height: 4),
         Align(
           alignment: Alignment.bottomRight,
@@ -289,8 +271,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
         border: Border.all(
           color: isUser
               ? Colors.white.withOpacity(0.3)
-              : const Color(0xFF2ECC71).withOpacity(0.3),
-          width: 1,
+              : const Color(0xFF1BBA8A).withOpacity(0.3),
         ),
       ),
       child: Column(
@@ -336,7 +317,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
           width: 7,
           height: 7,
           decoration: BoxDecoration(
-            color: const Color(0xFF2ECC71).withOpacity(0.6),
+            color: const Color(0xFF1BBA8A).withOpacity(0.6),
             shape: BoxShape.circle,
           ),
         );
@@ -344,46 +325,44 @@ class _ChatbotPageState extends State<ChatbotPage> {
     );
   }
 
-  // ── Quick Reply Buttons (sesuai screenshot Sinora) ─────────
-  Widget _buildQuickReplies() {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: _controller.quickReplies.map((qr) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: GestureDetector(
-                onTap: () {
-                  _sendMessage(qr['message']!);
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2ECC71),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    qr['label']!,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
+  // ── Quick Reply — style pill hijau seperti gambar ──────────
+  // Widget _buildQuickReplies() {
+  //   return Container(
+  //     color: const Color(0xFFF5F7FA), // ← background abu muda
+  //     padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+  //     child: SingleChildScrollView(
+  //       scrollDirection: Axis.horizontal,
+  //       child: Row(
+  //         children: _controller.quickReplies.map((qr) {
+  //           return Padding(
+  //             padding: const EdgeInsets.only(right: 8),
+  //             child: GestureDetector(
+  //               onTap: () => _sendMessage(qr['message']!),
+  //               child: Container(
+  //                 padding: const EdgeInsets.symmetric(
+  //                     horizontal: 20, vertical: 10),
+  //                 decoration: BoxDecoration(
+  //                   color: const Color(0xFF2ECC71),
+  //                   borderRadius: BorderRadius.circular(24), // ← pill shape
+  //                 ),
+  //                 child: Text(
+  //                   qr['label']!,
+  //                   style: const TextStyle(
+  //                     color: Colors.white,
+  //                     fontSize: 13,
+  //                     fontWeight: FontWeight.w600,
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           );
+  //         }).toList(),
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  // ── Input Bar ──────────────────────────────────────────────
+  // ── Input Bar — send icon transparan seperti gambar ────────
   Widget _buildInputBar() {
     return Container(
       color: Colors.white,
@@ -394,56 +373,44 @@ class _ChatbotPageState extends State<ChatbotPage> {
       child: Row(
         children: [
           Expanded(
-            child: TextField(
-              controller:  _textController,
-              enabled:     !_controller.isTyping,
-              maxLength:   500,
-              buildCounter: (_, {required currentLength,
-                  required isFocused, maxLength}) => null,
-              decoration: InputDecoration(
-                hintText:       'Tulis Pesan....',
-                hintStyle:      const TextStyle(
-                    color: Color(0xFFB0B0C3), fontSize: 14),
-                border:         OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide:   BorderSide.none,
-                ),
-                filled:         true,
-                fillColor:      const Color(0xFFF5F7FA),
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 18, vertical: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F7FA),
+                borderRadius: BorderRadius.circular(26),
+                border: Border.all(color: const Color(0xFFE8E8E8)),
               ),
-              onSubmitted: (_) => _sendMessage(_textController.text),
+              child: TextField(
+                controller:  _textController,
+                enabled:     !_controller.isTyping,
+                maxLength:   500,
+                buildCounter: (_, {required currentLength,
+                    required isFocused, maxLength}) => null,
+                decoration: const InputDecoration(
+                  hintText:       'Tulis Pesan....',
+                  hintStyle:      TextStyle(
+                      color: Color(0xFFB0B0C3), fontSize: 14),
+                  border:         InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(
+                      horizontal: 18, vertical: 12),
+                ),
+                onSubmitted: (_) => _sendMessage(_textController.text),
+              ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
 
-          // Tombol kirim
+          // ── Tombol kirim — icon send tanpa lingkaran ──────
           GestureDetector(
             onTap: _controller.isTyping
                 ? null
                 : () => _sendMessage(_textController.text),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: _controller.isTyping
-                    ? const Color(0xFFB0B0C3)
-                    : const Color(0xFF2ECC71),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF2ECC71).withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.send_rounded,
-                color: Colors.white,
-                size: 20,
-              ),
+            child: Icon(
+               //Icons.send_rounded,  // ← icon send saja, tidak pakai Container
+              Icons.send, 
+              color: _controller.isTyping
+                  ? const Color(0xFFB0B0C3)
+                  : const Color(0xFF1BBA8A),
+              size: 28,
             ),
           ),
         ],

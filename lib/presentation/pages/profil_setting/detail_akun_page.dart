@@ -41,7 +41,7 @@ class _DetailAkunPageState extends State<DetailAkunPage> {
   // ── AppBar hijau ──────────────────────────────────────────
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: const Color(0xFF2ECC71),
+      backgroundColor: const Color(0xFF1BBA8A),
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new,
@@ -64,7 +64,7 @@ class _DetailAkunPageState extends State<DetailAkunPage> {
   Widget _buildBody() {
     if (_controller.isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF2ECC71)),
+        child: CircularProgressIndicator(color: Color(0xFF1BBA8A)),
       );
     }
 
@@ -87,7 +87,7 @@ class _DetailAkunPageState extends State<DetailAkunPage> {
               ElevatedButton(
                 onPressed: _controller.loadUser,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2ECC71),
+                  backgroundColor: const Color(0xFF1BBA8A),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
@@ -131,7 +131,7 @@ class _DetailAkunPageState extends State<DetailAkunPage> {
                   'Edit Profil',
                   style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF2ECC71),
+                    color: Color(0xFF1BBA8A),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -211,7 +211,7 @@ class _DetailAkunPageState extends State<DetailAkunPage> {
           errorBuilder: (_, __, ___) => const Icon(
             Icons.person,
             size: 48,
-            color: Color(0xFF2ECC71),
+            color: Color(0xFF1BBA8A),
           ),
         ),
       ),

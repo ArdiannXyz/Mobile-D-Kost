@@ -54,7 +54,7 @@ class _SearchPageState extends State<SearchPage> {
             child: _controller.isLoading
                 ? const Center(
                     child: CircularProgressIndicator(
-                        color: Color(0xFF2ECC71)))
+                        color: Color(0xFF1BBA8A)))
                 : _controller.currentMode == sc.SearchMode.suggestion
                     ? _buildSuggestionView()
                     : _buildResultsView(),
@@ -67,7 +67,7 @@ class _SearchPageState extends State<SearchPage> {
   // ── Header hijau dengan search bar ────────────────────────
   Widget _buildHeader() {
     return Container(
-      color: const Color(0xFF2ECC71),
+      color: const Color(0xFF1BBA8A),
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 10,
         left: 8,
@@ -156,7 +156,7 @@ class _SearchPageState extends State<SearchPage> {
         ),
         ..._controller.searchSuggestions.map((s) => ListTile(
               leading: const Icon(Icons.search,
-                  color: Color(0xFF2ECC71), size: 18),
+                  color: Color(0xFF1BBA8A), size: 18),
               title: Text(s,
                   style: const TextStyle(
                       fontSize: 14, color: Color(0xFF1A1A2E))),
@@ -187,7 +187,7 @@ class _SearchPageState extends State<SearchPage> {
                 child: const Text('Hapus semua',
                     style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF2ECC71),
+                        color: Color(0xFF1BBA8A),
                         fontWeight: FontWeight.w500)),
               ),
             ],
@@ -294,7 +294,7 @@ class _SearchPageState extends State<SearchPage> {
                 child: const Text('Ubah',
                     style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF2ECC71),
+                        color: Color(0xFF1BBA8A),
                         fontWeight: FontWeight.w500)),
               ),
             ],
@@ -308,12 +308,11 @@ class _SearchPageState extends State<SearchPage> {
               : GridView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: _controller.searchResults.length,
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     mainAxisSpacing: 14,
                     crossAxisSpacing: 14,
-                    childAspectRatio: 0.82,
+                    childAspectRatio: 0.70, // ← ubah dari 0.82 ke 0.70
                   ),
                   itemBuilder: (context, index) {
                     final kamar = _controller.searchResults[index];
@@ -352,7 +351,7 @@ class _SearchPageState extends State<SearchPage> {
             TextButton(
               onPressed: _controller.clearSearch,
               child: const Text('Coba kata kunci lain',
-                  style: TextStyle(color: Color(0xFF2ECC71))),
+                  style: TextStyle(color: Color(0xFF1BBA8A))),
             ),
           ],
         ),

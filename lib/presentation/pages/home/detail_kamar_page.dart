@@ -44,7 +44,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
       appBar: _buildAppBar(),
       body: _controller.isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF2ECC71)))
+              child: CircularProgressIndicator(color: Color(0xFF1BBA8A)))
           : _controller.errorMessage != null
               ? _buildError()
               : _buildContent(),
@@ -148,7 +148,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
     return Container(
       color: const Color(0xFFE8F5E9),
       child: const Center(
-        child: Icon(Icons.bed_outlined, color: Color(0xFF2ECC71), size: 64),
+        child: Icon(Icons.bed_outlined, color: Color(0xFF1BBA8A), size: 64),
       ),
     );
   }
@@ -273,7 +273,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: _controller.tglMulaiSewa != null
-                                ? const Color(0xFF2ECC71)
+                                ? const Color(0xFF1BBA8A)
                                 : const Color(0xFFE0E0E0),
                           ),
                           borderRadius: BorderRadius.circular(10),
@@ -286,14 +286,14 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
                               width: 16,
                               height: 16,
                               color: _controller.tglMulaiSewa != null
-                                  ? const Color(0xFF2ECC71)
+                                  ? const Color(0xFF1BBA8A)
                                   : const Color(0xFF9E9E9E),
                               colorBlendMode: BlendMode.srcIn,
                               errorBuilder: (_, __, ___) => Icon(
                                 Icons.calendar_today_outlined,
                                 size: 16,
                                 color: _controller.tglMulaiSewa != null
-                                    ? const Color(0xFF2ECC71)
+                                    ? const Color(0xFF1BBA8A)
                                     : const Color(0xFF9E9E9E),
                               ),
                             ),
@@ -336,13 +336,13 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
               child: Row(
                 children: [
                   const Icon(Icons.info_outline,
-                      size: 14, color: Color(0xFF2ECC71)),
+                      size: 14, color: Color(0xFF1BBA8A)),
                   const SizedBox(width: 6),
                   Text(
                     'Akhir sewa: ${_controller.formatTanggal(_controller.tglAkhirSewa)}',
                     style: const TextStyle(
                       fontSize: 12,
-                      color: Color(0xFF2ECC71),
+                      color: Color(0xFF1BBA8A),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -371,13 +371,13 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF2ECC71),
+              primary: Color(0xFF1BBA8A),
               onPrimary: Colors.white,
               onSurface: Color(0xFF1A1A2E),
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF2ECC71),
+                foregroundColor: const Color(0xFF1BBA8A),
               ),
             ),
           ),
@@ -421,7 +421,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
             ),
             child: const Text(
               'Tulis Ulasan',
-              style: TextStyle(color: Color(0xFF2ECC71), fontSize: 14),
+              style: TextStyle(color: Color(0xFF1BBA8A), fontSize: 14),
             ),
           ),
         ],
@@ -463,7 +463,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
           ? const Center(
               child: Padding(
                 padding: EdgeInsets.all(20),
-                child: CircularProgressIndicator(color: Color(0xFF2ECC71)),
+                child: CircularProgressIndicator(color: Color(0xFF1BBA8A)),
               ),
             )
           : reviews.isEmpty
@@ -496,7 +496,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
                                 horizontal: 16, vertical: 7),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                  color: const Color(0xFF2ECC71)),
+                                  color: const Color(0xFF1BBA8A)),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
@@ -507,7 +507,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
                                       ? 'Tampilkan lebih sedikit'
                                       : 'Lihat ${totalReviews - KamarDetailController.maxDisplayedReviews} ulasan lainnya',
                                   style: const TextStyle(
-                                      color: Color(0xFF2ECC71),
+                                      color: Color(0xFF1BBA8A),
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500),
                                 ),
@@ -515,7 +515,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
                                   _controller.showAllReviews
                                       ? Icons.keyboard_arrow_up
                                       : Icons.keyboard_arrow_down,
-                                  color: const Color(0xFF2ECC71),
+                                  color: const Color(0xFF1BBA8A),
                                   size: 16,
                                 ),
                               ],
@@ -529,11 +529,11 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
                       child: const Text(
                         'Lihat Semua Ulasan Produk',
                         style: TextStyle(
-                          color: Color(0xFF2ECC71),
+                          color: Color(0xFF1BBA8A),
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                           decoration: TextDecoration.underline,
-                          decorationColor: Color(0xFF2ECC71),
+                          decorationColor: Color(0xFF1BBA8A),
                         ),
                       ),
                     ),
@@ -568,7 +568,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
           onPressed: tersedia ? () => _onPesanSekarang() : null,
           style: ElevatedButton.styleFrom(
             backgroundColor:
-                tersedia ? const Color(0xFF2ECC71) : const Color(0xFFB0B0C3),
+                tersedia ? const Color(0xFF1BBA8A) : const Color(0xFFB0B0C3),
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12)),
@@ -656,7 +656,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
           ElevatedButton(
             onPressed: _controller.init,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2ECC71),
+              backgroundColor: const Color(0xFF1BBA8A),
               foregroundColor: Colors.white,
             ),
             child: const Text('Coba Lagi'),
@@ -756,7 +756,7 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                         Text(
                           '${c.formatTanggal(c.tglMulaiSewa)} → ${c.formatTanggal(c.tglAkhirSewa)}',
                           style: const TextStyle(
-                              fontSize: 11, color: Color(0xFF2ECC71)),
+                              fontSize: 11, color: Color(0xFF1BBA8A)),
                         ),
                       ],
                       const SizedBox(height: 4),
@@ -809,7 +809,7 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                       '${furniturTersedia.length} tersedia',
                       style: const TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF2ECC71),
+                        color: Color(0xFF1BBA8A),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -880,7 +880,7 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2ECC71),
+                    color: Color(0xFF1BBA8A),
                   ),
                 ),
               ],
@@ -903,7 +903,7 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                     c.goToBookingForm(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2ECC71),
+                    backgroundColor: const Color(0xFF1BBA8A),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
@@ -931,7 +931,7 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: const Icon(Icons.bed_outlined,
-            color: Color(0xFF2ECC71), size: 28),
+            color: Color(0xFF1BBA8A), size: 28),
       );
 
   String _cap(String s) =>
@@ -980,7 +980,7 @@ class _FurniturItem extends StatelessWidget {
                 Icons.chair_outlined,
                 color: isHabis
                     ? const Color(0xFFBDBDBD)
-                    : const Color(0xFF2ECC71),
+                    : const Color(0xFF1BBA8A),
                 size: 20,
               ),
             ),
@@ -1025,7 +1025,7 @@ class _FurniturItem extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                           color: isHabis
                               ? const Color(0xFFE74C3C)
-                              : const Color(0xFF2ECC71),
+                              : const Color(0xFF1BBA8A),
                         ),
                       ),
                     ],
@@ -1079,7 +1079,7 @@ class _CounterBtn extends StatelessWidget {
         height: 28,
         decoration: BoxDecoration(
           color: onTap != null
-              ? const Color(0xFF2ECC71)
+              ? const Color(0xFF1BBA8A)
               : const Color(0xFFE0E0E0),
           borderRadius: BorderRadius.circular(6),
         ),
@@ -1107,13 +1107,13 @@ class _ReviewItem extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: const Color(0xFF2ECC71).withOpacity(0.2),
+            backgroundColor: const Color(0xFF1BBA8A).withOpacity(0.2),
             child: Text(
               review.namaUser.isNotEmpty
                   ? review.namaUser[0].toUpperCase()
                   : 'U',
               style: const TextStyle(
-                  color: Color(0xFF2ECC71),
+                  color: Color(0xFF1BBA8A),
                   fontWeight: FontWeight.bold,
                   fontSize: 14),
             ),

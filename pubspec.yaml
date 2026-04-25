@@ -12,6 +12,8 @@ dependencies:
     
   url_launcher: ^6.3.0
 
+  qr_flutter: ^4.1.0
+
   # ── Networking ───────────────────────────────────────────────
   http: ^1.3.0
 
@@ -70,6 +72,8 @@ flutter:
     - assets/images/detail_informasi_akun.png # Icon info akun
     - assets/images/change-password-icon.png  # Icon ganti password
     - assets/images/logout.png                # Icon logout
+    - assets/images/launcher.png
+    - assets/images/guidebook.png       
 
 # ── Splash Screen ───────────────────────────────────────────────
 flutter_native_splash:
@@ -80,7 +84,7 @@ flutter_native_splash:
   web: true
 
 # ── Launcher Icon ───────────────────────────────────────────────
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/dkos_3.png"   # Ganti ke logo D'Kost
+  image_path: "assets/images/launcher.png"   # Ganti ke logo D'Kost 

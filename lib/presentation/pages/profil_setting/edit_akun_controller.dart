@@ -142,7 +142,7 @@ class EditProfilController {
           const SizedBox(width: 8),
           Text(message),
         ]),
-        backgroundColor: const Color(0xFF2ECC71),
+        backgroundColor: const Color(0xFF1BBA8A),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         margin: const EdgeInsets.all(16),
@@ -217,7 +217,7 @@ class _HapusDraftDialog extends StatelessWidget {
                 TextButton(
                   onPressed: () => Navigator.pop(context, 'simpan'),
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF2ECC71),
+                    backgroundColor: const Color(0xFF1BBA8A),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 8),

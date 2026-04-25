@@ -39,7 +39,7 @@ class _TulisReviewPageState extends State<TulisReviewPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2ECC71),
+        backgroundColor: const Color(0xFF1BBA8A),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new,
@@ -103,7 +103,7 @@ class _TulisReviewPageState extends State<TulisReviewPage> {
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2ECC71),
+                    backgroundColor: const Color(0xFF1BBA8A),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(
@@ -160,7 +160,7 @@ class _TulisReviewPageState extends State<TulisReviewPage> {
       child: Row(
         children: [
           const Icon(Icons.meeting_room_outlined,
-              color: Color(0xFF2ECC71), size: 20),
+              color: Color(0xFF1BBA8A), size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -235,7 +235,7 @@ class _TulisReviewPageState extends State<TulisReviewPage> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide:
-              const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
+              const BorderSide(color: Color(0xFF1BBA8A), width: 1.5),
         ),
         contentPadding: const EdgeInsets.all(14),
       ),
@@ -259,9 +259,9 @@ class _TulisReviewPageState extends State<TulisReviewPage> {
               ? null
               : () => _controller.submit(context),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF2ECC71),
+            backgroundColor: const Color(0xFF1BBA8A),
             disabledBackgroundColor:
-                const Color(0xFF2ECC71).withOpacity(0.5),
+                const Color(0xFF1BBA8A).withOpacity(0.5),
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12)),

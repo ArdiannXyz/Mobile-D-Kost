@@ -43,7 +43,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2ECC71),
+        backgroundColor: const Color(0xFF1BBA8A),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
@@ -119,7 +119,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
+          borderSide: const BorderSide(color: Color(0xFF1BBA8A), width: 1.5),
         ),
         contentPadding: const EdgeInsets.all(14),
       ),
@@ -145,8 +145,8 @@ class _EditReviewPageState extends State<EditReviewPage> {
                   ? null
                   : () => _controller.simpan(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2ECC71),
-                disabledBackgroundColor: const Color(0xFF2ECC71).withOpacity(0.5),
+                backgroundColor: const Color(0xFF1BBA8A),
+                disabledBackgroundColor: const Color(0xFF1BBA8A).withOpacity(0.5),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 elevation: 0,
