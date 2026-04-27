@@ -35,42 +35,44 @@
 //     _controller.loadData();
 //   }
 
-// void _onTabTapped(int index) {
-//   setState(() {
-//     _currentNavIndex = index;
-//     _visitedTabs.add(index);
-//   });
+//   void _onTabTapped(int index) {
+//     setState(() {
+//       _currentNavIndex = index;
+//       _visitedTabs.add(index);
+//     });
 
-//   // Auto refresh saat tab dibuka
-//   if (index == 0) {
-//     _controller.loadData(); // ← tambah ini untuk refresh dashboard
-//   } else if (index == 1) {
-//     keluhanRefreshKey.currentState?.refresh();
-//   } else if (index == 2) {
-//     tagihanRefreshKey.currentState?.refresh();
+//     if (index == 0) {
+//       _controller.loadData();
+//     } else if (index == 1) {
+//       keluhanRefreshKey.currentState?.refresh();
+//     } else if (index == 2) {
+//       tagihanRefreshKey.currentState?.refresh();
+//     }
 //   }
-// }
 
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
 //       backgroundColor: const Color(0xFFF5F7FA),
+
+//       // ── FAB Sinora ────────────────────────────────────────
+//       floatingActionButton: _buildChatFAB(),
+//       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+//       // ─────────────────────────────────────────────────────
+
 //       body: IndexedStack(
 //         index: _currentNavIndex,
 //         children: [
 //           _DashboardTab(controller: _controller),
 
-//           // Tab 1: Keluhan
 //           _visitedTabs.contains(1)
 //               ? _KeluhanListPageRefresh(key: keluhanRefreshKey)
 //               : const SizedBox.shrink(),
 
-//           // Tab 2: Tagihan
 //           _visitedTabs.contains(2)
 //               ? _TagihanPageRefresh(key: tagihanRefreshKey)
 //               : const SizedBox.shrink(),
 
-//           // Tab 3: Setting
 //           _visitedTabs.contains(3)
 //               ? const SettingPage()
 //               : const SizedBox.shrink(),
@@ -80,12 +82,38 @@
 //     );
 //   }
 
+//   // ── FAB Sinora ─────────────────────────────────────────────
+//   Widget _buildChatFAB() {
+//     return GestureDetector(
+//       onTap: () => Navigator.pushNamed(context, '/chatbot'),
+//       child: Image.asset(
+//         'assets/images/sinora_icon.png',
+//         width: 65,
+//         height: 65,
+//         fit: BoxFit.contain,
+//         errorBuilder: (_, __, ___) => Container(
+//           width: 65,
+//           height: 65,
+//           decoration: const BoxDecoration(
+//             color: Color(0xFF1BBA8A),
+//             shape: BoxShape.circle,
+//           ),
+//           child: const Icon(
+//             Icons.smart_toy_rounded,
+//             color: Colors.white,
+//             size: 32,
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
 //   Widget _buildBottomNav() {
 //     const items = [
-//       ['assets/images/home_green.png', 'assets/images/home_black.png'],
-//       ['assets/images/Keluhan_green.png', 'assets/images/Keluhan_black.png'],
-//       ['assets/images/kamarku_green.png', 'assets/images/kamarku_black.png'],
-//       ['assets/images/setting_green.png', 'assets/images/setting_black.png'],
+//       ['assets/images/home_green.png', 'assets/images/home_black.png', 'Dashboard'],
+//       ['assets/images/Keluhan_green.png', 'assets/images/Keluhan_black.png', 'Keluhan'],
+//       ['assets/images/kamarku_green.png', 'assets/images/kamarku_black.png', 'Kamarku'],
+//       ['assets/images/setting_green.png', 'assets/images/setting_black.png', 'Setting'],
 //     ];
 
 //     return Container(
@@ -102,7 +130,7 @@
 //       child: SafeArea(
 //         top: false,
 //         child: SizedBox(
-//           height: 58,
+//           height: 64,
 //           child: Row(
 //             children: List.generate(4, (index) {
 //               final isActive = _currentNavIndex == index;
@@ -111,22 +139,44 @@
 //                   onTap: () => _onTabTapped(index),
 //                   behavior: HitTestBehavior.opaque,
 //                   child: Center(
-//                     child: Image.asset(
-//                       isActive ? items[index][0] : items[index][1],
-//                       width: 24,
-//                       height: 24,
-//                       errorBuilder: (_, __, ___) => Icon(
-//                         [
-//                           Icons.home_outlined,
-//                           Icons.report_problem_outlined,
-//                           Icons.receipt_long_outlined,
-//                           Icons.settings_outlined,
-//                         ][index],
-//                         color: isActive
-//                             ? const Color(0xFF2ECC71)
-//                             : const Color(0xFF9E9E9E),
-//                         size: 24,
-//                       ),
+//                     child: Column(
+//                       mainAxisSize: MainAxisSize.min,
+//                       children: [
+//                         Image.asset(
+//                           isActive ? items[index][0] : items[index][1],
+//                           width: 24,
+//                           height: 24,
+//                           errorBuilder: (_, __, ___) => Icon(
+//                             [
+//                               Icons.home_outlined,
+//                               Icons.report_problem_outlined,
+//                               Icons.receipt_long_outlined,
+//                               Icons.settings_outlined,
+//                             ][index],
+//                             color: isActive
+//                                 ? const Color(0xFF1BBA8A)
+//                                 : const Color(0xFF9E9E9E),
+//                             size: 24,
+//                           ),
+//                         ),
+//                         AnimatedSize(
+//                           duration: const Duration(milliseconds: 200),
+//                           curve: Curves.easeInOut,
+//                           child: isActive
+//                               ? Padding(
+//                                   padding: const EdgeInsets.only(top: 3),
+//                                   child: Text(
+//                                     items[index][2],
+//                                     style: const TextStyle(
+//                                       fontSize: 10,
+//                                       fontWeight: FontWeight.w600,
+//                                       color: Color(0xFF1BBA8A),
+//                                     ),
+//                                   ),
+//                                 )
+//                               : const SizedBox.shrink(),
+//                         ),
+//                       ],
 //                     ),
 //                   ),
 //                 ),
@@ -138,6 +188,7 @@
 //     );
 //   }
 // }
+
 
 // // ── Wrapper Keluhan dengan refresh ────────────────────────────
 // class _KeluhanListPageRefresh extends StatefulWidget {
@@ -239,7 +290,7 @@
 //   Widget build(BuildContext context) {
 //     if (widget.controller.isLoading) {
 //       return const Center(
-//           child: CircularProgressIndicator(color: Color(0xFF2ECC71)));
+//           child: CircularProgressIndicator(color: Color(0xFF1BBA8A)));
 //     }
 //     if (widget.controller.errorMessage != null) {
 //       return Center(
@@ -255,7 +306,7 @@
 //             ElevatedButton(
 //               onPressed: widget.controller.refresh,
 //               style: ElevatedButton.styleFrom(
-//                 backgroundColor: const Color(0xFF2ECC71),
+//                 backgroundColor: const Color(0xFF1BBA8A),
 //                 foregroundColor: Colors.white,
 //                 shape: RoundedRectangleBorder(
 //                     borderRadius: BorderRadius.circular(10)),
@@ -268,7 +319,7 @@
 //     }
 
 //     return RefreshIndicator(
-//       color: const Color(0xFF2ECC71),
+//       color: const Color(0xFF1BBA8A),
 //       onRefresh: widget.controller.refresh,
 //       child: CustomScrollView(
 //         slivers: [
@@ -309,7 +360,7 @@
 
 //   Widget _buildSearchBar(BuildContext context) {
 //     return Container(
-//       color: const Color(0xFF2ECC71),
+//       color: const Color(0xFF1BBA8A),
 //       padding: EdgeInsets.only(
 //         top: MediaQuery.of(context).padding.top + 12,
 //         left: 16,
@@ -345,31 +396,29 @@
 //       child: Column(
 //         children: [
 //           ClipRRect(
-//               borderRadius: BorderRadius.circular(16),
-//               child: SizedBox(
-//                 height: 140,
-//                 child: PageView.builder(
-//                   controller: PageController(
-//                     viewportFraction: 1.1, // ← makin kecil, makin keliatan banner sebelah
-//                   ),
-//                   itemCount: _banners.length,
-//                   onPageChanged: (index) {
-//                     setState(() => _currentBannerIndex = index);
-//                   },
-//                   itemBuilder: (_, index) => Padding(
-//                     padding: const EdgeInsets.symmetric(horizontal: 6), // ← jarak antar banner
-//                     child: ClipRRect(
-//                       borderRadius: BorderRadius.circular(16), // ← rounded per banner
-//                       child: Image.asset(
-//                         _banners[index],
-//                         width: double.infinity,
-//                         height: 140,
-//                         fit: BoxFit.cover,
-//                         errorBuilder: (context, error, stackTrace) => Container(
-//                           color: const Color(0xFF2ECC71),
-//                           child: const Center(
-//                             child: Icon(Icons.image_not_supported, color: Colors.white54),
-//                           ),
+//             borderRadius: BorderRadius.circular(16),
+//             child: SizedBox(
+//               height: 140,
+//               child: PageView.builder(
+//                 controller: PageController(viewportFraction: 1.1),
+//                 itemCount: _banners.length,
+//                 onPageChanged: (index) {
+//                   setState(() => _currentBannerIndex = index);
+//                 },
+//                 itemBuilder: (_, index) => Padding(
+//                   padding: const EdgeInsets.symmetric(horizontal: 6),
+//                   child: ClipRRect(
+//                     borderRadius: BorderRadius.circular(16),
+//                     child: Image.asset(
+//                       _banners[index],
+//                       width: double.infinity,
+//                       height: 140,
+//                       fit: BoxFit.cover,
+//                       errorBuilder: (context, error, stackTrace) => Container(
+//                         color: const Color(0xFF1BBA8A),
+//                         child: const Center(
+//                           child: Icon(Icons.image_not_supported,
+//                               color: Colors.white54),
 //                         ),
 //                       ),
 //                     ),
@@ -377,6 +426,7 @@
 //                 ),
 //               ),
 //             ),
+//           ),
 //           const SizedBox(height: 10),
 //           Row(
 //             mainAxisAlignment: MainAxisAlignment.center,
@@ -389,7 +439,8 @@
 //                 width: isActive ? 20 : 8,
 //                 height: 8,
 //                 decoration: BoxDecoration(
-//                   color: isActive ? const Color(0xFF2ECC71) : Colors.white38,
+//                   color:
+//                       isActive ? const Color(0xFF1BBA8A) : Colors.grey[300],
 //                   borderRadius: BorderRadius.circular(4),
 //                 ),
 //               );
@@ -459,7 +510,7 @@
 //               label: Text(filters[i]),
 //               selected: isSelected,
 //               onSelected: (_) => widget.controller.applyFilter(filters[i]),
-//               selectedColor: const Color(0xFF2ECC71),
+//               selectedColor: const Color(0xFF1BBA8A),
 //               backgroundColor: Colors.white,
 //               checkmarkColor: Colors.white,
 //               labelStyle: TextStyle(
@@ -469,13 +520,14 @@
 //               ),
 //               side: BorderSide(
 //                 color: isSelected
-//                     ? const Color(0xFF2ECC71)
+//                     ? const Color(0xFF1BBA8A)
 //                     : const Color(0xFFE0E0E0),
 //               ),
 //               shape: RoundedRectangleBorder(
 //                   borderRadius: BorderRadius.circular(11)),
 //               showCheckmark: false,
-//               padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 9),
+//               padding:
+//                   const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
 //             ),
 //           );
 //         },
@@ -507,6 +559,7 @@ import 'package:dkost/presentation/widgets/kamar_card.dart';
 import 'package:dkost/presentation/pages/review_keluhan/keluhan_page.dart';
 import 'package:dkost/presentation/pages/tagihan/tagihan_page.dart';
 import 'package:dkost/presentation/pages/profil_setting/setting_page.dart';
+import 'package:dkost/presentation/pages/notifikasi/notification_page.dart';
 
 // ── GlobalKey untuk akses refresh dari luar ──────────────────
 final GlobalKey<_KeluhanListPageRefreshState> keluhanRefreshKey =
@@ -525,6 +578,7 @@ class _HomePageState extends State<HomePage> {
   late final HomeController _controller;
   int _currentNavIndex = 0;
   final Set<int> _visitedTabs = {0};
+  final _notifManager = NotifikasiManager();
 
   @override
   void initState() {
@@ -552,6 +606,24 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  /// Buka halaman notifikasi dan tangani hasil navigasi balik
+  Future<void> _bukaNotifikasi() async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => const NotifikasiPage()),
+    );
+
+    // Refresh badge setelah kembali
+    setState(() {});
+
+    // Arahkan ke tab yang sesuai berdasarkan notif yang ditekan
+    if (result == 'tagihan') {
+      _onTabTapped(2); // Tab Kamarku/Tagihan
+    } else if (result == 'keluhan') {
+      _onTabTapped(1); // Tab Keluhan
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -565,7 +637,11 @@ class _HomePageState extends State<HomePage> {
       body: IndexedStack(
         index: _currentNavIndex,
         children: [
-          _DashboardTab(controller: _controller),
+          _DashboardTab(
+            controller: _controller,
+            onNotifTap: _bukaNotifikasi,
+            notifCount: _notifManager.jumlahBelumDibaca,
+          ),
 
           _visitedTabs.contains(1)
               ? _KeluhanListPageRefresh(key: keluhanRefreshKey)
@@ -746,7 +822,14 @@ class _TagihanPageRefreshState extends State<_TagihanPageRefresh> {
 // ══════════════════════════════════════════════════════════════
 class _DashboardTab extends StatefulWidget {
   final HomeController controller;
-  const _DashboardTab({required this.controller});
+  final VoidCallback onNotifTap;
+  final int notifCount;
+
+  const _DashboardTab({
+    required this.controller,
+    required this.onNotifTap,
+    required this.notifCount,
+  });
 
   @override
   State<_DashboardTab> createState() => _DashboardTabState();
@@ -784,7 +867,7 @@ class _DashboardTabState extends State<_DashboardTab> {
   @override
   void dispose() {
     _bannerTimer?.cancel();
-    _bannerController.dispose();
+    _bannerController.dispose();  
     super.dispose();
   }
 
@@ -860,6 +943,9 @@ class _DashboardTabState extends State<_DashboardTab> {
     );
   }
 
+  // ══════════════════════════════════════════════════════
+  // SEARCH BAR + BELL NOTIFIKASI
+  // ══════════════════════════════════════════════════════
   Widget _buildSearchBar(BuildContext context) {
     return Container(
       color: const Color(0xFF1BBA8A),
@@ -869,24 +955,93 @@ class _DashboardTabState extends State<_DashboardTab> {
         right: 16,
         bottom: 14,
       ),
-      child: GestureDetector(
-        onTap: () => widget.controller.goToSearch(context),
-        child: Container(
-          height: 44,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
+      child: Row(
+        children: [
+          // ── Search field ──────────────────────────────
+          Expanded(
+            child: GestureDetector(
+              onTap: () => widget.controller.goToSearch(context),
+              child: Container(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Row(
+                  children: [
+                    SizedBox(width: 14),
+                    Icon(Icons.search, color: Color(0xFF9E9E9E), size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Cari kamar kost...',
+                      style:
+                          TextStyle(color: Color(0xFFB0B0C3), fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-          child: const Row(
-            children: [
-              SizedBox(width: 14),
-              Icon(Icons.search, color: Color(0xFF9E9E9E), size: 20),
-              SizedBox(width: 8),
-              Text('Cari kamar kost...',
-                  style: TextStyle(color: Color(0xFFB0B0C3), fontSize: 14)),
-            ],
+
+          const SizedBox(width: 10),
+
+          // ── Bell Icon + Badge ─────────────────────────
+          GestureDetector(
+            onTap: widget.onNotifTap,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Icon lonceng dari asset, fallback ke Icon widget
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Image.asset(
+                    'assets/images/notifikasi.png',
+                    width: 24,
+                    height: 24,
+                    color: Colors.white,
+                    errorBuilder: (_, __, ___) => const Icon(
+                      Icons.notifications_outlined,
+                      color: Colors.white,
+                      size: 26,
+                    ),
+                  ),
+                ),
+
+                // ── Badge jumlah notif ──────────────────
+                if (widget.notifCount > 0)
+                  Positioned(
+                    top: -4,
+                    right: -4,
+                    child: Container(
+                      width: 18,
+                      height: 18,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          widget.notifCount > 9
+                              ? '9+'
+                              : '${widget.notifCount}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

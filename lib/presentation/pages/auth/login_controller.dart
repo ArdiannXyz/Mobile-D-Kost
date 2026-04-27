@@ -6,6 +6,7 @@ import '../../../data/helper/api_exception.dart';
 import 'register_page.dart';
 import 'lupa_password_page.dart';
 import '../home/home_page.dart';
+import '../../../data/services/notifikasi_api_service.dart';
 
 class LoginController {
   bool isLoading = false;
@@ -70,7 +71,15 @@ class LoginController {
         final token = await ApiHelper.getToken();
         if (token != null) {
           MidtransService.setToken(token);
+          
         }
+          // ── Simpan token untuk API notifikasi ──────────
+          NotifikasiApiService.authToken = data['token'] ?? '';
+
+          // ── Init FCM ───────────────────────────────────
+          debugPrint('Memanggil initFcm...');
+          await FcmSetup.initFcm();
+          debugPrint('initFcm selesai');
 
         if (!context.mounted) return;
         _showSuccessDialog(context);

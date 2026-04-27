@@ -47,11 +47,21 @@ import '../../../data/models/user_models.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
 
+// ── Firebase ───────────────────────────────────────────────────
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  await initializeDateFormatting('id_ID', null); // ← tambah baris ini
+  await initializeDateFormatting('id_ID', null); 
+  
+  // Inisialisasi Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   final isLoggedIn = await ApiHelper.isLoggedIn();
   FlutterNativeSplash.remove();
