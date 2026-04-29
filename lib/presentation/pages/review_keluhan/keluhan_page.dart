@@ -5,6 +5,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'keluhan_controller.dart';
+import 'package:dkost/main.dart';
 
 class KeluhanListPage extends StatefulWidget {
   const KeluhanListPage({super.key});
@@ -13,7 +14,7 @@ class KeluhanListPage extends StatefulWidget {
   State<KeluhanListPage> createState() => _KeluhanListPageState();
 }
 
-class _KeluhanListPageState extends State<KeluhanListPage> {
+class _KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
   late final KeluhanController _controller;
 
   @override
@@ -28,9 +29,21 @@ class _KeluhanListPageState extends State<KeluhanListPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
   void dispose() {
-    _controller.dispose();
+    routeObserver.unsubscribe(this); 
     super.dispose();
+  }
+
+  
+  @override
+  void didPopNext() {
+    _controller.loadKeluhanList();// refresh saat kembali ke halaman ini
   }
 
   @override

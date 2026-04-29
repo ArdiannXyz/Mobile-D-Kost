@@ -7,6 +7,7 @@ class ChatMessage {
   final bool   isUser;
   final bool   isLoading;
   final List<Map<String, dynamic>>? dataList;
+  final List<Map<String, dynamic>>? kamarList; // ← TAMBAH INI
   final String? type;
   final bool   fromCache;
   final DateTime createdAt;
@@ -16,6 +17,7 @@ class ChatMessage {
     required this.isUser,
     this.isLoading = false,
     this.dataList,
+    this.kamarList, // ← TAMBAH INI
     this.type,
     this.fromCache = false,
     DateTime? createdAt,

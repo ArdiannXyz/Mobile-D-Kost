@@ -137,7 +137,7 @@ class _HomePageState extends State<HomePage> {
     const items = [
       ['assets/images/home_green.png', 'assets/images/home_black.png', 'Dashboard'],
       ['assets/images/Keluhan_green.png', 'assets/images/Keluhan_black.png', 'Keluhan'],
-      ['assets/images/kamarku_green.png', 'assets/images/kamarku_black.png', 'Kamarku'],
+      ['assets/images/kamarku_green.png', 'assets/images/kamarku_black.png', 'Tagihan'],
       ['assets/images/setting_green.png', 'assets/images/setting_black.png', 'Setting'],
     ];
 

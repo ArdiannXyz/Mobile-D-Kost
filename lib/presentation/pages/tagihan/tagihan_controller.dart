@@ -281,8 +281,13 @@ void showInfo(BuildContext context) {
 
   // ── GO TO DETAIL ─────────────────────────
   void goToDetail(BuildContext context, TagihanUiModel tagihan) {
-    Navigator.pushNamed(context, '/detail-kamarku',
-        arguments: {'booking_id': tagihan.idBooking});
+    Navigator.pushNamed(
+      context,
+      '/detail-kamarku',
+      arguments: {'booking_id': tagihan.idBooking},
+    ).then((result) {
+      if (result == 'selesai') loadTagihan(); // ✅ refresh jika akhiri sewa
+    });
   }
 
   // ── ERROR ────────────────────────────────

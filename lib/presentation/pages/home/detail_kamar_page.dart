@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'detail_kamar_controller.dart';
 import '../../../data/models/furnitur_models.dart';
 import '../../../data/models/review_models.dart';
+import 'package:dkost/main.dart'; 
 
 class KamarDetailPage extends StatefulWidget {
   final int kamarId;
@@ -15,7 +16,7 @@ class KamarDetailPage extends StatefulWidget {
   State<KamarDetailPage> createState() => _KamarDetailPageState();
 }
 
-class _KamarDetailPageState extends State<KamarDetailPage> {
+class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
   late final KamarDetailController _controller;
   final PageController _pageController = PageController();
 
@@ -31,10 +32,23 @@ class _KamarDetailPageState extends State<KamarDetailPage> {
     _controller.init();
   }
 
+   
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
   @override
   void dispose() {
-    _pageController.dispose();
+    routeObserver.unsubscribe(this); 
     super.dispose();
+  }
+
+  
+  @override
+  void didPopNext() {
+    _controller.init(); // refresh saat kembali ke halaman ini
   }
 
   @override
