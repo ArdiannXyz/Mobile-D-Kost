@@ -10,7 +10,7 @@ class ApiConstants {
       return 'http://localhost:8000/api/';      // Web
     } else if (Platform.isAndroid) {
       //return 'http://10.0.2.2:8000/api/';       // Emulator Android
-      return 'http://10.73.161.109:8000/api/'; 
+      return 'http://10.113.107.109:8000/api/'; 
     } else {
       return 'http://10.73.161.109:8000/api/';  // Device fisik
     }
@@ -21,7 +21,7 @@ class ApiConstants {
       return 'http://localhost:8000/storage/';
     } else if (Platform.isAndroid) {
       //return 'http://10.0.2.2:8000/storage/';
-      return 'http://10.73.161.109:8000/storage/';
+      return 'http://10.113.107.109:8000/storage/';
     } else {
       return 'http://10.73.161.109:8000/storage/';
     }
