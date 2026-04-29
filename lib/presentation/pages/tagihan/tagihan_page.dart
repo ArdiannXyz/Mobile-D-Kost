@@ -2,6 +2,7 @@ import 'package:dkost/data/helper/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'tagihan_controller.dart';
 import 'package:dkost/data/models/tagihan_models.dart';
+import 'package:dkost/main.dart';
 
 
     class TagihanPage extends StatefulWidget {
@@ -11,7 +12,7 @@ import 'package:dkost/data/models/tagihan_models.dart';
       State<TagihanPage> createState() => _TagihanPageState();
     }
     // ← with WidgetsBindingObserver dihapus — penyebab reload loop
-    class _TagihanPageState extends State<TagihanPage> {
+    class _TagihanPageState extends State<TagihanPage> with RouteAware {
       late final TagihanController _controller;
 
       @override
@@ -24,9 +25,23 @@ import 'package:dkost/data/models/tagihan_models.dart';
       }
 
       @override
+      void didChangeDependencies() {
+        super.didChangeDependencies();
+        routeObserver.subscribe(this, ModalRoute.of(context)!);
+      }
+
+      @override
       void dispose() {
+        routeObserver.unsubscribe(this); 
         super.dispose();
       }
+
+      @override
+      void didPopNext() {
+        _controller.loadTagihan();
+      }
+
+
 
       @override
       Widget build(BuildContext context) {

@@ -88,41 +88,53 @@ class ChatbotController {
 
   // ── Handle Response ────────────────────────────────────────
   void _handleResponse(Map<String, dynamic> res) {
-    // Hapus loading bubble
     messages.removeWhere((m) => m.isLoading);
     isTyping = false;
 
     if (res['success'] == false && res['type'] == 'rate_limited') {
-      // Rate limit kena
       final seconds = res['retry_after'] ?? 60;
       messages.add(ChatMessage(
-        text:   'Terlalu banyak pesan nih 😅 Tunggu $seconds detik ya!',
+        text: 'Terlalu banyak pesan nih 😅 Tunggu $seconds detik ya!',
         isUser: false,
-        type:   'rate_limited',
+        type: 'rate_limited',
       ));
       onStateChanged();
       return;
+      
     }
 
-    // Parse data list dari DB
-    List<Map<String, dynamic>>? dataList;
-    final rawData = res['data'];
+  // ── Parse dataList biasa ──────────────────────────────────
+  List<Map<String, dynamic>>? dataList;
+  final rawData = res['data'];
+  if (rawData is List && rawData.isNotEmpty) {
+    dataList = rawData.whereType<Map<String, dynamic>>().toList();
+  }
 
-    if (rawData is List && rawData.isNotEmpty) {
-      dataList = rawData
-          .whereType<Map<String, dynamic>>()
-          .toList();
+    List<Map<String, dynamic>>? kamarList;
+    if (res['type'] == 'cek_kamar_tersedia' && rawData is List && rawData.isNotEmpty) {
+      kamarList = rawData.whereType<Map<String, dynamic>>().toList();
+      dataList = null; // jangan render sebagai dataList teks biasa
     }
+      print('=== FULL RESPONSE ===');
+      print(res.keys.toList());      // lihat semua field yang ada
+      print(jsonEncode(res));        // lihat full JSON
+      print('====================');
 
     messages.add(ChatMessage(
-      text:      res['message'] ?? 'Maaf, ada kesalahan 🙏',
-      isUser:    false,
-      dataList:  dataList,
-      type:      res['type'],
+      text: res['message'] ?? 'Maaf, ada kesalahan 🙏',
+      isUser: false,
+      dataList: dataList,
+      kamarList: kamarList,  // ← TAMBAH INI
+      type: res['type'],
       fromCache: res['from_cache'] ?? false,
     ));
 
     onStateChanged();
+  }
+
+  
+  void goToKamarDetail(BuildContext context, int kamarId) {
+    Navigator.pushNamed(context, '/kamar-detail', arguments: {'id': kamarId});
   }
 
   // ── Handle Error ───────────────────────────────────────────

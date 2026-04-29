@@ -58,6 +58,9 @@ void main() async {
   runApp(DKostApp(isLoggedIn: isLoggedIn));
 }
 
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
+
 class DKostApp extends StatelessWidget {
   final bool isLoggedIn;
   const DKostApp({super.key, required this.isLoggedIn});
@@ -65,6 +68,7 @@ class DKostApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorObservers: [routeObserver],
       debugShowCheckedModeBanner: false,
       title: "D'Kost",
       theme: ThemeData(

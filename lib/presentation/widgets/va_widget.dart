@@ -250,7 +250,7 @@ class _CopyButtonState extends State<_CopyButton> {
               _copied ? 'Tersalin' : 'Salin',
               style: const TextStyle(
                 fontSize: 12,
-                color: Color(0xFF1BBA8A),
+                color: Color(0xFF2563EB),
                 fontWeight: FontWeight.w600,
               ),
             ),

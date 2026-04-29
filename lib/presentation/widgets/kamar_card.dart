@@ -109,7 +109,7 @@ class KamarCard extends StatelessWidget {
                     ],
                   ),
 
-                  // Tombol "Detail Kamar" HANYA untuk mode horizontal (rekomendasi)
+                  
                   if (mode == KamarCardMode.grid) ...[
                     const SizedBox(height: 8),
                     SizedBox(

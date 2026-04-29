@@ -1,14 +1,6 @@
-// ============================================================
-// FRONTEND LAYER — edit_review_page.dart
-// Sesuai Figma: AppBar hijau "Edit Ulasan", 5 bintang,
-// textarea komentar, tombol "Simpan Perubahan" hijau,
-// tombol "Cancel" merah → dialog "Hapus Draf?" (Hapus/Simpan).
-// ============================================================
-
 import 'package:flutter/material.dart';
 import '../../../data/models/review_models.dart';
 import 'review_controller.dart';
-
 
 class EditReviewPage extends StatefulWidget {
   final ReviewModel existingReview;
@@ -40,36 +32,43 @@ class _EditReviewPageState extends State<EditReviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1BBA8A),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
-          onPressed: () => _controller.goBack(context),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        await _controller.handleBackPressed(context);
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F7FA),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF1BBA8A),
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+            onPressed: () => _controller.handleBackPressed(context),
+          ),
+          centerTitle: true,
+          title: const Text('Edit Ulasan',
+              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
         ),
-        centerTitle: true,
-        title: const Text('Edit Ulasan',
-            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  _buildStarRating(),
-                  const SizedBox(height: 24),
-                  _buildKomentarField(),
-                ],
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    _buildStarRating(),
+                    const SizedBox(height: 24),
+                    _buildKomentarField(),
+                  ],
+                ),
               ),
             ),
-          ),
-          _buildBottomButtons(),
-        ],
+            _buildBottomButtons(),
+          ],
+        ),
       ),
     );
   }
@@ -136,7 +135,6 @@ class _EditReviewPageState extends State<EditReviewPage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Simpan Perubahan
           SizedBox(
             width: double.infinity,
             height: 48,
@@ -158,10 +156,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
             ),
           ),
-
           const SizedBox(height: 10),
-
-          // Cancel → dialog Hapus Draf
           SizedBox(
             width: double.infinity,
             height: 48,

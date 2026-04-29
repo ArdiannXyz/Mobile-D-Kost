@@ -7,21 +7,21 @@ class ApiConstants {
   // ── Base URL (auto-detect environment) ─────────────────────
   static String get baseUrl {
     if (kIsWeb) {
-      return 'http://localhost:8082/api/';
+      return 'http://localhost:8080/api/';
     } else if (Platform.isAndroid) {
-      return 'http://10.0.2.2:8082/api/';       // Emulator Android
+      return 'http://10.113.107.254:8000/api/';       // Emulator Android
     } else {
-      return 'http://10.43.187.254:8082/api/';  // Device fisik
+      return 'http://10.113.107.254:8080/api/';  // Device fisik
     }
   }
 
   static String get storageUrl {
     if (kIsWeb) {
-      return 'http://localhost:8082/storage/';
+      return 'http://localhost:8000/storage/';
     } else if (Platform.isAndroid) {
-      return 'http://10.0.2.2:8082/storage/';
+      return 'http://10.113.107.254:8000/storage/';
     } else {
-      return 'http://10.43.187.254:8082/storage/';
+      return 'http://10.113.107.254:8000/storage/';
     }
   }
 
