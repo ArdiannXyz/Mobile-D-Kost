@@ -7,7 +7,9 @@ import 'register_page.dart';
 import 'lupa_password_page.dart';
 import '../home/home_page.dart';
 import '../../../data/services/notifikasi_api_service.dart';
-import '../../../data/services/fcm_setup.dart';
+// import '../../../data/services/fcm_setup.dart';
+
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class LoginController {
   bool isLoading = false;
@@ -99,6 +101,15 @@ class LoginController {
         token: token,
       );
 
+      // ← TAMBAH 2 BARIS INI  
+        await OneSignal.logout();
+        await Future.delayed(const Duration(seconds: 2));   
+        await OneSignal.login('dkost_${data['user']['id_user']}');
+        debugPrint('OneSignal login: dkost_${data['user']['id_user']}');
+        debugPrint('OneSignal login dipanggil: dkost_${data['user']['id_user']}');
+
+        
+
       // 🔥 pakai token ke service lain
         MidtransService.setToken(token);
         NotifikasiApiService.authToken = token;
@@ -107,7 +118,7 @@ class LoginController {
 
       // 🔥 INIT FCM SETELAH TOKEN SIAP
       debugPrint('Memanggil initFcm...');
-      await FcmSetup.initFcm();
+      // await FcmSetup.initFcm();
       debugPrint('initFcm selesai');
 
         if (!context.mounted) return;

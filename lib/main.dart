@@ -51,9 +51,20 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+//onesignal
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+//import 'package:flutter_app_badger/flutter_app_badger.dart'; 
+import 'presentation/pages/notifikasi/notifikasi_manager.dart';
+
+// ── Tambahan ───────────────────────────────────────────────────
+import 'dart:convert';
+
+// Global variable untuk menyimpan OneSignal player ID
+String? globalOneSignalPlayerId;
+
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  WidgetsFlutterBinding.ensureInitialized();
+  //WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await initializeDateFormatting('id_ID', null); 
@@ -63,9 +74,83 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // 1. Inisialisasi OneSignal terlebih dahulu
+  OneSignal.initialize("2a99cc5f-1669-4a7d-913a-ffc2cb9cd6a2");
+  await OneSignal.Notifications.requestPermission(true);
+
+  // 2. Ambil Subscription ID (player ID)
+  globalOneSignalPlayerId = OneSignal.User.pushSubscription.id;
+  debugPrint('OneSignal Subscription ID (immediate): $globalOneSignalPlayerId');
+
+  // 3. Dengarkan perubahan Subscription ID (misal ketika user mengubah izin)
+  OneSignal.User.pushSubscription.addObserver((state) {
+    final newPlayerId = state?.current.id; // Perbaikan ada di baris ini!
+    if (newPlayerId != null && newPlayerId != globalOneSignalPlayerId) {
+      globalOneSignalPlayerId = newPlayerId;
+      debugPrint('Subscription ID (from observer): $globalOneSignalPlayerId');
+    }
+  });
+
+    // 4. Listener foreground (tambah pengecekan null)
+  OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+    final notification = event.notification;
+    if (notification == null) {
+      debugPrint('Foreground notification is null');
+      return;
+    }
+    debugPrint('Foreground notif: ${notification.jsonRepresentation()}');
+
+    final manager = NotifikasiManager();
+    final payloadMap = jsonDecode(notification.jsonRepresentation()) as Map<String, dynamic>;
+    manager.tambahDariPush(payloadMap);    
+    _updateAppBadge(manager.jumlahBelumDibaca);
+  });
+
+    OneSignal.Notifications.addClickListener((event) {
+  final data = event.notification.additionalData;
+
+  if (data != null) {
+    final tipe = data['tipe'];
+
+    if (tipe == 'tagihan') {
+      // navigasi ke halaman tagihan
+    } else if (tipe == 'keluhan') {
+      // navigasi ke halaman keluhan
+    }
+  }
+  });
+
+  // // 5. Listener klik notifikasi (tambah pengecekan null)
+  // OneSignal.Notifications.addClickListener((event) {
+  //   final notification = event.notification;
+  //   ///if (notification != null) {
+  //     debugPrint('Notifikasi diklik: ${notification.jsonRepresentation()}');
+  //   //} else {
+  //     debugPrint('Clicked notification is null');
+  //   }
+  // });
+
+  // OneSignal.Notifications.addClickListener((event) {
+  // debugPrint('Notifikasi diklik: ${event.notification?.jsonRepresentation()}');
+  // });
+
+  // // ← TAMBAH INI — tunggu subscription ready
+  // OneSignal.Notifications.addPermissionObserver((state) {
+  // debugPrint('OneSignal permission state: $state');
+  // });
+
   final isLoggedIn = await ApiHelper.isLoggedIn();
   FlutterNativeSplash.remove();
   runApp(DKostApp(isLoggedIn: isLoggedIn));
+}
+
+// ========== DITAMBAH: fungsi untuk update badge di ikon launcher ==========
+void _updateAppBadge(int count) {
+  if (count > 0) {
+    //FlutterAppBadger.updateBadgeCount(count);
+  } else {
+    //FlutterAppBadger.removeBadge();
+  }
 }
 
 class DKostApp extends StatelessWidget {

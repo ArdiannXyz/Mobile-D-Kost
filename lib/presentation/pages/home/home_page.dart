@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dkost/data/services/notifikasi_api_service.dart';
 import 'package:flutter/material.dart';
 import 'home_controller.dart';
 import 'package:dkost/presentation/widgets/kamar_card.dart';
@@ -7,6 +8,14 @@ import 'package:dkost/presentation/pages/tagihan/tagihan_page.dart';
 import 'package:dkost/presentation/pages/profil_setting/setting_page.dart';
 import 'package:dkost/presentation/pages/notifikasi/notification_page.dart';
 import 'package:dkost/presentation/pages/notifikasi/notifikasi_manager.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../../../data/helper/api_constants.dart';
+import '../../../data/helper/api_helper.dart';
+
+// ── Tambahkan import OneSignal ────────────────────────────────
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import '../../../presentation/widgets/in_app_notif_overlay.dart';
 
 // ── GlobalKey untuk akses refresh dari luar ──────────────────
 final GlobalKey<_KeluhanListPageRefreshState> keluhanRefreshKey =
@@ -36,6 +45,44 @@ class _HomePageState extends State<HomePage> {
       },
     );
     _controller.loadData();
+    _notifManager.addListener(_onNotifUpdate);
+    ApiHelper.getToken().then((token) {
+    if (token != null) {
+      NotifikasiApiService.authToken = token;
+      debugPrint('AUTH TOKEN SET: ${NotifikasiApiService.authToken}');
+      _notifManager.muat(); // ← pindah ke sini
+      _registerDeviceToBackend();
+    }
+    });
+    // _notifManager.addListener(() {
+    //   if (mounted) setState(() {});
+    // });
+    // Muat jumlah notifikasi awal dari server
+    
+
+    // Setelah registrasi, login ke OneSignal dengan external ID user
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final userId = await ApiHelper.getUserId();
+        if (userId != null) {
+          OneSignal.login("dkost_$userId");
+        } else {
+          debugPrint('User ID tidak tersedia untuk OneSignal login');
+        }
+      } catch (e) {
+        debugPrint('Error mendapatkan user ID untuk OneSignal: $e');
+      }
+    });
+  }
+
+  void _onNotifUpdate() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _notifManager.removeListener(_onNotifUpdate);
+    super.dispose();
   }
 
   void _onTabTapped(int index) {
@@ -71,9 +118,48 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // tambahkan ini
+  Future<void> _registerDeviceToBackend() async {
+    try {
+      final playerId = OneSignal.User.pushSubscription.id;
+      if (playerId == null || playerId.isEmpty) {
+        debugPrint('Player ID belum tersedia');
+        return;
+      }
+      String? token;
+      try {
+        token = await ApiHelper.getToken();
+      } catch (e) {
+        debugPrint('Error mendapatkan token: $e');
+        return;
+      }
+      if (token == null || token.isEmpty) {
+        debugPrint('Token tidak tersedia, user mungkin belum login');
+        return;
+      }
+      final response = await http.post(
+        Uri.parse('${ApiConstants.baseUrl}onesignal/login'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'onesignal_player_id': playerId}),
+      );
+      if (response.statusCode == 200) {
+        debugPrint('✅ Perangkat terdaftar di backend');
+      } else {
+        debugPrint('❌ Gagal daftar: ${response.body}');
+      }
+    } catch (e) {
+      debugPrint('Error registrasi device: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return InAppNotifOverlay(
+      child: Scaffold(
+    //return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
 
       // ── FAB Sinora ────────────────────────────────────────
@@ -89,21 +175,19 @@ class _HomePageState extends State<HomePage> {
             onNotifTap: _bukaNotifikasi,
             notifCount: _notifManager.jumlahBelumDibaca,
           ),
-
           _visitedTabs.contains(1)
               ? _KeluhanListPageRefresh(key: keluhanRefreshKey)
               : const SizedBox.shrink(),
-
           _visitedTabs.contains(2)
               ? _TagihanPageRefresh(key: tagihanRefreshKey)
               : const SizedBox.shrink(),
-
           _visitedTabs.contains(3)
               ? const SettingPage()
               : const SizedBox.shrink(),
         ],
       ),
       bottomNavigationBar: _buildBottomNav(),
+    )
     );
   }
 
@@ -135,10 +219,26 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildBottomNav() {
     const items = [
-      ['assets/images/home_green.png', 'assets/images/home_black.png', 'Dashboard'],
-      ['assets/images/Keluhan_green.png', 'assets/images/Keluhan_black.png', 'Keluhan'],
-      ['assets/images/kamarku_green.png', 'assets/images/kamarku_black.png', 'Kamarku'],
-      ['assets/images/setting_green.png', 'assets/images/setting_black.png', 'Setting'],
+      [
+        'assets/images/home_green.png',
+        'assets/images/home_black.png',
+        'Dashboard'
+      ],
+      [
+        'assets/images/Keluhan_green.png',
+        'assets/images/Keluhan_black.png',
+        'Keluhan'
+      ],
+      [
+        'assets/images/kamarku_green.png',
+        'assets/images/kamarku_black.png',
+        'Kamarku'
+      ],
+      [
+        'assets/images/setting_green.png',
+        'assets/images/setting_black.png',
+        'Setting'
+      ],
     ];
 
     return Container(
@@ -213,7 +313,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
 
 // ── Wrapper Keluhan dengan refresh ────────────────────────────
 class _KeluhanListPageRefresh extends StatefulWidget {
@@ -314,7 +413,7 @@ class _DashboardTabState extends State<_DashboardTab> {
   @override
   void dispose() {
     _bannerTimer?.cancel();
-    _bannerController.dispose();  
+    _bannerController.dispose();
     super.dispose();
   }
 
@@ -421,8 +520,7 @@ class _DashboardTabState extends State<_DashboardTab> {
                     SizedBox(width: 8),
                     Text(
                       'Cari kamar kost...',
-                      style:
-                          TextStyle(color: Color(0xFFB0B0C3), fontSize: 14),
+                      style: TextStyle(color: Color(0xFFB0B0C3), fontSize: 14),
                     ),
                   ],
                 ),
@@ -478,9 +576,7 @@ class _DashboardTabState extends State<_DashboardTab> {
                       ),
                       child: Center(
                         child: Text(
-                          widget.notifCount > 9
-                              ? '9+'
-                              : '${widget.notifCount}',
+                          widget.notifCount > 9 ? '9+' : '${widget.notifCount}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 10,
@@ -548,8 +644,7 @@ class _DashboardTabState extends State<_DashboardTab> {
                 width: isActive ? 20 : 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color:
-                      isActive ? const Color(0xFF1BBA8A) : Colors.grey[300],
+                  color: isActive ? const Color(0xFF1BBA8A) : Colors.grey[300],
                   borderRadius: BorderRadius.circular(4),
                 ),
               );
@@ -635,8 +730,7 @@ class _DashboardTabState extends State<_DashboardTab> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(11)),
               showCheckmark: false,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
             ),
           );
         },
