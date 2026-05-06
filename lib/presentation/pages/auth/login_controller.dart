@@ -13,7 +13,7 @@ class LoginController {
   bool isLoading = false;
   bool obscurePassword = true;
 
-  final TextEditingController emailController = TextEditingController();
+  final TextEditingController emailController    = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final VoidCallback onStateChanged;
 
@@ -40,6 +40,7 @@ class LoginController {
     return null;
   }
 
+  // ── Login Biasa ────────────────────────────────────────────
   Future<void> loginUser(BuildContext context) async {
     final errorMsg = validate();
     if (errorMsg != null) {
@@ -52,18 +53,15 @@ class LoginController {
 
     try {
       final data = await UserService.login(
-        email: emailController.text.trim(),
+        email   : emailController.text.trim(),
         password: passwordController.text,
       );
 
       if (!context.mounted) return;
 
       if (data['error'] == false) {
-        // ✅ Cek role dari data['user']['role']
         final String role = data['user']?['role'] ?? '';
-
         if (role == 'admin') {
-          // ❌ Admin tidak diizinkan masuk ke aplikasi mobile
           _showAdminDeniedDialog(context);
           return;
         }
@@ -112,28 +110,87 @@ class LoginController {
 
         if (!context.mounted) return;
         _showSuccessDialog(context);
+
+      } else if (data['need_verification'] == true) {
+        // ← Email belum diverifikasi (user lama sebelum fitur ini)
+        _showNeedVerificationSnackbar(context, data['email'] ?? '');
+
       } else {
         _showErrorSnackbar(context, data['message'] ?? 'Login gagal.');
       }
     } on ApiException catch (e) {
       if (context.mounted) _showErrorSnackbar(context, e.message);
     } catch (_) {
-      if (context.mounted)
+      if (context.mounted) {
         _showErrorSnackbar(context, 'Terjadi kesalahan. Coba lagi nanti.');
+      }
     } finally {
       isLoading = false;
       onStateChanged();
     }
   }
 
-  void goToRegister(BuildContext context) =>
-      Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterPage()));
+  // ── Login dengan Google (BARU) ─────────────────────────────
+  Future<void> loginWithGoogle(BuildContext context) async {
+    isLoading = true;
+    onStateChanged();
 
-  void goToForgotPassword(BuildContext context) =>
-      Navigator.push(context, MaterialPageRoute(builder: (_) => const LupaPasswordPage()));
+    try {
+      final data = await UserService.loginWithGoogle();
 
-  void _goToHome(BuildContext context) =>
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
+      if (!context.mounted) return;
+
+      if (data['error'] == false) {
+        final String role = data['user']?['role'] ?? '';
+        if (role == 'admin') {
+          _showAdminDeniedDialog(context);
+          return;
+        }
+
+        final token = await ApiHelper.getToken();
+        if (token != null) MidtransService.setToken(token);
+
+        if (!context.mounted) return;
+        _showSuccessDialog(context);
+
+      } else {
+        _showErrorSnackbar(
+          context,
+          data['message'] ?? 'Login Google gagal.',
+        );
+      }
+    } on ApiException catch (e) {
+      // Jika user cancel Google Sign-In popup, tidak perlu tampilkan error
+      if (e.statusCode == 0) return;
+      if (context.mounted) _showErrorSnackbar(context, e.message);
+    } catch (_) {
+      if (context.mounted) {
+        _showErrorSnackbar(context, 'Login Google gagal. Coba lagi nanti.');
+      }
+    } finally {
+      isLoading = false;
+      onStateChanged();
+    }
+  }
+
+  // ── Navigasi ───────────────────────────────────────────────
+
+  void goToRegister(BuildContext context) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const RegisterPage()),
+      );
+
+  void goToForgotPassword(BuildContext context) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const LupaPasswordPage()),
+      );
+
+  void _goToHome(BuildContext context) => Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+      );
+
+  // ── Dialogs & Snackbars ────────────────────────────────────
 
   void _showSuccessDialog(BuildContext context) {
     showDialog(
@@ -161,35 +218,23 @@ class LoginController {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 72,
-                height: 72,
+                width: 72, height: 72,
                 decoration: BoxDecoration(
                   color: Colors.red.shade50,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.block_rounded,
-                  color: Colors.red.shade600,
-                  size: 40,
-                ),
+                child: Icon(Icons.block_rounded,
+                    color: Colors.red.shade600, size: 40),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Akses Ditolak',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A2E),
-                ),
-              ),
+              const Text('Akses Ditolak',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,
+                      color: Color(0xFF1A1A2E))),
               const SizedBox(height: 10),
               const Text(
                 'Akun admin tidak dapat masuk\nke aplikasi mobile ini.\nGunakan dashboard web untuk admin.',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF9E9E9E),
-                ),
+                style: TextStyle(fontSize: 14, color: Color(0xFF9E9E9E)),
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -204,10 +249,9 @@ class LoginController {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    'Mengerti',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
+                  child: const Text('Mengerti',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
@@ -215,6 +259,29 @@ class LoginController {
         ),
       ),
     );
+  }
+
+  // Snackbar khusus untuk user yang belum verifikasi email
+  void _showNeedVerificationSnackbar(BuildContext context, String email) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Row(children: [
+        const Icon(Icons.mark_email_unread_outlined,
+            color: Colors.white, size: 20),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            email.isNotEmpty
+                ? 'Email belum diverifikasi. Cek inbox $email.'
+                : 'Email belum diverifikasi. Cek inbox anda.',
+          ),
+        ),
+      ]),
+      backgroundColor: Colors.orange.shade700,
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(seconds: 4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.all(16),
+    ));
   }
 
   void _showErrorSnackbar(BuildContext context, String message) {
@@ -248,31 +315,20 @@ class _LoginSuccessDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 72,
-              height: 72,
+              width: 72, height: 72,
               decoration: const BoxDecoration(
-                color: Color(0xFF1BBA8A),
-                shape: BoxShape.circle,
-              ),
+                color: Color(0xFF1BBA8A), shape: BoxShape.circle),
               child: const Icon(Icons.check, color: Colors.white, size: 40),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Login Berhasil!',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A2E),
-              ),
-            ),
+            const Text('Login Berhasil!',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1A2E))),
             const SizedBox(height: 10),
             const Text(
               'Selamat datang kembali!\nAnda akan diarahkan ke halaman utama.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF9E9E9E),
-              ),
+              style: TextStyle(fontSize: 14, color: Color(0xFF9E9E9E)),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -287,10 +343,9 @@ class _LoginSuccessDialog extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   elevation: 0,
                 ),
-                child: const Text(
-                  'Lanjutkan',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
+                child: const Text('Lanjutkan',
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600)),
               ),
             ),
           ],

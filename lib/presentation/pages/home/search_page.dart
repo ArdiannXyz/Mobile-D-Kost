@@ -308,11 +308,11 @@ class _SearchPageState extends State<SearchPage> {
               : GridView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: _controller.searchResults.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     mainAxisSpacing: 14,
                     crossAxisSpacing: 14,
-                    childAspectRatio: 0.70, // ← ubah dari 0.82 ke 0.70
+                    childAspectRatio: _cardAspectRatio(context), // ← ubah dari 0.82 ke 0.70
                   ),
                   itemBuilder: (context, index) {
                     final kamar = _controller.searchResults[index];
@@ -327,6 +327,15 @@ class _SearchPageState extends State<SearchPage> {
         ),
       ],
     );
+  }
+
+    double _cardAspectRatio(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = (screenWidth - 16 * 2 - 12) / 2; // padding + gap
+    // tinggi = foto (aspect 16/14) + info section ~90px
+    final photoHeight = cardWidth * (14 / 16);
+    const infoHeight = 100.0; // nama + learn more + tombol + padding
+    return cardWidth / (photoHeight + infoHeight);
   }
 
   Widget _buildEmptyResults() {

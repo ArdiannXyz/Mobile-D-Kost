@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../data/services/user_service.dart';
+import '../../../data/helper/api_exception.dart';
 import 'login_page.dart';
+import 'verifikasi_email_page.dart';
 
 class RegisterController {
   bool isLoading = false;
   bool obscurePassword = true;
 
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController nameController     = TextEditingController();
+  final TextEditingController emailController    = TextEditingController();
+  final TextEditingController phoneController    = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController alamatController = TextEditingController();
+  final TextEditingController alamatController   = TextEditingController();
 
   final VoidCallback onStateChanged;
   RegisterController({required this.onStateChanged});
@@ -29,53 +31,102 @@ class RegisterController {
   }
 
   String? validate() {
-    if (nameController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        phoneController.text.isEmpty ||
-        passwordController.text.isEmpty) {
+    final nama     = nameController.text.trim();
+    final email    = emailController.text.trim();
+    final phone    = phoneController.text.trim();
+    final password = passwordController.text;
+
+    if (nama.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty) {
       return 'Semua kolom harus diisi!';
     }
-    if (!RegExp(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
-        .hasMatch(emailController.text)) {
+
+    // ── Nama: hanya huruf & spasi ──────────────────────────
+    if (!RegExp(r'^[\p{L}\s]+$', unicode: true).hasMatch(nama)) {
+      return 'Nama hanya boleh berisi huruf dan spasi.';
+    }
+
+    // ── Email ──────────────────────────────────────────────
+    if (!RegExp(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
+        .hasMatch(email)) {
       return 'Masukkan email yang valid!';
     }
-    if (passwordController.text.length < 6) {
-      return 'Password harus minimal 6 karakter!';
+
+    // ── Password: minimal 8 karakter ──────────────────────
+    if (password.length < 8) {
+      return 'Password harus minimal 8 karakter!';
     }
+
+    // ── Password: harus ada huruf besar ───────────────────
+    if (!RegExp(r'[A-Z]').hasMatch(password)) {
+      return 'Password harus mengandung minimal 1 huruf besar!';
+    }
+
+    // ── Password: harus ada simbol ────────────────────────
+    if (!RegExp(r'[!@#\$&*~%^()_\-+=\[\]{};:"\\|,.<>/?]')
+        .hasMatch(password)) {
+      return 'Password harus mengandung minimal 1 simbol (contoh: @, #, !)';
+    }
+
     return null;
   }
 
   Future<void> registerUser(BuildContext context) async {
     final errorMsg = validate();
-    if (errorMsg != null) { _showErrorSnackbar(context, errorMsg); return; }
+    if (errorMsg != null) {
+      _showErrorSnackbar(context, errorMsg);
+      return;
+    }
 
     isLoading = true;
     onStateChanged();
 
     try {
       final data = await UserService.registerUser(
-        nama: nameController.text.trim(),
-        email: emailController.text.trim(),
-        noHp: phoneController.text.trim(),
+        nama    : nameController.text.trim(),
+        email   : emailController.text.trim(),
+        noHp    : phoneController.text.trim(),
         password: passwordController.text,
-        alamat: alamatController.text.trim(),
+        alamat  : alamatController.text.trim(),
       );
+
       if (!context.mounted) return;
+
       if (data['error'] == false) {
-        _showSuccessDialog(context);
+        _goToVerifikasiEmail(context, emailController.text.trim());
       } else {
-        _showErrorSnackbar(context, 'Registrasi gagal: ${data['message']}');
+        _showErrorSnackbar(
+          context,
+          data['message'] ?? 'Registrasi gagal. Coba lagi.',
+        );
       }
+    } on ApiException catch (e) {
+      if (context.mounted) _showErrorSnackbar(context, e.message);
     } catch (_) {
-      if (context.mounted) _showErrorSnackbar(context, 'Terjadi kesalahan. Coba lagi nanti.');
+      if (context.mounted) {
+        _showErrorSnackbar(context, 'Terjadi kesalahan. Coba lagi nanti.');
+      }
     } finally {
       isLoading = false;
       onStateChanged();
     }
   }
 
-  void goToLogin(BuildContext context) =>
-      Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginPage()));
+  // ── Navigasi ───────────────────────────────────────────────
+
+  void goToLogin(BuildContext context) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+      );
+
+  void _goToVerifikasiEmail(BuildContext context, String email) =>
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => VerifikasiEmailPage(email: email),
+        ),
+      );
+
+  // ── Snackbar Error ─────────────────────────────────────────
 
   void _showErrorSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -89,70 +140,5 @@ class RegisterController {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.all(16),
     ));
-  }
-
-  void _showSuccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => _RegisterSuccessDialog(
-        onContinue: () {
-          Navigator.of(context).pop();
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (_) => const LoginPage()));
-        },
-      ),
-    );
-  }
-}
-
-class _RegisterSuccessDialog extends StatelessWidget {
-  final VoidCallback onContinue;
-  const _RegisterSuccessDialog({required this.onContinue});
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      backgroundColor: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 72, height: 72,
-              decoration: const BoxDecoration(
-                  color: Color(0xFF1BBA8A), shape: BoxShape.circle),
-              child: const Icon(Icons.check, color: Colors.white, size: 40),
-            ),
-            const SizedBox(height: 20),
-            const Text('Registrasi Berhasil!',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A1A2E))),
-            const SizedBox(height: 10),
-            const Text('Akun Anda telah berhasil dibuat.\nSilakan login untuk melanjutkan.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Color(0xFF9E9E9E))),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: onContinue,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1BBA8A),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  elevation: 0,
-                ),
-                child: const Text('Login Sekarang',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

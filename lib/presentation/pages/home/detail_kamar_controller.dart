@@ -69,6 +69,31 @@ class KamarDetailController {
     return '${date.day} ${bulan[date.month]} ${date.year}';
   }
 
+  // di KamarDetailController
+  Future<void> refreshStatusOnly() async {
+    try {
+      // Gunakan KamarService langsung, sama seperti _loadKamarDetail()
+      final updatedKamar = await KamarService.getKamarDetail(kamarId);
+      if (updatedKamar == null) return;
+
+      // Field-nya 'kamar' bukan '_kamar'
+      kamar = KamarModel(
+        idKamar: updatedKamar.idKamar,
+        nomorKamar: updatedKamar.nomorKamar,
+        tipeKamar: updatedKamar.tipeKamar,
+        deskripsi: updatedKamar.deskripsi,
+        hargaPerBulan: updatedKamar.hargaPerBulan,
+        statusKamar: updatedKamar.statusKamar,
+        fotoPrimary: updatedKamar.fotoPrimary,
+        galeri: updatedKamar.galeri,
+        rating: updatedKamar.rating,
+      );
+      onStateChanged();
+    } catch (_) {
+      // silent fail
+    }
+  }
+
   // ── Init ───────────────────────────────────────────────────
   Future<void> init() async {
     isLoading = true;

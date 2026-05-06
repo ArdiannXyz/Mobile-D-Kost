@@ -1079,7 +1079,7 @@ class _PilihMetodeSheetState extends State<_PilihMetodeSheet> {
       case PaymentMethodType.bcaVa:     return 'assets/banks/bca.png';
       case PaymentMethodType.bniVa:     return 'assets/banks/bni.png';
       case PaymentMethodType.briVa:     return 'assets/banks/bri.png';
-      case PaymentMethodType.mandiriVa: return 'assets/banks/mandiri.png';
+      case PaymentMethodType.permataVa: return 'assets/banks/permata.png';
       case PaymentMethodType.qris:      return 'assets/payment/qris.png';
       case PaymentMethodType.gopay:     return 'assets/payment/gopay.png';
       case PaymentMethodType.shopeepay: return 'assets/payment/shopeepay.png';
@@ -1221,7 +1221,7 @@ Widget build(BuildContext context) {
                     PaymentMethodType.bcaVa,
                     PaymentMethodType.bniVa,
                     PaymentMethodType.briVa,
-                    PaymentMethodType.mandiriVa,
+                    PaymentMethodType.permataVa,
                   ]),
                   const SizedBox(height: 10),
                   const Divider(height: 1),

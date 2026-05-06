@@ -4,11 +4,23 @@ import '../helper/api_constants.dart';
 import '../helper/api_helper.dart';
 import '../helper/api_exception.dart';
 import '../models/booking_models.dart';
+import 'cache_service.dart';
 
 class BookingService {
   BookingService._();
 
-  static Future<List<BookingModel>> getBookingList(int userId) async {
+  // ── GET: List riwayat booking ──────────────────────────────
+  static Future<List<BookingModel>> getBookingList(
+    int userId, {
+    bool forceRefresh = false,
+  }) async {
+    final cacheKey = '${CacheService.keyBookingPrefix}$userId';
+
+    if (!forceRefresh) {
+      final cached = CacheService.get<List<BookingModel>>(cacheKey);
+      if (cached != null) return cached;
+    }
+
     try {
       final headers = await ApiHelper.authHeaders;
       final response = await http.get(
@@ -22,7 +34,11 @@ class BookingService {
         final list = data['data'];
         if (list == null || list is! List) return [];
 
-        return list.map((e) => BookingModel.fromJson(e)).toList();
+        final result = list.map((e) => BookingModel.fromJson(e)).toList();
+
+        // Cache booking list 2 menit
+        CacheService.set(cacheKey, result, ttl: CacheService.ttlBooking);
+        return result;
       }
 
       return [];
@@ -36,7 +52,18 @@ class BookingService {
     }
   }
 
-  static Future<List<BookingModel>> getBookingAktif(int userId) async {
+  // ── GET: Booking aktif ─────────────────────────────────────
+  static Future<List<BookingModel>> getBookingAktif(
+    int userId, {
+    bool forceRefresh = false,
+  }) async {
+    final cacheKey = '${CacheService.keyBookingAktifPrefix}$userId';
+
+    if (!forceRefresh) {
+      final cached = CacheService.get<List<BookingModel>>(cacheKey);
+      if (cached != null) return cached;
+    }
+
     try {
       final headers = await ApiHelper.authHeaders;
       final response = await http.get(
@@ -50,7 +77,11 @@ class BookingService {
         final list = data['data'];
         if (list == null || list is! List) return [];
 
-        return list.map((e) => BookingModel.fromJson(e)).toList();
+        final result = list.map((e) => BookingModel.fromJson(e)).toList();
+
+        // Cache booking aktif 2 menit
+        CacheService.set(cacheKey, result, ttl: CacheService.ttlBooking);
+        return result;
       }
 
       return [];
@@ -63,6 +94,7 @@ class BookingService {
   }
 
   // ── GET: Detail booking ────────────────────────────────────
+  // Detail tidak di-cache karena statusnya bisa berubah kapan saja
   static Future<BookingModel?> getBookingDetail(int id) async {
     final headers = await ApiHelper.authHeaders;
     final response = await http.get(
@@ -81,6 +113,7 @@ class BookingService {
   }
 
   // ── POST: Buat booking baru ────────────────────────────────
+  // Setelah berhasil → invalidate cache booking user ini
   static Future<Map<String, dynamic>> createBooking({
     required int idKamar,
     required String tglMulaiSewa,
@@ -106,7 +139,19 @@ class BookingService {
       }),
     );
 
-    return jsonDecode(response.body) as Map<String, dynamic>;
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+    // Booking baru → cache booking sudah tidak valid
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      if (userId != null) {
+        CacheService.invalidatePrefix(CacheService.keyBookingPrefix);
+        CacheService.invalidatePrefix(CacheService.keyBookingAktifPrefix);
+      }
+      // Cache kamar juga perlu di-refresh (status kamar bisa berubah)
+      CacheService.invalidate(CacheService.keyKamarList);
+    }
+
+    return data;
   }
 
   // ── PUT: Batalkan booking ──────────────────────────────────
@@ -116,7 +161,17 @@ class BookingService {
       Uri.parse('${ApiConstants.baseUrl}booking/$id/batal'),
       headers: headers,
     );
-    return jsonDecode(response.body) as Map<String, dynamic>;
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+    // Batal booking → invalidate semua cache booking
+    if (response.statusCode == 200) {
+      CacheService.invalidatePrefix(CacheService.keyBookingPrefix);
+      CacheService.invalidatePrefix(CacheService.keyBookingAktifPrefix);
+      CacheService.invalidate(CacheService.keyKamarList);
+    }
+
+    return data;
   }
 
   // ── POST: Tambah furnitur mid-sewa ─────────────────────────
@@ -138,6 +193,9 @@ class BookingService {
 
     final data = jsonDecode(response.body);
     if (response.statusCode == 200 && data['success'] == true) {
+      // Detail booking berubah → invalidate cache booking
+      CacheService.invalidatePrefix(CacheService.keyBookingPrefix);
+      CacheService.invalidatePrefix(CacheService.keyBookingAktifPrefix);
       return data as Map<String, dynamic>;
     }
     throw ApiException(
@@ -156,6 +214,10 @@ class BookingService {
 
     final data = jsonDecode(response.body);
     if (response.statusCode == 200 && data['success'] == true) {
+      // Sewa selesai → invalidate semua cache terkait booking & kamar
+      CacheService.invalidatePrefix(CacheService.keyBookingPrefix);
+      CacheService.invalidatePrefix(CacheService.keyBookingAktifPrefix);
+      CacheService.invalidate(CacheService.keyKamarList);
       return data as Map<String, dynamic>;
     }
     throw ApiException(

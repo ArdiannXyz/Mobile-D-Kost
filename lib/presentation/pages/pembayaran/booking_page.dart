@@ -342,7 +342,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
                 _buildMethodRow(PaymentMethodType.bcaVa),
                 _buildMethodRow(PaymentMethodType.bniVa),
                 _buildMethodRow(PaymentMethodType.briVa),
-                _buildMethodRow(PaymentMethodType.mandiriVa),
+                _buildMethodRow(PaymentMethodType.permataVa),
 
                 const SizedBox(height: 10),
                 const Divider(height: 1, color: Color(0xFFF0F0F0)),
@@ -604,7 +604,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
       case PaymentMethodType.bcaVa:     return 'assets/banks/bca.png';
       case PaymentMethodType.bniVa:     return 'assets/banks/bni.png';
       case PaymentMethodType.briVa:     return 'assets/banks/bri.png';
-      case PaymentMethodType.mandiriVa: return 'assets/banks/mandiri.png';
+      case PaymentMethodType.permataVa: return 'assets/banks/permata.png';
       case PaymentMethodType.qris:      return 'assets/payment/qris.png';
       case PaymentMethodType.gopay:     return 'assets/payment/gopay.png';
       case PaymentMethodType.shopeepay: return 'assets/payment/shopeepay.png';
