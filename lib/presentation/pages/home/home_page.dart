@@ -1,3 +1,4 @@
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'home_controller.dart';
@@ -5,6 +6,7 @@ import 'package:dkost/presentation/widgets/kamar_card.dart';
 import 'package:dkost/presentation/pages/review_keluhan/keluhan_page.dart';
 import 'package:dkost/presentation/pages/tagihan/tagihan_page.dart';
 import 'package:dkost/presentation/pages/profil_setting/setting_page.dart';
+import 'package:flutter/services.dart';
 import 'package:dkost/presentation/pages/notifikasi/notification_page.dart';
 import 'package:dkost/presentation/pages/notifikasi/notifikasi_manager.dart';
 
@@ -71,15 +73,25 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+    @override
+    Widget build(BuildContext context) {
+      return PopScope(
+        canPop: false,
+    onPopInvokedWithResult: (didPop, result) {
+      if (didPop) return;
+      if (_currentNavIndex != 0) {
+        setState(() => _currentNavIndex = 0);
+      } else {
+        _controller.showExitDialog(context).then((shouldExit) {
+          if (shouldExit) SystemNavigator.pop();
+        });
+      }
+    },
+    child: Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
 
-      // ── FAB Sinora ────────────────────────────────────────
       floatingActionButton: _buildChatFAB(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      // ─────────────────────────────────────────────────────
 
       body: IndexedStack(
         index: _currentNavIndex,
@@ -104,8 +116,9 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       bottomNavigationBar: _buildBottomNav(),
-    );
-  }
+    ),
+  );
+}
 
   // ── FAB Sinora ─────────────────────────────────────────────
   Widget _buildChatFAB() {
@@ -283,7 +296,7 @@ class _DashboardTab extends StatefulWidget {
 }
 
 class _DashboardTabState extends State<_DashboardTab> {
-  final PageController _bannerController = PageController();
+final PageController _bannerController = PageController(viewportFraction: 1.05);
   Timer? _bannerTimer;
   int _currentBannerIndex = 0;
 
@@ -376,12 +389,11 @@ class _DashboardTabState extends State<_DashboardTab> {
                       },
                       childCount: widget.controller.filteredKamar.length,
                     ),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
-                      childAspectRatio: 0.70,
+                      childAspectRatio: _cardAspectRatio(context),
                     ),
                   ),
                 ),
@@ -390,9 +402,15 @@ class _DashboardTabState extends State<_DashboardTab> {
     );
   }
 
-  // ══════════════════════════════════════════════════════
-  // SEARCH BAR + BELL NOTIFIKASI
-  // ══════════════════════════════════════════════════════
+    double _cardAspectRatio(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = (screenWidth - 16 * 2 - 12) / 2; // padding + gap
+    // tinggi = foto (aspect 16/14) + info section ~90px
+    final photoHeight = cardWidth * (14 / 16);
+    const infoHeight = 100.0; // nama + learn more + tombol + padding
+    return cardWidth / (photoHeight + infoHeight);
+  }
+
   Widget _buildSearchBar(BuildContext context) {
     return Container(
       color: const Color(0xFF1BBA8A),
@@ -498,67 +516,62 @@ class _DashboardTabState extends State<_DashboardTab> {
     );
   }
 
-  Widget _buildBannerSlider(BuildContext context) {
-    return Container(
-      color: const Color(0xFFF5F7FA),
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: SizedBox(
-              height: 140,
-              child: PageView.builder(
-                controller: PageController(viewportFraction: 1.1),
-                itemCount: _banners.length,
-                onPageChanged: (index) {
-                  setState(() => _currentBannerIndex = index);
-                },
-                itemBuilder: (_, index) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      _banners[index],
-                      width: double.infinity,
-                      height: 140,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: const Color(0xFF1BBA8A),
-                        child: const Center(
-                          child: Icon(Icons.image_not_supported,
-                              color: Colors.white54),
-                        ),
-                      ),
+Widget _buildBannerSlider(BuildContext context) {
+  return Container(
+    color: const Color(0xFFF5F7FA),
+    padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+    child: Column(
+      children: [
+        AspectRatio(
+          aspectRatio: 18 / 6,
+          child: PageView.builder(
+            controller: _bannerController,
+            clipBehavior: Clip.none, // ← tambah ini
+            itemCount: _banners.length,
+            onPageChanged: (index) {
+              setState(() => _currentBannerIndex = index);
+            },
+            itemBuilder: (_, index) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  _banners[index],
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: const Color(0xFF1BBA8A),
+                    child: const Center(
+                      child: Icon(Icons.image_not_supported, color: Colors.white54),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(_banners.length, (index) {
-              final isActive = index == _currentBannerIndex;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                width: isActive ? 20 : 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color:
-                      isActive ? const Color(0xFF1BBA8A) : Colors.grey[300],
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              );
-            }),
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(_banners.length, (index) {
+            final isActive = index == _currentBannerIndex;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: isActive ? 20 : 6,
+              height: 8,
+              decoration: BoxDecoration(
+                color: isActive ? const Color(0xFF1BBA8A) : Colors.grey[300],
+                borderRadius: BorderRadius.circular(4),
+              ),
+            );
+          }),
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildRekomendasi(BuildContext context) {
     final tersedia = widget.controller.semuaKamar

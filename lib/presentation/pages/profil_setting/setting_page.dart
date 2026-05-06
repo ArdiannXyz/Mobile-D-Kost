@@ -11,6 +11,8 @@
 
 import 'package:flutter/material.dart';
 import 'setting_controller.dart';
+import 'package:dkost/main.dart';
+
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -19,7 +21,7 @@ class SettingPage extends StatefulWidget {
   State<SettingPage> createState() => _SettingPageState();
 }
 
-class _SettingPageState extends State<SettingPage> {
+class _SettingPageState extends State<SettingPage> with RouteAware {
   late final SettingController _controller;
 
   @override
@@ -32,6 +34,23 @@ class _SettingPageState extends State<SettingPage> {
     );
     _controller.init();
   }
+
+        @override
+      void didChangeDependencies() {
+        super.didChangeDependencies();
+        routeObserver.subscribe(this, ModalRoute.of(context)!);
+      }
+
+      @override
+      void dispose() {
+        routeObserver.unsubscribe(this); 
+        super.dispose();
+      }
+
+      @override
+      void didPopNext() {
+        _controller.init();
+      }
 
   @override
   Widget build(BuildContext context) {
@@ -50,14 +69,14 @@ class _SettingPageState extends State<SettingPage> {
                   const SizedBox(height: 8),
                   _buildMenuGroup([
                     _MenuItem(
-                      assetIcon: 'assets/images/kamarku_green.png',
-                      label: 'Kamarku',
-                      onTap: () => _controller.goToKamarku(context),
-                    ),
-                    _MenuItem(
                       assetIcon: 'assets/images/detail_informasi_akun.png',
                       label: 'Detail Informasi Akun',
                       onTap: () => _controller.goToDetailAkun(context),
+                    ),
+                    _MenuItem(
+                      assetIcon: 'assets/images/kamarku_green.png',
+                      label: 'Kamarku',
+                      onTap: () => _controller.goToKamarku(context),
                     ),
                     _MenuItem(
                       assetIcon: 'assets/images/guidebook.png',

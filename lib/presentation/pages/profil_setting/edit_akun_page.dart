@@ -1,11 +1,9 @@
 // ============================================================
 // FRONTEND LAYER — edit_profil_page.dart
-// Sesuai Figma: AppBar hijau, 4 field (Nama, Email disabled,
-// No. Handphone, Alamat), dialog "Hapus Draf?" saat back
-// dengan ada perubahan, tombol "Simpan" hijau di bawah.
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../data/models/user_models.dart';
 import 'edit_akun_controller.dart';
 
@@ -40,7 +38,6 @@ class _EditProfilPageState extends State<EditProfilPage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      // Intercept back button → cek perubahan
       canPop: false,
       onPopInvokedWithResult: (didPop, _) async {
         if (didPop) return;
@@ -55,7 +52,7 @@ class _EditProfilPageState extends State<EditProfilPage> {
     );
   }
 
-  // ── AppBar hijau ──────────────────────────────────────────
+  // ── AppBar ─────────────────────────────────────────────────
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       backgroundColor: const Color(0xFF1BBA8A),
@@ -80,7 +77,7 @@ class _EditProfilPageState extends State<EditProfilPage> {
     );
   }
 
-  // ── Body ──────────────────────────────────────────────────
+  // ── Body ───────────────────────────────────────────────────
   Widget _buildBody() {
     return Column(
       children: [
@@ -90,15 +87,22 @@ class _EditProfilPageState extends State<EditProfilPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Nama
+
+                // ── Nama: hanya huruf & spasi, max 50 ────────
                 _buildInputField(
                   label: 'Nama',
                   controller: _controller.namaController,
                   hint: 'Masukkan nama lengkap',
+                  maxLength: 50,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'[\p{L}\s]', unicode: true),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 20),
 
-                // Email (disabled)
+                // ── Email: disabled, tidak bisa diedit ────────
                 _buildInputField(
                   label: 'Email',
                   controller: _controller.emailController,
@@ -107,28 +111,34 @@ class _EditProfilPageState extends State<EditProfilPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // No. Handphone
+                // ── No. Handphone: hanya angka, max 13 ────────
                 _buildInputField(
                   label: 'No. Handphone',
                   controller: _controller.noHpController,
                   hint: 'Masukkan nomor handphone',
                   keyboardType: TextInputType.phone,
+                  maxLength: 13,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
                 ),
                 const SizedBox(height: 20),
 
-                // Alamat
+                // ── Alamat: bebas, max 100 ────────────────────
                 _buildInputField(
                   label: 'Alamat',
                   controller: _controller.alamatController,
                   hint: 'Masukkan alamat',
                   maxLines: 2,
+                  maxLength: 100,
                 ),
+
               ],
             ),
           ),
         ),
 
-        // ── Tombol Simpan (sticky di bawah) ─────────────────
+        // ── Tombol Simpan sticky di bawah ─────────────────────
         Container(
           color: Colors.white,
           padding: EdgeInsets.only(
@@ -172,7 +182,7 @@ class _EditProfilPageState extends State<EditProfilPage> {
     );
   }
 
-  // ── Input Field ───────────────────────────────────────────
+  // ── Reusable Input Field ───────────────────────────────────
   Widget _buildInputField({
     required String label,
     required TextEditingController controller,
@@ -180,6 +190,8 @@ class _EditProfilPageState extends State<EditProfilPage> {
     bool enabled = true,
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
+    int? maxLength,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,6 +210,8 @@ class _EditProfilPageState extends State<EditProfilPage> {
           enabled: enabled,
           keyboardType: keyboardType,
           maxLines: maxLines,
+          maxLength: maxLength,
+          inputFormatters: inputFormatters,
           style: TextStyle(
             fontSize: 14,
             color: enabled
@@ -210,22 +224,21 @@ class _EditProfilPageState extends State<EditProfilPage> {
             filled: true,
             fillColor:
                 enabled ? Colors.white : const Color(0xFFF5F5F5),
+            // Counter disembunyikan — batas tetap aktif via maxLength
+            counterText: '',
             contentPadding: const EdgeInsets.symmetric(
                 horizontal: 14, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide:
-                  const BorderSide(color: Color(0xFFE0E0E0)),
+              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide:
-                  const BorderSide(color: Color(0xFFE0E0E0)),
+              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide:
-                  const BorderSide(color: Color(0xFFEEEEEE)),
+              borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),

@@ -7,23 +7,21 @@ class ApiConstants {
   // ── Base URL (auto-detect environment) ─────────────────────
   static String get baseUrl {
     if (kIsWeb) {
-      return 'http://localhost:8000/api/';      // Web
+      return 'http://localhost:8082/api/';
     } else if (Platform.isAndroid) {
-      //return 'http://10.0.2.2:8000/api/';       // Emulator Android
-      return 'http://10.113.107.109:8000/api/'; 
+      return 'http://10.113.107.254:8082/api/';       // Emulator Android
     } else {
-      return 'http://10.73.161.109:8000/api/';  // Device fisik
+      return 'http://10.113.107.254:8082/api/';  // Device fisik
     }
   }
 
   static String get storageUrl {
     if (kIsWeb) {
-      return 'http://localhost:8000/storage/';
+      return 'http://localhost:8082/storage/';
     } else if (Platform.isAndroid) {
-      //return 'http://10.0.2.2:8000/storage/';
-      return 'http://10.113.107.109:8000/storage/';
+      return 'http://10.113.107.254:8082/storage/';
     } else {
-      return 'http://10.73.161.109:8000/storage/';
+      return 'http://10.113.107.254:8082/storage/';
     }
   }
 
@@ -34,6 +32,9 @@ class ApiConstants {
   static String get lupaPassword  => '${baseUrl}lupa-password';
   static String get cekOtp        => '${baseUrl}cek-otp';
   static String get gantiPassword => '${baseUrl}ganti-password';
+  static String get googleLogin      => '${baseUrl}google-login';
+  static String get verifikasiEmail  => '${baseUrl}verifikasi-email';
+  static String get resendOtpRegister => '${baseUrl}resend-otp-register';
 
   // ── User Endpoints ─────────────────────────────────────────
   static String userDetail(int id) => '${baseUrl}user/$id';

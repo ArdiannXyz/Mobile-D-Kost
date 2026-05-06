@@ -47,6 +47,7 @@ class KamarModel {
   final String statusKamar;
   final String? fotoPrimary;
   final double? rating;
+  final List<String> galeri; // ✅ TAMBAH INI
 
   const KamarModel({
     required this.idKamar,
@@ -57,33 +58,32 @@ class KamarModel {
     required this.statusKamar,
     this.fotoPrimary,
     this.rating,
+    this.galeri = const [], // ✅ default kosong
   });
 
   factory KamarModel.fromJson(Map<String, dynamic> json) {
     return KamarModel(
-      // ✅ AMAN dari null / string / int
       idKamar: int.tryParse(json['id_kamar'].toString()) ?? 0,
-
       nomorKamar: json['nomor_kamar']?.toString() ?? '',
       tipeKamar: json['tipe_kamar']?.toString() ?? '',
       deskripsi: json['deskripsi']?.toString() ?? '',
-
-      // ✅ FIX DOUBLE (sering error disini)
       hargaPerBulan:
           double.tryParse(json['harga_per_bulan']?.toString() ?? '0') ?? 0,
-
       statusKamar: json['status_kamar']?.toString() ?? 'tersedia',
-
-      // ✅ FIX FOTO (anti null + kosong)
       fotoPrimary: (json['foto_primary'] != null &&
               json['foto_primary'].toString().isNotEmpty)
           ? json['foto_primary'].toString()
           : null,
-
-      // ✅ FIX RATING (kadang null)
       rating: json['rating'] != null
           ? double.tryParse(json['rating'].toString())
           : null,
+
+      // ✅ TAMBAH INI — parse list galeri
+      galeri: json['galeri'] != null
+          ? List<String>.from(
+              (json['galeri'] as List).map((e) => e.toString()),
+            )
+          : [],
     );
   }
 

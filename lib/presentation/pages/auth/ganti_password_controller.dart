@@ -1,33 +1,23 @@
-// ============================================================
-// BACKEND LAYER — ganti_password_controller.dart
-// Bertanggung jawab atas: ambil email dari route args,
-// validasi password, pemanggilan UserService.gantiPassword,
-// dan navigasi ke halaman login setelah berhasil.
-// Tidak boleh ada Widget/UI di sini.
-// ============================================================
-
 import 'package:flutter/material.dart';
 import '../../../data/services/user_service.dart';
 import '../../../data/helper/api_exception.dart';
+
 class GantiPasswordController {
   // ── State ──────────────────────────────────────────────────
   bool isLoading = false;
-  bool obscureNewPassword = true;
+  bool obscureNewPassword     = true;
   bool obscureConfirmPassword = true;
 
   // ── Text Controllers ───────────────────────────────────────
-  final TextEditingController newPasswordController = TextEditingController();
+  final TextEditingController newPasswordController     = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
-  // Email diterima dari route arguments (dari masuk_otp_page)
   String email = '';
 
-  // Callback untuk trigger setState di View
   final VoidCallback onStateChanged;
-
   GantiPasswordController({required this.onStateChanged});
 
-  // ── Init: Ambil email dari route arguments ─────────────────
+  // ── Init ───────────────────────────────────────────────────
   void init(BuildContext context) {
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args != null && args is Map<String, dynamic>) {
@@ -52,24 +42,32 @@ class GantiPasswordController {
     onStateChanged();
   }
 
-  // ── Validasi ───────────────────────────────────────────────
+  // ── Validasi (client-side) ─────────────────────────────────
   String? validate() {
-    final newPass = newPasswordController.text;
+    final newPass     = newPasswordController.text;
     final confirmPass = confirmPasswordController.text;
 
     if (newPass.isEmpty || confirmPass.isEmpty) {
       return 'Semua kolom harus diisi.';
     }
 
-    if (newPass.length < 6) {
-      return 'Password baru harus minimal 6 karakter.';
+    if (newPass.length < 8) {
+      return 'Password baru harus minimal 8 karakter.';
+    }
+
+    if (!RegExp(r'[A-Z]').hasMatch(newPass)) {
+      return 'Password harus mengandung minimal 1 huruf besar.';
+    }
+
+    if (!RegExp(r'[!@#\$&*~%^()_\-+=\[\]{};:"\\|,.<>/?]').hasMatch(newPass)) {
+      return 'Password harus mengandung minimal 1 simbol (contoh: @, #, !).';
     }
 
     if (newPass != confirmPass) {
       return 'Password dan konfirmasi password tidak cocok.';
     }
 
-    return null; // null = valid
+    return null;
   }
 
   // ── Ganti Password ─────────────────────────────────────────
@@ -85,9 +83,9 @@ class GantiPasswordController {
 
     try {
       final result = await UserService.gantiPassword(
-        email: email,
-        password: newPasswordController.text,
-        passwordConfirmation: confirmPasswordController.text,
+        email                : email,
+        password             : newPasswordController.text,
+        passwordConfirmation : confirmPasswordController.text,
       );
 
       if (!context.mounted) return;
@@ -97,7 +95,6 @@ class GantiPasswordController {
           context,
           result['message'] ?? 'Password berhasil diubah.',
         );
-        // Delay 2 detik lalu arahkan ke halaman login, hapus semua route
         await Future.delayed(const Duration(seconds: 2));
         if (context.mounted) {
           Navigator.pushNamedAndRemoveUntil(
@@ -107,6 +104,8 @@ class GantiPasswordController {
           );
         }
       } else {
+        // Termasuk pesan "Password baru tidak boleh sama dengan password lama"
+        // yang dikirim dari backend
         _showErrorSnackbar(
           context,
           result['message'] ?? 'Gagal mengubah password.',
@@ -125,21 +124,17 @@ class GantiPasswordController {
   }
 
   // ── Navigasi Kembali ───────────────────────────────────────
-  void goBack(BuildContext context) {
-    Navigator.pop(context);
-  }
+  void goBack(BuildContext context) => Navigator.pop(context);
 
   // ── Helper Snackbar ────────────────────────────────────────
   void _showSuccessSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
-            const SizedBox(width: 10),
-            Expanded(child: Text(message)),
-          ],
-        ),
+        content: Row(children: [
+          const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+          const SizedBox(width: 10),
+          Expanded(child: Text(message)),
+        ]),
         backgroundColor: const Color(0xFF2ECC71),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -152,13 +147,11 @@ class GantiPasswordController {
   void _showErrorSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.error_outline, color: Colors.white, size: 20),
-            const SizedBox(width: 10),
-            Expanded(child: Text(message)),
-          ],
-        ),
+        content: Row(children: [
+          const Icon(Icons.error_outline, color: Colors.white, size: 20),
+          const SizedBox(width: 10),
+          Expanded(child: Text(message)),
+        ]),
         backgroundColor: Colors.red.shade600,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

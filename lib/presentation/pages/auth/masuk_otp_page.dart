@@ -69,7 +69,7 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Back button pojok atas kiri
+            // ── Back button ──────────────────────────────────
             Padding(
               padding: const EdgeInsets.only(left: 24, top: 16),
               child: GestureDetector(
@@ -91,7 +91,7 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
               ),
             ),
 
-            // Konten
+            // ── Konten ──────────────────────────────────────
             Expanded(
               child: Center(
                 child: SingleChildScrollView(
@@ -161,7 +161,7 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
 
                       const SizedBox(height: 36),
 
-                      // 6 kotak OTP
+                      // ── 6 kotak OTP ───────────────────────
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: List.generate(6, (index) {
@@ -184,14 +184,14 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
                                   fontWeight: FontWeight.bold,
                                 ),
                                 inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
+                                  FilteringTextInputFormatter.digitsOnly,
                                 ],
                                 onChanged: (value) =>
                                     _onDigitChanged(index, value),
                                 decoration: InputDecoration(
                                   counterText: '',
                                   filled: true,
-                                  fillColor: const Color.fromARGB(255, 233, 233, 233),
+                                  fillColor: const Color(0xFFE9E9E9),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(
@@ -216,26 +216,48 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
                         }),
                       ),
 
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
 
-                      // Kirim ulang
+                      // ── Kirim Ulang + Countdown ────────────
                       Center(
-                        child: TextButton(
-                          onPressed: () => _controller.resendOtp(context),
-                          child: const Text(
-                            'Kirim ulang kode OTP',
-                            style: TextStyle(
-                              color: Color(0xFF1BBA8A),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
+                        child: _controller.isCooldown
+                            ? RichText(
+                                text: TextSpan(
+                                  style: const TextStyle(fontSize: 13),
+                                  children: [
+                                    const TextSpan(
+                                      text: 'Kirim ulang dalam ',
+                                      style: TextStyle(
+                                          color: Color(0xFF9E9E9E)),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          '${_controller.cooldownSeconds}s',
+                                      style: const TextStyle(
+                                        color: Color(0xFF1BBA8A),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : TextButton(
+                                onPressed: () =>
+                                    _controller.resendOtp(context),
+                                child: const Text(
+                                  'Kirim ulang kode OTP',
+                                  style: TextStyle(
+                                    color: Color(0xFF1BBA8A),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
                       ),
 
                       const SizedBox(height: 20),
 
-                      // Tombol Verifikasi
+                      // ── Tombol Verifikasi ──────────────────
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -244,8 +266,8 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
                               : () => _controller.submitOtp(context),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1BBA8A),
-                            disabledBackgroundColor:
-                                const Color(0xFF1BBA8A).withValues(alpha: 0.5),
+                            disabledBackgroundColor: const Color(0xFF1BBA8A)
+                                .withValues(alpha: 0.5),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),

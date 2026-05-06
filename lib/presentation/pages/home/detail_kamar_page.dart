@@ -48,7 +48,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
   
   @override
   void didPopNext() {
-    _controller.init(); // refresh saat kembali ke halaman ini
+    _controller.refreshStatusOnly(); // ✅ hanya refresh status, durasi/tanggal aman
   }
 
   @override
@@ -100,7 +100,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
           _buildInfoSection(),
           const SizedBox(height: 8),
           _buildSection(
-            title: 'Deskripsi Produk',
+            title: 'Deskripsi Kamar',
             child: Text(
               kamar.deskripsi.isEmpty ? 'Tidak ada deskripsi.' : kamar.deskripsi,
               style: const TextStyle(
@@ -118,24 +118,46 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
   }
 
   // ── Gallery ───────────────────────────────────────────────
-  Widget _buildGallery() {
-    final kamar = _controller.kamar!;
-    final hasPhoto = kamar.fotoPrimary != null && kamar.fotoPrimary!.isNotEmpty;
+ Widget _buildGallery() {
+  final kamar = _controller.kamar!;
 
-    return Stack(
-      children: [
-        SizedBox(
-          height: 240,
-          width: double.infinity,
-          child: hasPhoto
-              ? Image.network(
-                  kamar.fotoPrimary!,
+  // Gabungkan semua foto: primary dulu, lalu pendamping
+  final List<String> allPhotos = [
+    if (kamar.fotoPrimary != null && kamar.fotoPrimary!.isNotEmpty)
+      kamar.fotoPrimary!,
+    ...kamar.galeri.where((url) => url != kamar.fotoPrimary), // hindari duplikat
+  ];
+
+  final hasPhoto = allPhotos.isNotEmpty;
+  final PageController pageController = PageController();
+  int currentPage = 0;
+
+  if (!hasPhoto) {
+    return SizedBox(height: 240, child: _placeholderPhoto());
+  }
+
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return Stack(
+        children: [
+          SizedBox(
+            height: 240,
+            width: double.infinity,
+            child: PageView.builder(
+              controller: pageController,
+              itemCount: allPhotos.length,
+              onPageChanged: (index) => setState(() => currentPage = index),
+              itemBuilder: (context, index) {
+                return Image.network(
+                  allPhotos[index],
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => _placeholderPhoto(),
-                )
-              : _placeholderPhoto(),
-        ),
-        if (hasPhoto)
+                );
+              },
+            ),
+          ),
+
+          // Counter pojok kanan bawah: "1/3"
           Positioned(
             right: 12,
             bottom: 12,
@@ -145,18 +167,46 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
                 color: Colors.black.withOpacity(0.55),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Text(
-                '1/1',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600),
+              child: Text(
+                '${currentPage + 1}/${allPhotos.length}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
-      ],
-    );
-  }
+
+          // Dot indicator bawah tengah (opsional, hapus kalau tidak mau)
+          if (allPhotos.length > 1)
+            Positioned(
+              bottom: 12,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(allPhotos.length, (index) {
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: currentPage == index ? 16 : 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: currentPage == index
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  );
+                }),
+              ),
+            ),
+        ],
+      );
+    },
+  );
+}
 
   Widget _placeholderPhoto() {
     return Container(
@@ -408,7 +458,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
   // ── Rating Section ────────────────────────────────────────
   Widget _buildRatingSection() {
     return _buildSection(
-      title: 'Beri rating produk ini',
+      title: 'Beri rating kamar ini',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -455,7 +505,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
         : 0.0;
 
     return _buildSection(
-      title: 'Ulasan Produk',
+      title: 'Ulasan Kamar',
       trailing: Row(
         children: [
           const Icon(Icons.star_rounded, color: Color(0xFFFFC107), size: 18),
@@ -541,7 +591,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
                     GestureDetector(
                       onTap: () => _controller.goToSemuaReview(context),
                       child: const Text(
-                        'Lihat Semua Ulasan Produk',
+                        'Lihat Semua Ulasan Kamar',
                         style: TextStyle(
                           color: Color(0xFF1BBA8A),
                           fontSize: 13,
