@@ -84,32 +84,34 @@ class DetailKamarkuController {
 
   // ── Timer countdown ────────────────────────────────────────
   void startCountdown(VoidCallback onExpired) {
-    final b = booking;
-    if (b == null || b.statusBooking != 'menunggu_pembayaran') return;
+  final b = booking;
+  if (b == null || b.statusBooking != 'menunggu_pembayaran') return;
 
-    final expiredAt = b.expiredAt;
-    if (expiredAt == null) return;
+  final expiredAt = b.expiredAt;
+  if (expiredAt == null) return;
 
-    remainingTime = expiredAt.difference(DateTime.now());
+  remainingTime = expiredAt.difference(DateTime.now());
 
-    if (remainingTime.isNegative || remainingTime.inSeconds <= 0) {
-      remainingTime = Duration.zero;
-      onStateChanged();
-      onExpired();
-      return;
-    }
-
-    _countdownTimer?.cancel();
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      remainingTime -= const Duration(seconds: 1);
-      onStateChanged();
-      if (remainingTime.inSeconds <= 0) {
-        remainingTime = Duration.zero;
-        _countdownTimer?.cancel();
-        onExpired();
-      }
-    });
+  if (remainingTime.isNegative || remainingTime.inSeconds <= 0) {
+    remainingTime = Duration.zero;
+    onStateChanged();
+    // ✅ Reload dulu, baru panggil onExpired
+    loadDetail().then((_) => onExpired());
+    return;
   }
+
+  _countdownTimer?.cancel();
+  _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+    remainingTime -= const Duration(seconds: 1);
+    onStateChanged();
+    if (remainingTime.inSeconds <= 0) {
+      remainingTime = Duration.zero;
+      _countdownTimer?.cancel();
+      // ✅ Reload dulu, baru panggil onExpired
+      loadDetail().then((_) => onExpired());
+    }
+  });
+}
 
   void stopCountdown() => _countdownTimer?.cancel();
 

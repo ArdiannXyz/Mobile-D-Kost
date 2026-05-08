@@ -43,7 +43,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
   }
 
   void _onExpired() {
-    _controller.batalBooking(context);
+    _controller.loadDetail();
   }
 
   @override
@@ -487,33 +487,36 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
     );
   }
 
-  // ══════════════════════════════════════════════════════════
-  // Bottom Bar — beda tampilan per status booking
-  // ══════════════════════════════════════════════════════════
-  Widget? _buildBottomBar() {
-    final b = _controller.booking;
-    if (b == null || _controller.isLoading) return null;
+  // ══════════════════════════════════════════════════════════════
+// Bottom Bar — beda tampilan per status booking
+// ══════════════════════════════════════════════════════════════
+Widget? _buildBottomBar() {
+  final b = _controller.booking;
+  if (b == null || _controller.isLoading) return null;
 
-    // ── Status menunggu_pembayaran: Batal + Bayar (asli) ──
-      if (b.statusBooking == 'menunggu_pembayaran') {
-    final idTagihan  = b.tagihan?.idTagihan;
+  // ── Status menunggu_pembayaran: Batal + Bayar (asli) ──
+  if (b.statusBooking == 'menunggu_pembayaran') {
+    final idTagihan = b.tagihan?.idTagihan;
     final totalBayar = _controller.totalBiaya;
-    final namaKamar  = 'Kos ${_cap(b.tipeKamar ?? '')} ${b.nomorKamar ?? ''}';
+    final namaKamar =
+        'Kos ${_cap(b.tipeKamar ?? '')} ${b.nomorKamar ?? ''}';
 
     // ── Jika tagihan sudah lunas, sembunyikan bottom bar ──
     final isLunas = b.tagihan?.statusTagihan == 'lunas';
     if (isLunas) return null;
-      return Container(
-        color  : Colors.white,
-        padding: EdgeInsets.only(
-          left  : 16,
-          right : 16,
-          top   : 12,
-          bottom: MediaQuery.of(context).padding.bottom + 12,
-        ),
-        child: Row(
-          children: [
-            // ── Tombol Batal ─────────────────────────────
+    
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 12,
+        bottom: MediaQuery.of(context).padding.bottom + 12,
+      ),
+      child: Row(
+        children: [
+          // ── Tombol Batal (hanya muncul jika belum expired) ──
+          if (!_controller.isExpired) ...[
             ElevatedButton(
               onPressed: () => _controller.batalBooking(context),
               style: ElevatedButton.styleFrom(
@@ -529,116 +532,118 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
                       fontSize: 14, fontWeight: FontWeight.w600)),
             ),
             const SizedBox(width: 12),
-            // ── Tombol Bayar Sekarang ─────────────────────
-            Expanded(
-              child: SizedBox(
-                height: 48,
-                child: ElevatedButton(
-                 onPressed: (idTagihan == null || _controller.isExpired)
+          ],
+          // ── Tombol Bayar Sekarang ─────────────────────
+          Expanded(
+            child: SizedBox(
+              height: 48,
+              child: ElevatedButton(
+                onPressed: (idTagihan == null || _controller.isExpired)
                     ? null
                     : () => _controller.goToPayment(
                           context,
-                          idTagihan : idTagihan,
+                          idTagihan: idTagihan,
                           totalBayar: totalBayar,
-                          namaKamar : namaKamar,
-                          onNeedMethod: () => showModalBottomSheet<PaymentMethodType>(
+                          namaKamar: namaKamar,
+                          onNeedMethod: () =>
+                              showModalBottomSheet<PaymentMethodType>(
                             context: context,
                             shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20)),
                             ),
                             builder: (_) => const _PilihMetodeSheet(),
                           ),
                         ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor        : const Color(0xFF1BBA8A),
-                    disabledBackgroundColor: const Color(0xFF9E9E9E),
-                    foregroundColor        : Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    elevation: 0,
-                  ),
-                  child: const Text('Bayar Sekarang',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600)),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // ── Status aktif: + Furnitur + Akhiri Sewa ────────────
-    if (b.statusBooking == 'aktif') {
-      return Container(
-        color  : Colors.white,
-        padding: EdgeInsets.only(
-          left  : 16,
-          right : 16,
-          top   : 12,
-          bottom: MediaQuery.of(context).padding.bottom + 12,
-        ),
-        child: Row(
-          children: [
-            // ── Tambah Furnitur ──────────────────────────
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _controller.isSubmitting
-                    ? null
-                    : () => _controller.showTambahFurniturDialog(context),
-                icon : const Icon(Icons.add_shopping_cart_outlined,
-                    size: 18),
-                label: const Text('+ Furnitur'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF1BBA8A),
-                  side : const BorderSide(color: Color(0xFF1BBA8A)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1BBA8A),
+                  disabledBackgroundColor: const Color(0xFF9E9E9E),
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                  textStyle: const TextStyle(
-                      fontSize  : 13,
-                      fontWeight: FontWeight.w600),
+                  elevation: 0,
                 ),
+                child: const Text('Bayar Sekarang',
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600)),
               ),
             ),
-            const SizedBox(width: 12),
-            // ── Akhiri Sewa ──────────────────────────────
-            Expanded(
-              child: SizedBox(
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: _controller.isSubmitting
-                      ? null
-                      : () => _controller.akhiriSewa(context),
-                  icon: _controller.isSubmitting
-                      ? const SizedBox(
-                          width : 16,
-                          height: 16,
-                          child : CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2))
-                      : const Icon(Icons.exit_to_app_rounded, size: 18),
-                  label: const Text('Akhiri Sewa'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade600,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    elevation: 0,
-                    textStyle: const TextStyle(
-                        fontSize  : 13,
-                        fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+          ),
+        ],
+      ),
+    );
+  }
 
-    return null;
+  // ── Status aktif: + Furnitur + Akhiri Sewa ────────────
+  if (b.statusBooking == 'aktif') {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 12,
+        bottom: MediaQuery.of(context).padding.bottom + 12,
+      ),
+      child: Row(
+        children: [
+          // ── Tambah Furnitur ──────────────────────────
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: _controller.isSubmitting
+                  ? null
+                  : () => _controller.showTambahFurniturDialog(context),
+              icon: const Icon(Icons.add_shopping_cart_outlined,
+                  size: 18),
+              label: const Text('+ Furnitur'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFF1BBA8A),
+                side: const BorderSide(color: Color(0xFF1BBA8A)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                textStyle: const TextStyle(
+                    fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // ── Akhiri Sewa ──────────────────────────────
+          Expanded(
+            child: SizedBox(
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: _controller.isSubmitting
+                    ? null
+                    : () => _controller.akhiriSewa(context),
+                icon: _controller.isSubmitting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2))
+                    : const Icon(Icons.exit_to_app_rounded, size: 18),
+                label: const Text('Akhiri Sewa'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade600,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                  textStyle: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  return null;
   }
 }
+
 
 // ══════════════════════════════════════════════════════════════
 // 2. CHECKOUT PAGE — tidak diubah sama sekali
