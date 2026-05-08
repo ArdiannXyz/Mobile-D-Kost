@@ -6,8 +6,9 @@ import '../../../data/helper/api_exception.dart';
 import 'register_page.dart';
 import 'lupa_password_page.dart';
 import '../home/home_page.dart';
-import '../../../data/services/notifikasi_api_service.dart';
-import '../../../data/services/fcm_setup.dart';
+import '../../../data/services/notifikasi_service.dart';
+import '../../../data/services/onesignal_setup.dart';
+
 
 class LoginController {
   bool isLoading = false;
@@ -66,22 +67,6 @@ class LoginController {
           return;
         }
 
-        // // ✅ Hanya penyewa yang boleh lanjut
-        // final token = await ApiHelper.getToken();
-        // if (token != null) {
-        //   MidtransService.setToken(token);
-          
-        // }
-        //   // ── Simpan token untuk API notifikasi ──────────
-        //   NotifikasiApiService.authToken = data['token'] ?? '';
-        //   debugPrint('Token dipakai: $token');
-
-        //   // ── Init FCM ───────────────────────────────────
-        //   debugPrint('Memanggil initFcm...');
-        //   debugPrint('Token yang akan dipakai FCM: ${NotifikasiApiService.authToken}');
-        //   await FcmSetup.initFcm();
-        //   debugPrint('initFcm selesai');
-
         // 🔥 AMBIL TOKEN DARI LOGIN (SUMBER UTAMA)
       final token = data['token'];
 
@@ -99,15 +84,10 @@ class LoginController {
 
       // 🔥 pakai token ke service lain
         MidtransService.setToken(token);
-        NotifikasiApiService.authToken = token;
-
+        NotifikasiService.authToken = token;
+        await OneSignalSetup.kirimPlayerIdKeBackend(); // ← kirim player ID ke backend
         debugPrint('Token dipakai: $token');
-
-      // 🔥 INIT FCM SETELAH TOKEN SIAP
-      debugPrint('Memanggil initFcm...');
-      await FcmSetup.initFcm();
-      debugPrint('initFcm selesai');
-
+      
         if (!context.mounted) return;
         _showSuccessDialog(context);
 

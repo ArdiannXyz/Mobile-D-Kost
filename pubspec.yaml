@@ -39,6 +39,13 @@ dependencies:
   image_picker: ^1.2.1
   intl: ^0.20.2
 
+    # State management
+  get: ^4.6.6
+ 
+  # OneSignal push notification
+  onesignal_flutter: ^5.2.5
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
