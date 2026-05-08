@@ -7,21 +7,21 @@ class ApiConstants {
   // ── Base URL (auto-detect environment) ─────────────────────
   static String get baseUrl {
     if (kIsWeb) {
-      return 'http://localhost:8082/api/';
+      return 'http://localhost:8000/api/';
     } else if (Platform.isAndroid) {
-      return 'http://10.113.107.254:8082/api/';       // Emulator Android
+      return 'http://192.168.1.17:8000/api/';       // Emulator Android
     } else {
-      return 'http://10.113.107.254:8082/api/';  // Device fisik
+      return 'http://192.168.1.17:8000/api/';  // Device fisik
     }
   }
 
   static String get storageUrl {
     if (kIsWeb) {
-      return 'http://localhost:8082/storage/';
+      return 'http://localhost:8000/storage/';
     } else if (Platform.isAndroid) {
-      return 'http://10.113.107.254:8082/storage/';
+      return 'http://192.168.1.17:8000/storage/';
     } else {
-      return 'http://10.113.107.254:8082/storage/';
+      return 'http://192.168.1.17:8000/storage/';
     }
   }
 
@@ -66,4 +66,11 @@ class ApiConstants {
   static String get reviewCreate          => '${baseUrl}review';
   static String reviewList(int kamarId)   => '${baseUrl}review/kamar/$kamarId';
   static String reviewUpdate(int id)      => '${baseUrl}review/$id';
+
+    // ── Notifikasi Endpoints ───────────────────────────────────
+  static String get notifikasiList      => '${baseUrl}notifikasi';
+  static String get notifikasiBacaSemua => '${baseUrl}notifikasi/baca-semua';
+  static String notifikasiBaca(int id)  => '${baseUrl}notifikasi/$id/baca';
+  static String get oneSignalPlayerId   => '${baseUrl}onesignal-player-id';
+
 }

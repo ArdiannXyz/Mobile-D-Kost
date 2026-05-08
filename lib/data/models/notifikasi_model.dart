@@ -1,33 +1,37 @@
-enum NotifikasiTipe { tagihan, keluhan, umum }
-
-class NotifikasiItem {
+class NotifikasiModel {
   final int id;
+  final int userId;
   final String judul;
   final String pesan;
-  final NotifikasiTipe tipe;
-  bool sudahDibaca;
-  final DateTime waktu;
+  final String tipe;
+  final bool sudahDibaca;
+  final String? dibacaAt;
+  final String createdAt;
+  final String updatedAt;
 
-  NotifikasiItem({
+  NotifikasiModel({
     required this.id,
+    required this.userId,
     required this.judul,
     required this.pesan,
     required this.tipe,
     required this.sudahDibaca,
-    required this.waktu,
+    this.dibacaAt,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
-  factory NotifikasiItem.fromJson(Map<String, dynamic> json) {
-    return NotifikasiItem(
-      id: json['id'],
-      judul: json['judul'],
-      pesan: json['pesan'],
-      tipe: NotifikasiTipe.values.firstWhere(
-        (e) => e.name == json['tipe'],
-        orElse: () => NotifikasiTipe.umum,
-      ),
-      sudahDibaca: json['sudah_dibaca'] == true,
-      waktu: DateTime.parse(json['created_at']),
+  factory NotifikasiModel.fromJson(Map<String, dynamic> json) {
+    return NotifikasiModel(
+      id          : json['id'],
+      userId      : json['user_id'],
+      judul       : json['judul'],
+      pesan       : json['pesan'],
+      tipe        : json['tipe'],
+      sudahDibaca : json['sudah_dibaca'] == true || json['sudah_dibaca'] == 1,
+      dibacaAt    : json['dibaca_at'],
+      createdAt   : json['created_at'],
+      updatedAt   : json['updated_at'],
     );
   }
 }

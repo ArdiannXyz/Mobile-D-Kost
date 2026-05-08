@@ -46,10 +46,11 @@ import '../../../data/models/review_models.dart';
 import '../../../data/models/user_models.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
+import 'data/services/onesignal_setup.dart';
 
 // ── Firebase ───────────────────────────────────────────────────
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'firebase_options.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -57,11 +58,12 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await initializeDateFormatting('id_ID', null); 
+  await OneSignalSetup.init();
   
-  // Inisialisasi Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // // Inisialisasi Firebase
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
 
   final isLoggedIn = await ApiHelper.isLoggedIn();
   FlutterNativeSplash.remove();
