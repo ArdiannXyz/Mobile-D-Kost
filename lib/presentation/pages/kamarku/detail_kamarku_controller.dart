@@ -178,6 +178,7 @@ Future<void> batalBooking(BuildContext context) async {
 
       if (response.statusCode == 200 && data['success'] == true) {
         _snack(context, 'Booking berhasil dibatalkan.', const Color(0xFF2ECC71));
+        KamarService.invalidateCache(); // ✅ Paksa refresh dashboard
         Navigator.pop(context, true);
       } else {
         _snack(context, data['message'] ?? 'Gagal membatalkan booking.', Colors.red);
@@ -308,6 +309,7 @@ Future<void> batalBooking(BuildContext context) async {
       if (!context.mounted) return;
       _snack(context, 'Sewa berhasil diakhiri. Kamar kembali tersedia.',
           const Color(0xFF2ECC71));
+      KamarService.invalidateCache(); // ✅ Paksa refresh dashboard
       Navigator.pop(context, 'selesai');
     } on ApiException catch (e) {
       if (context.mounted) _snack(context, e.message, Colors.red);

@@ -8,6 +8,7 @@ import '../../../data/models/kamar_models.dart';
 import '../../../data/models/furnitur_models.dart';
 import '../../../data/models/payment_model.dart';
 
+
 // ══════════════════════════════════════════════════════════════
 // 1. DETAIL KAMARKU PAGE
 // ══════════════════════════════════════════════════════════════
@@ -207,9 +208,15 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
     );
   }
 
-  Widget _buildKamarCard() {
-    final b = _controller.booking!;
-    return _card(
+Widget _buildKamarCard() {
+  final b = _controller.booking!;
+  return GestureDetector(                                    // ← tambah ini
+    onTap: () => Navigator.pushNamed(
+      context,
+      '/kamar-detail',
+      arguments: {'id': b.idKamar},
+    ),
+    child: _card(
       child: Row(
         children: [
           ClipRRect(
@@ -247,10 +254,17 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
               ],
             ),
           ),
+          // ← indikator bisa diklik
+          const Icon(
+            Icons.arrow_forward_ios_rounded,
+            size : 14,
+            color: Color(0xFFB0B0C3),
+          ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   // ── Furnitur — dengan tombol Tambah inline jika aktif ─────
   Widget _buildFurniturSection() {

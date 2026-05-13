@@ -1,12 +1,12 @@
 // ============================================================
-// FRONTEND LAYER — kamar_detail_page.dart
+// FRONTEND LAYER — detail_kamar_page.dart
 // ============================================================
 
 import 'package:flutter/material.dart';
 import 'detail_kamar_controller.dart';
 import '../../../data/models/furnitur_models.dart';
 import '../../../data/models/review_models.dart';
-import 'package:dkost/main.dart'; 
+import '../../../main.dart'; // ✅ Import routeObserver
 
 class KamarDetailPage extends StatefulWidget {
   final int kamarId;
@@ -16,6 +16,7 @@ class KamarDetailPage extends StatefulWidget {
   State<KamarDetailPage> createState() => _KamarDetailPageState();
 }
 
+// ✅ Re-implement RouteAware untuk refresh otomatis saat kembali ke halaman ini
 class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
   late final KamarDetailController _controller;
   final PageController _pageController = PageController();
@@ -32,23 +33,25 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
     _controller.init();
   }
 
-   
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context)!);
+    // Daftarkan halaman ini ke routeObserver
+    routeObserver.subscribe(this, ModalRoute.of(context)! as PageRoute);
+  }
+
+  @override
+  void didPopNext() {
+    // Dipanggil saat halaman di atasnya di-pop (user kembali ke sini)
+    debugPrint("Kembali ke Detail Kamar -> Refresh status...");
+    _controller.refreshStatusOnly();
   }
 
   @override
   void dispose() {
-    routeObserver.unsubscribe(this); 
+    routeObserver.unsubscribe(this); // Unsubscribe saat dispose
+    _pageController.dispose();
     super.dispose();
-  }
-
-  
-  @override
-  void didPopNext() {
-    _controller.refreshStatusOnly(); // ✅ hanya refresh status, durasi/tanggal aman
   }
 
   @override
@@ -118,95 +121,98 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
   }
 
   // ── Gallery ───────────────────────────────────────────────
- Widget _buildGallery() {
-  final kamar = _controller.kamar!;
+  Widget _buildGallery() {
+    final kamar = _controller.kamar!;
 
-  // Gabungkan semua foto: primary dulu, lalu pendamping
-  final List<String> allPhotos = [
-    if (kamar.fotoPrimary != null && kamar.fotoPrimary!.isNotEmpty)
-      kamar.fotoPrimary!,
-    ...kamar.galeri.where((url) => url != kamar.fotoPrimary), // hindari duplikat
-  ];
+    // Gabungkan semua foto: primary dulu, lalu pendamping
+    final List<String> allPhotos = [
+      if (kamar.fotoPrimary != null && kamar.fotoPrimary!.isNotEmpty)
+        kamar.fotoPrimary!,
+      ...kamar.galeri.where((url) => url != kamar.fotoPrimary),
+    ];
 
-  final hasPhoto = allPhotos.isNotEmpty;
-  final PageController pageController = PageController();
-  int currentPage = 0;
+    final hasPhoto = allPhotos.isNotEmpty;
 
-  if (!hasPhoto) {
-    return SizedBox(height: 240, child: _placeholderPhoto());
-  }
+    if (!hasPhoto) {
+      return SizedBox(height: 240, child: _placeholderPhoto());
+    }
 
-  return StatefulBuilder(
-    builder: (context, setState) {
-      return Stack(
-        children: [
-          SizedBox(
-            height: 240,
-            width: double.infinity,
-            child: PageView.builder(
-              controller: pageController,
-              itemCount: allPhotos.length,
-              onPageChanged: (index) => setState(() => currentPage = index),
-              itemBuilder: (context, index) {
-                return Image.network(
-                  allPhotos[index],
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _placeholderPhoto(),
-                );
-              },
-            ),
-          ),
+    return StatefulBuilder(
+      builder: (context, setLocalState) {
+        int currentPage = 0;
+        final PageController pageCtrl = PageController();
 
-          // Counter pojok kanan bawah: "1/3"
-          Positioned(
-            right: 12,
-            bottom: 12,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.55),
-                borderRadius: BorderRadius.circular(12),
+        return Stack(
+          children: [
+            SizedBox(
+              height: 240,
+              width: double.infinity,
+              child: PageView.builder(
+                controller: pageCtrl,
+                itemCount: allPhotos.length,
+                onPageChanged: (index) =>
+                    setLocalState(() => currentPage = index),
+                itemBuilder: (context, index) {
+                  return Image.network(
+                    allPhotos[index],
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _placeholderPhoto(),
+                  );
+                },
               ),
-              child: Text(
-                '${currentPage + 1}/${allPhotos.length}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+            ),
+
+            // Counter pojok kanan bawah: "1/3"
+            Positioned(
+              right: 12,
+              bottom: 12,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.55),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${currentPage + 1}/${allPhotos.length}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // Dot indicator bawah tengah (opsional, hapus kalau tidak mau)
-          if (allPhotos.length > 1)
-            Positioned(
-              bottom: 12,
-              left: 0,
-              right: 0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(allPhotos.length, (index) {
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    width: currentPage == index ? 16 : 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: currentPage == index
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  );
-                }),
+            // Dot indicator bawah tengah
+            if (allPhotos.length > 1)
+              Positioned(
+                bottom: 12,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(allPhotos.length, (index) {
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      width: currentPage == index ? 16 : 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: currentPage == index
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    );
+                  }),
+                ),
               ),
-            ),
-        ],
-      );
-    },
-  );
-}
+          ],
+        );
+      },
+    );
+  }
 
   Widget _placeholderPhoto() {
     return Container(
@@ -860,7 +866,6 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                   ),
                 ),
                 const Spacer(),
-                // Badge jumlah item tersedia
                 if (furniturTersedia.isNotEmpty)
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -901,9 +906,9 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: allFurnitur.length,
                 itemBuilder: (_, index) {
-                  final f    = allFurnitur[index];
+                  final f     = allFurnitur[index];
                   final habis = f.jumlah <= 0;
-                  final qty  = c.getFurniturQty(f.idFurnitur);
+                  final qty   = c.getFurniturQty(f.idFurnitur);
                   return _FurniturItem(
                     furnitur   : f,
                     qty        : qty,
@@ -1067,7 +1072,6 @@ class _FurniturItem extends StatelessWidget {
                         fontSize: 11, color: Color(0xFF9E9E9E)),
                   ),
                   const SizedBox(height: 2),
-                  // ── Info stok ──────────────────────────────
                   Row(
                     children: [
                       Icon(
@@ -1118,7 +1122,7 @@ class _FurniturItem extends StatelessWidget {
                 ),
                 _CounterBtn(
                   icon: Icons.add,
-                  onTap: onTambah, // null jika habis atau sudah max
+                  onTap: onTambah,
                 ),
               ],
             ),

@@ -12,6 +12,14 @@ import 'cache_service.dart';
 
 class KamarService {
   KamarService._();
+  
+  // ── Invalidate Cache ────────────────────────────────────────
+  static void invalidateCache() {
+    CacheService.invalidate(CacheService.keyKamarList);
+    // Invalidate detail cache juga bisa dilakukan jika perlu, 
+    // tapi list yang paling krusial untuk dashboard.
+    CacheService.invalidatePrefix('kamar_detail_');
+  }
 
   // ── GET: List semua kamar ──────────────────────────────────
   // forceRefresh: true → abaikan cache, ambil dari API
@@ -27,8 +35,12 @@ class KamarService {
     // Cache miss / expired / forceRefresh → fetch dari API
     try {
       final headers = await ApiHelper.authHeaders;
+      final url = forceRefresh 
+          ? '${ApiConstants.kamarList}?_t=${DateTime.now().millisecondsSinceEpoch}'
+          : ApiConstants.kamarList;
+          
       final response = await http.get(
-        Uri.parse(ApiConstants.kamarList),
+        Uri.parse(url),
         headers: headers,
       );
 
@@ -60,8 +72,12 @@ class KamarService {
 
     try {
       final headers = await ApiHelper.authHeaders;
+      final url = forceRefresh
+          ? '${ApiConstants.kamarDetail(id)}?_t=${DateTime.now().millisecondsSinceEpoch}'
+          : ApiConstants.kamarDetail(id);
+
       final response = await http.get(
-        Uri.parse(ApiConstants.kamarDetail(id)),
+        Uri.parse(url),
         headers: headers,
       );
 

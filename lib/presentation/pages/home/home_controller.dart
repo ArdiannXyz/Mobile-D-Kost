@@ -25,17 +25,20 @@ class HomeController {
 
   // Filter chips sesuai ERD tipe_kamar
   static const List<String> filterOptions = [
-    'Semua',
-    'Serba 300rb',
-    'Serba 600rb',
-    'Up to 900rb',
+    'Semua', 'Tersedia', 'Terisi',
+    '>400rb', '>600rb', '>800rb',
   ];
 
-  static const Map<String, String?> filterToTipe = {
+  static const Map<String, String?> filterToStatus = {
     'Semua': null,
-    'Serba 300rb': 'biasa',
-    'Serba 600rb': 'sedang',
-    'Up to 900rb': 'mewah',
+    'Tersedia': 'tersedia',
+    'Terisi': 'terisi',
+  };
+
+  static const Map<String, double?> filterToHarga = {
+    '>400rb': 400000,
+    '>600rb': 600000,
+    '>800rb': 800000,
   };
 
   final VoidCallback onStateChanged;
@@ -108,32 +111,41 @@ class HomeController {
   }
 
   void _applyCurrentFilter() {
-    final tipe = filterToTipe[selectedFilter];
-    if (tipe == null) {
-      filteredKamar = List.from(semuaKamar);
-    } else {
-      filteredKamar = semuaKamar.where((k) => k.tipeKamar == tipe).toList();
+    final status = filterToStatus[selectedFilter];
+    final double? minHarga = filterToHarga[selectedFilter];
+
+    if (status != null) {
+      filteredKamar =
+          semuaKamar.where((k) => k.statusKamar == status).toList();
+  } else if (minHarga != null) {
+    filteredKamar =
+        semuaKamar.where((k) => k.hargaPerBulan >= minHarga).toList();
+  } else {
+      filteredKamar = List.from(semuaKamar); // 'Semua'
     }
   }
 
   // ── Search Kamar ───────────────────────────────────────────
   void searchKamar(String query) {
-    if (query.isEmpty) {
-      _applyCurrentFilter();
-      onStateChanged();
-      return;
-    }
-
-    final tipe = filterToTipe[selectedFilter];
-    filteredKamar = semuaKamar.where((k) {
-      final matchQuery =
-          k.nomorKamar.toLowerCase().contains(query.toLowerCase()) ||
-              k.tipeKamar.toLowerCase().contains(query.toLowerCase());
-      final matchTipe = tipe == null || k.tipeKamar == tipe;
-      return matchQuery && matchTipe;
-    }).toList();
+  if (query.isEmpty) {
+    _applyCurrentFilter();
     onStateChanged();
+    return;
   }
+
+  final status = filterToStatus[selectedFilter];
+  final minHarga = filterToHarga[selectedFilter];
+
+  filteredKamar = semuaKamar.where((k) {
+    final matchQuery =
+        k.nomorKamar.toLowerCase().contains(query.toLowerCase()) ||
+        k.tipeKamar.toLowerCase().contains(query.toLowerCase());
+    final matchStatus = status == null || k.statusKamar == status;
+    final matchHarga = minHarga == null || k.hargaPerBulan >= minHarga;
+    return matchQuery && matchStatus && matchHarga;
+  }).toList();
+  onStateChanged();
+}
 
   // ── Exit Dialog ────────────────────────────────────────────
   Future<bool> showExitDialog(BuildContext context) async {

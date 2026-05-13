@@ -157,6 +157,8 @@ class BookingController {
         final idBooking  = result['data']['id_booking'];
         final idTagihan  = result['data']['id_tagihan'];
         final totalBayar = (result['data']['total_biaya'] as num).toDouble();
+        
+        KamarService.invalidateCache(); // ✅ Invalidate dashboard
 
         Navigator.pushReplacementNamed(
           context,
@@ -201,6 +203,9 @@ class BookingController {
         // Ambil id_tagihan dari response backend
         // Pastikan Laravel return: { "success": true, "data": { "id_tagihan": 1, ... } }
         final idTagihan = result['data']['id_tagihan'];
+        
+        KamarService.invalidateCache(); // ✅ Invalidate dashboard
+        
         if (idTagihan == null) {
           if (context.mounted) {
             _showError(context, 'id_tagihan tidak ditemukan di response.');

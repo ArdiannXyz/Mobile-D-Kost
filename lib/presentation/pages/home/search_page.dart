@@ -2,8 +2,6 @@
 // FRONTEND LAYER — search_page.dart
 // Halaman pencarian kamar D'Kost.
 // Mode suggestion: riwayat + kata kunci populer
-// Mode results: grid KamarCard hasil pencarian
-// Style konsisten dengan home_page (header hijau).
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -18,7 +16,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  late final sc.SearchController _controller;
+  late sc.SearchController _controller;
 
   @override
   void initState() {
@@ -29,8 +27,9 @@ class _SearchPageState extends State<SearchPage> {
       },
     );
     _controller.init().then((_) {
-      // Auto fokus search bar saat halaman dibuka
-      _controller.searchFocusNode.requestFocus();
+      if (mounted) {
+        _controller.searchFocusNode.requestFocus();
+      }
     });
   }
 
@@ -46,10 +45,7 @@ class _SearchPageState extends State<SearchPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: Column(
         children: [
-          // ── Header + Search Bar ──────────────────────────────
           _buildHeader(),
-
-          // ── Konten ──────────────────────────────────────────
           Expanded(
             child: _controller.isLoading
                 ? const Center(
@@ -64,7 +60,6 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // ── Header hijau dengan search bar ────────────────────────
   Widget _buildHeader() {
     return Container(
       color: const Color(0xFF1BBA8A),
@@ -76,13 +71,11 @@ class _SearchPageState extends State<SearchPage> {
       ),
       child: Row(
         children: [
-          // Tombol back
           IconButton(
             onPressed: () => _controller.goBack(context),
             icon: const Icon(Icons.arrow_back_ios_new,
                 color: Colors.white, size: 18),
           ),
-          // Search bar
           Expanded(
             child: Container(
               height: 44,
@@ -123,21 +116,16 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // ── Mode Suggestion ───────────────────────────────────────
   Widget _buildSuggestionView() {
     return ListView(
       padding: EdgeInsets.zero,
       children: [
-        // Saran real-time
         if (_controller.searchSuggestions.isNotEmpty)
           _buildSuggestionList(),
-
-        // Riwayat pencarian
         if (_controller.searchHistory.isNotEmpty)
           _buildHistorySection(),
-
-        // Kata kunci populer
         _buildPopularKeywords(),
+        _buildPriceKeywords(),
       ],
     );
   }
@@ -177,11 +165,31 @@ class _SearchPageState extends State<SearchPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Riwayat pencarian',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF9E9E9E),
-                      fontWeight: FontWeight.w600)),
+              Row(
+                children: [
+                  const Text('Riwayat pencarian',
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF9E9E9E),
+                          fontWeight: FontWeight.w600)),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      'Max ${sc.SearchController.maxHistoryLength}',
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Color(0xFF1BBA8A),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               GestureDetector(
                 onTap: _controller.clearHistory,
                 child: const Text('Hapus semua',
@@ -255,11 +263,103 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // ── Mode Results ──────────────────────────────────────────
+  Widget _buildPriceKeywords() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 10),
+          child: Text('Cari berdasarkan harga',
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Color(0xFF9E9E9E),
+                  fontWeight: FontWeight.w600)),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _buildPriceChip(
+                label: 'Harga < Rp 400.000',
+                keyword: 'harga dibawah 400rb',
+                icon: Icons.money_off,
+              ),
+              _buildPriceChip(
+                label: 'Harga < Rp 700.000',
+                keyword: 'harga dibawah 700rb',
+                icon: Icons.attach_money,
+              ),
+              _buildPriceChip(
+                label: 'Rp 400k - Rp 700k',
+                keyword: 'harga 400rb sampai 700rb',
+                icon: Icons.compare_arrows,
+              ),
+              _buildPriceChip(
+                label: 'Rp 700k - Rp 1jt',
+                keyword: 'harga 700rb sampai 1jt',
+                icon: Icons.trending_up,
+              ),
+              _buildPriceChip(
+                label: 'Harga > Rp 1.000.000',
+                keyword: 'harga diatas 1jt',
+                icon: Icons.king_bed,
+              ),
+              _buildPriceChip(
+                label: 'Kamar termurah',
+                keyword: 'termurah',
+                icon: Icons.arrow_downward,
+                color: const Color(0xFF4CAF50),
+              ),
+              _buildPriceChip(
+                label: 'Kamar termahal',
+                keyword: 'termahal',
+                icon: Icons.arrow_upward,
+                color: const Color(0xFFFF9800),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  Widget _buildPriceChip({
+    required String label,
+    required String keyword,
+    required IconData icon,
+    Color color = const Color(0xFF1BBA8A),
+  }) {
+    return GestureDetector(
+      onTap: () => _controller.useSuggestion(keyword),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withOpacity(0.5)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: color),
+            const SizedBox(width: 6),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 12,
+                    color: color,
+                    fontWeight: FontWeight.w500)),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildResultsView() {
     return Column(
       children: [
-        // Info hasil + jumlah
         Container(
           padding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -288,7 +388,6 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ),
               ),
-              // Tombol kembali ke suggestion
               GestureDetector(
                 onTap: _controller.clearSearch,
                 child: const Text('Ubah',
@@ -300,8 +399,6 @@ class _SearchPageState extends State<SearchPage> {
             ],
           ),
         ),
-
-        // Grid hasil atau empty state
         Expanded(
           child: _controller.searchResults.isEmpty
               ? _buildEmptyResults()
@@ -312,7 +409,7 @@ class _SearchPageState extends State<SearchPage> {
                     crossAxisCount: 2,
                     mainAxisSpacing: 14,
                     crossAxisSpacing: 14,
-                    childAspectRatio: _cardAspectRatio(context), // ← ubah dari 0.82 ke 0.70
+                    childAspectRatio: _cardAspectRatio(context),
                   ),
                   itemBuilder: (context, index) {
                     final kamar = _controller.searchResults[index];
@@ -329,12 +426,11 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-    double _cardAspectRatio(BuildContext context) {
+  double _cardAspectRatio(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = (screenWidth - 16 * 2 - 12) / 2; // padding + gap
-    // tinggi = foto (aspect 16/14) + info section ~90px
+    final cardWidth = (screenWidth - 32 - 14) / 2;
     final photoHeight = cardWidth * (14 / 16);
-    const infoHeight = 100.0; // nama + learn more + tombol + padding
+    const infoHeight = 100.0;
     return cardWidth / (photoHeight + infoHeight);
   }
 
