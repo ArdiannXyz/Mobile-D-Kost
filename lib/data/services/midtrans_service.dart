@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../helper/api_constants.dart';
 
+/// [LEGACY] MidtransService
+/// Service ini sudah digantikan oleh PaymentService (payment_service.dart).
+/// Dipertahankan untuk backward-compatibility jika ada pemanggilan `setToken()`
+/// dari login flow yang belum dimigrasi.
 class MidtransService {
-  // ── Base URL ───────────────────────────────────────────────
-  // Pilih salah satu, comment sisanya:
-
-  //static const String baseUrl = 'http://127.0.0.1:8000/api';        // Browser
-  //static const String baseUrl = 'http://10.0.2.2:8000/api';      // Emulator Android
-  // static const String baseUrl = 'http://192.168.x.x:8000/api';   // HP Fisik
-  static const String baseUrl =
-      'https://bacteriophagic-marcelle-semiconical.ngrok-free.dev/api'; // Ngrok
+  // ── Gunakan ApiConstants.baseUrl agar konsisten dengan service lain ─
+  // (URL ngrok lama sudah dihapus, jangan hardcode URL di sini)
+  static String get _baseUrl => ApiConstants.baseUrl.replaceAll('/api/', '');
 
   static String? _authToken;
 
@@ -27,7 +27,7 @@ class MidtransService {
   static Future<Map<String, dynamic>> createSnapToken(int idTagihan) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/payment/create-token'),
+        Uri.parse('$_baseUrl/api/payment/create-token'),
         headers: _headers,
         body: jsonEncode({'id_tagihan': idTagihan}),
       );

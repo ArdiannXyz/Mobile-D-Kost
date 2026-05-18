@@ -4,21 +4,21 @@ import 'presentation/pages/home/search_page.dart';
 import 'package:dkost/presentation/pages/review_keluhan/lapor_keluhan_page.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter/material.dart';
-import '../../../data/helper/api_helper.dart';
+import 'data/helper/api_helper.dart';
 import 'presentation/pages/kamar/kamarku_page.dart';
 import 'presentation/pages/pembayaran/payment_page.dart';
 import 'presentation/pages/pembayaran/pembayaran_status_page.dart';
-import 'Presentation/pages/review_keluhan/edit_keluhan_page.dart';
+import 'presentation/pages/review_keluhan/edit_keluhan_page.dart';
 // ── Auth ───────────────────────────────────────────────────────
-import '../presentation/pages/auth/welcome_screen.dart';
-import '../presentation/pages/auth/login_page.dart';
-import '../presentation/pages/auth/register_page.dart';
-import '../presentation/pages/auth/lupa_password_page.dart';
-import '../presentation/pages/auth/masuk_otp_page.dart';
-import '../presentation/pages/auth/ganti_password_page.dart';
+import 'presentation/pages/auth/welcome_screen.dart';
+import 'presentation/pages/auth/login_page.dart';
+import 'presentation/pages/auth/register_page.dart';
+import 'presentation/pages/auth/lupa_password_page.dart';
+import 'presentation/pages/auth/masuk_otp_page.dart';
+import 'presentation/pages/auth/ganti_password_page.dart';
 
 // ── Home ───────────────────────────────────────────────────────
-import '../presentation/pages/home/home_page.dart';
+import 'presentation/pages/home/home_page.dart';
 
 // ── Booking ────────────────────────────────────────────────────
 import 'presentation/pages/kamarku/detail_kamarku_page.dart';
@@ -39,10 +39,10 @@ import 'presentation/pages/profil_setting/panduan_page.dart';
 import 'presentation/pages/chatbot/chatbot_page.dart';
 
 // ── Model ──────────────────────────────────────────────────────
-import '../../../data/models/kamar_models.dart';
-import '../../../data/models/furnitur_models.dart';
-import '../../../data/models/review_models.dart';
-import '../../../data/models/user_models.dart';
+import 'data/models/kamar_models.dart';
+import 'data/models/furnitur_models.dart';
+import 'data/models/review_models.dart';
+import 'data/models/user_models.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
 import 'data/services/onesignal_setup.dart';
@@ -53,7 +53,6 @@ import 'data/services/onesignal_setup.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await initializeDateFormatting('id_ID', null);

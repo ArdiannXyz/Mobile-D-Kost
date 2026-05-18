@@ -69,11 +69,6 @@ class TagihanModel {
     required this.statusTagihan,
   });
 
-  static double _parseDouble(dynamic val) {
-    if (val == null) return 0;
-    return double.tryParse(val.toString()) ?? 0;
-  }
-
   static int _parseInt(dynamic val) {
     if (val == null) return 0;
     return int.tryParse(val.toString()) ?? 0;

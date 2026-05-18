@@ -67,7 +67,7 @@ class BookingService {
     try {
       final headers = await ApiHelper.authHeaders;
       final response = await http.get(
-        Uri.parse('${ApiConstants.baseUrl}booking/aktif/$userId'),
+        Uri.parse(ApiConstants.bookingAktif(userId)),
         headers: headers,
       );
 
@@ -85,6 +85,8 @@ class BookingService {
       }
 
       return [];
+    } on ApiException {
+      rethrow;
     } catch (_) {
       throw ApiException(
         message: 'Gagal memuat booking aktif.',
@@ -98,7 +100,7 @@ class BookingService {
   static Future<BookingModel?> getBookingDetail(int id) async {
     final headers = await ApiHelper.authHeaders;
     final response = await http.get(
-      Uri.parse('${ApiConstants.baseUrl}booking/$id'),
+      Uri.parse(ApiConstants.bookingDetail(id)),
       headers: headers,
     );
     final data = jsonDecode(response.body);
@@ -128,7 +130,7 @@ class BookingService {
         .toList();
 
     final response = await http.post(
-      Uri.parse('${ApiConstants.baseUrl}booking'),
+      Uri.parse(ApiConstants.bookingCreate),
       headers: headers,
       body: jsonEncode({
         'id_user': userId,
@@ -158,7 +160,7 @@ class BookingService {
   static Future<Map<String, dynamic>> batalBooking(int id) async {
     final headers = await ApiHelper.authHeaders;
     final response = await http.put(
-      Uri.parse('${ApiConstants.baseUrl}booking/$id/batal'),
+      Uri.parse('${ApiConstants.baseUrl}booking/$id/batal'), // endpoint batal belum di ApiConstants
       headers: headers,
     );
 
@@ -186,7 +188,7 @@ class BookingService {
         .toList();
 
     final response = await http.post(
-      Uri.parse('${ApiConstants.baseUrl}booking/$idBooking/furnitur'),
+      Uri.parse('${ApiConstants.baseUrl}booking/$idBooking/furnitur'), // endpoint furnitur belum di ApiConstants
       headers: headers,
       body: jsonEncode({'furnitur': furniturList}),
     );
@@ -208,7 +210,7 @@ class BookingService {
   static Future<Map<String, dynamic>> akhiriSewa(int idBooking) async {
     final headers = await ApiHelper.authHeaders;
     final response = await http.post(
-      Uri.parse('${ApiConstants.baseUrl}booking/$idBooking/selesai'),
+      Uri.parse('${ApiConstants.baseUrl}booking/$idBooking/selesai'), // endpoint selesai belum di ApiConstants
       headers: headers,
     );
 

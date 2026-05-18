@@ -4,6 +4,8 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
+  firebase_core
+  gal
   rive_common
   url_launcher_windows
 )

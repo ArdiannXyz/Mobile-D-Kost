@@ -7,8 +7,13 @@ class OneSignalSetup {
 
   // ── Panggil di main.dart sebelum runApp() ─────────────────
   static Future<void> init() async {
-    // Log verbose (hapus saat release/production)
-    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    // Log level: verbose untuk debug, none untuk release/production
+    // ignore: dead_code
+    assert(() {
+      OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+      return true;
+    }());
+    OneSignal.Debug.setLogLevel(OSLogLevel.none);
 
     // Inisialisasi dengan App ID
     OneSignal.initialize(_appId);
@@ -40,7 +45,7 @@ class OneSignalSetup {
       final playerId = OneSignal.User.pushSubscription.id;
 
       debugPrint('=== ONESIGNAL DEBUG ===');
-      debugPrint('Token: ${NotifikasiService.authToken}');
+      debugPrint('Token: [dikelola ApiHelper/SharedPreferences]');
       debugPrint('Player ID: $playerId');
 
       if (playerId == null || playerId.isEmpty) {

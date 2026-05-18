@@ -172,7 +172,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.55),
+                  color: Colors.black.withValues(alpha: 0.55),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -203,7 +203,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
                       decoration: BoxDecoration(
                         color: currentPage == index
                             ? Colors.white
-                            : Colors.white.withOpacity(0.5),
+                            : Colors.white.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(3),
                       ),
                     );
@@ -1159,7 +1159,7 @@ class _ReviewItem extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: const Color(0xFF1BBA8A).withOpacity(0.2),
+            backgroundColor: const Color(0xFF1BBA8A).withValues(alpha: 0.2),
             child: Text(
               review.namaUser.isNotEmpty
                   ? review.namaUser[0].toUpperCase()

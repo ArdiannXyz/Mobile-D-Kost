@@ -200,7 +200,7 @@ class HomeController {
   }
 
   void goToRiwayatKos(BuildContext context) {
-    Navigator.pushNamed(context, '/booking-list');
+    Navigator.pushNamed(context, '/kamarku');
   }
 
   void goToSetting(BuildContext context) {

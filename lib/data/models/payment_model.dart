@@ -130,11 +130,6 @@ class VaPaymentResult extends PaymentResult {
       vaNumber = json['permata_va_number'].toString();
     }
 
-    print('=== VA fromJson ===');
-    print(json);
-    print('permata_va_number: ${json['permata_va_number']}');
-    print('va_numbers: ${json['va_numbers']}');
-
     // Fallback
     if (bank.isEmpty) bank = json['bank']?.toString() ?? '';
     if (vaNumber.isEmpty) vaNumber = json['va_number']?.toString() ?? '';

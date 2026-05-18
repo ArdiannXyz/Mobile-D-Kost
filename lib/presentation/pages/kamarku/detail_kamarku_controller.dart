@@ -124,8 +124,9 @@ class DetailKamarkuController {
   }
 
   Color get countdownColor {
-    if (isExpired || remainingTime.inSeconds < 60)
+    if (isExpired || remainingTime.inSeconds < 60) {
       return const Color(0xFFE74C3C);
+    }
     if (remainingTime.inMinutes < 5) return const Color(0xFFF39C12);
     return const Color(0xFF2ECC71);
   }
@@ -436,8 +437,9 @@ class DetailKamarkuController {
     } on ApiException catch (e) {
       if (context.mounted) _snack(context, e.message, Colors.red);
     } catch (e) {
-      if (context.mounted)
+      if (context.mounted) {
         _snack(context, 'Gagal memuat pembayaran: $e', Colors.red);
+      }
     } finally {
       isSubmitting = false;
       onStateChanged();
@@ -803,6 +805,7 @@ class CheckoutController {
 
   double get totalPembayaran => totalKamar + totalFurnitur;
 
+  // ignore: library_private_types_in_public_api
   List<_FurniturCheckoutItem> get furniturItems {
     return selectedFurnitur.entries.map((entry) {
       final f = furniturList.firstWhere(

@@ -73,12 +73,11 @@ flutter:
     - assets/images/kamarku_black.png       # Bottom nav: Riwayat Kos nonaktif
     - assets/images/setting_green.png       # Bottom nav: Setting aktif
     - assets/images/setting_black.png       # Bottom nav: Setting nonaktif
-    - assets/images/sinora_icon.png         # Icon chatbot
+    - assets/images/sinora_icon.png         # Icon chatbot / Avatar chatbot
     - assets/images/person_1.png            # Avatar profil default
     - assets/images/person_2.png            # Avatar profil alternatif
-    - assets/images/picture.png             # Placeholder foto profil 
+    - assets/images/picture.png             # Placeholder foto profil
     - assets/images/robot.png               # Placeholder foto kamar
-    - assets/images/sinora_icon.png         # Avatar chatbot
     - assets/images/calendar_1.png          # Icon kalender (booking)
     - assets/images/attach_file.png         # Icon lampiran (keluhan)
     - assets/images/detail_informasi_akun.png # Icon info akun

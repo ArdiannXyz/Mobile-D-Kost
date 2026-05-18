@@ -32,8 +32,12 @@ class _VerifikasiEmailPageState extends State<VerifikasiEmailPage> {
   @override
   void dispose() {
     _timer?.cancel();
-    for (final c in _otpControllers) c.dispose();
-    for (final f in _focusNodes) f.dispose();
+    for (final c in _otpControllers) {
+      c.dispose();
+    }
+    for (final f in _focusNodes) {
+      f.dispose();
+    }
     super.dispose();
   }
 
@@ -71,8 +75,9 @@ class _VerifikasiEmailPageState extends State<VerifikasiEmailPage> {
     } on ApiException catch (e) {
       if (mounted) _showSnackbar(e.message, isError: true);
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         _showSnackbar('Terjadi kesalahan. Coba lagi.', isError: true);
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -88,7 +93,9 @@ class _VerifikasiEmailPageState extends State<VerifikasiEmailPage> {
         _showSnackbar('Kode OTP baru telah dikirim!');
         _startCountdown();
         // Reset semua kotak OTP
-        for (final c in _otpControllers) c.clear();
+        for (final c in _otpControllers) {
+          c.clear();
+        }
         _focusNodes[0].requestFocus();
       } else {
         _showSnackbar(data['message'] ?? 'Gagal mengirim ulang.',

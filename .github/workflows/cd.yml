@@ -1,0 +1,272 @@
+# ================================================================
+# CD — D'Kost Flutter App (Release Build)
+# ================================================================
+# Trigger: saat push tag versi (contoh: v1.0.0, v1.2.3-beta)
+#          atau saat dipicu manual dari GitHub Actions UI
+#
+# Jobs:
+#   1. build_release  → Build APK & AAB release (signed jika ada keystore)
+#   2. create_release → Upload ke GitHub Release (hanya saat push tag)
+#
+# Secret yang WAJIB ditambahkan di GitHub → Settings → Secrets:
+#   KEYSTORE_BASE64       → isi keystore Android (base64 encoded)
+#   KEYSTORE_PASSWORD     → password keystore
+#   KEY_ALIAS             → alias key signing
+#   KEY_PASSWORD          → password key
+#
+# Cara encode keystore ke base64:
+#   Linux/macOS : base64 -w 0 your-release.keystore > keystore_base64.txt
+#   Windows     : certutil -encode your-release.keystore tmp.txt && findstr /v /c:- tmp.txt > keystore_base64.txt
+# ================================================================
+
+name: "🚀 CD — Build & Release APK"
+
+on:
+  push:
+    tags:
+      - "v*.*.*"           # Contoh: v1.0.0, v2.1.3-beta
+  workflow_dispatch:        # Bisa dipicu manual dari GitHub UI
+    inputs:
+      version_name:
+        description: "Versi aplikasi (contoh: 1.0.0)"
+        required: true
+        default: "1.0.0"
+      build_number:
+        description: "Build number"
+        required: true
+        default: "1"
+      release_notes:
+        description: "Catatan release (singkat)"
+        required: false
+        default: "Bug fixes and improvements"
+
+env:
+  FLUTTER_VERSION: "3.29.3"
+  JAVA_VERSION: "17"
+  APP_NAME: "DKost"
+
+jobs:
+  # ──────────────────────────────────────────────────────────────
+  # JOB 1: Build Release APK + AAB
+  # ──────────────────────────────────────────────────────────────
+  build_release:
+    name: "🏗️ Build Release"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    outputs:
+      version_name: ${{ steps.version.outputs.version_name }}
+      build_number: ${{ steps.version.outputs.build_number }}
+      has_keystore: ${{ steps.check_keystore.outputs.has_keystore }}
+
+    steps:
+      - name: "📥 Checkout kode"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Ambil semua history untuk mendapatkan tag
+
+      # ── Tentukan versi ──────────────────────────────────────
+      - name: "🏷️ Tentukan versi build"
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            VERSION_NAME="${GITHUB_REF_NAME#v}"
+            BUILD_NUMBER="${{ github.run_number }}"
+          else
+            VERSION_NAME="${{ github.event.inputs.version_name }}"
+            BUILD_NUMBER="${{ github.event.inputs.build_number }}"
+          fi
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+          echo "📦 Version: $VERSION_NAME ($BUILD_NUMBER)"
+
+      # ── Cek apakah keystore secret tersedia ────────────────
+      - name: "🔍 Cek ketersediaan keystore"
+        id: check_keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "has_keystore=true" >> $GITHUB_OUTPUT
+            echo "✅ Keystore secret ditemukan — akan build signed release"
+          else
+            echo "has_keystore=false" >> $GITHUB_OUTPUT
+            echo "⚠️  Keystore secret tidak ada — akan build unsigned release"
+          fi
+
+      - name: "☕ Setup Java ${{ env.JAVA_VERSION }}"
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: "🐦 Setup Flutter ${{ env.FLUTTER_VERSION }}"
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+          cache-key: flutter-${{ env.FLUTTER_VERSION }}-${{ hashFiles('pubspec.lock') }}
+
+      - name: "📦 Install dependencies"
+        run: flutter pub get
+
+      - name: "🖼️ Generate splash screen"
+        run: dart run flutter_native_splash:create
+
+      - name: "🎯 Generate launcher icons"
+        run: dart run flutter_launcher_icons
+
+      # ── Setup Keystore (hanya jika secret tersedia) ────────
+      - name: "🔐 Decode keystore dari secret"
+        if: steps.check_keystore.outputs.has_keystore == 'true'
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_B64" | base64 --decode > android/app/release.keystore
+          echo "✅ Keystore berhasil didekode ke android/app/release.keystore"
+
+      - name: "🔧 Buat key.properties"
+        if: steps.check_keystore.outputs.has_keystore == 'true'
+        run: |
+          cat > android/key.properties << 'KEYEOF'
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=release.keystore
+          KEYEOF
+          echo "✅ key.properties berhasil dibuat"
+
+      # ── Build APK Release ───────────────────────────────────
+      - name: "📱 Build APK Release"
+        run: |
+          flutter build apk --release \
+            --build-name="${{ steps.version.outputs.version_name }}" \
+            --build-number="${{ steps.version.outputs.build_number }}" \
+            --no-pub
+
+      # ── Build AAB (untuk Google Play) ──────────────────────
+      - name: "📦 Build AAB (Android App Bundle)"
+        run: |
+          flutter build appbundle --release \
+            --build-name="${{ steps.version.outputs.version_name }}" \
+            --build-number="${{ steps.version.outputs.build_number }}" \
+            --no-pub
+
+      # ── Rename output files ─────────────────────────────────
+      - name: "✏️ Rename file output"
+        run: |
+          VERSION="${{ steps.version.outputs.version_name }}"
+          BUILD="${{ steps.version.outputs.build_number }}"
+          mv build/app/outputs/flutter-apk/app-release.apk \
+             "build/app/outputs/flutter-apk/dkost-v${VERSION}-${BUILD}.apk"
+          mv build/app/outputs/bundle/release/app-release.aab \
+             "build/app/outputs/bundle/release/dkost-v${VERSION}-${BUILD}.aab"
+          echo "📁 File yang dibuat:"
+          ls -lh build/app/outputs/flutter-apk/dkost-*.apk
+          ls -lh build/app/outputs/bundle/release/dkost-*.aab
+
+      # ── Upload Artifacts ────────────────────────────────────
+      - name: "📤 Upload APK ke GitHub Artifacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: dkost-release-apk-v${{ steps.version.outputs.version_name }}
+          path: build/app/outputs/flutter-apk/dkost-*.apk
+          retention-days: 30
+
+      - name: "📤 Upload AAB ke GitHub Artifacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: dkost-release-aab-v${{ steps.version.outputs.version_name }}
+          path: build/app/outputs/bundle/release/dkost-*.aab
+          retention-days: 30
+
+  # ──────────────────────────────────────────────────────────────
+  # JOB 2: Buat GitHub Release (hanya untuk push tag)
+  # ──────────────────────────────────────────────────────────────
+  create_github_release:
+    name: "🎉 Buat GitHub Release"
+    runs-on: ubuntu-latest
+    needs: build_release
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    permissions:
+      contents: write   # Izin untuk membuat release & upload assets
+
+    steps:
+      - name: "📥 Checkout kode"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── Download artifacts dari job sebelumnya ──────────────
+      - name: "📥 Download APK artifact"
+        uses: actions/download-artifact@v4
+        with:
+          name: dkost-release-apk-v${{ needs.build_release.outputs.version_name }}
+          path: release-files/
+
+      - name: "📥 Download AAB artifact"
+        uses: actions/download-artifact@v4
+        with:
+          name: dkost-release-aab-v${{ needs.build_release.outputs.version_name }}
+          path: release-files/
+
+      # ── Generate changelog otomatis dari git log ────────────
+      - name: "📝 Generate changelog"
+        id: changelog
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            CHANGES=$(git log "${PREV_TAG}..HEAD" --pretty=format:"- %s (%h)" --no-merges)
+          else
+            CHANGES=$(git log --pretty=format:"- %s (%h)" --no-merges -20)
+          fi
+          # Simpan multiline ke GITHUB_OUTPUT
+          {
+            echo "changes<<EOF"
+            echo "$CHANGES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # ── Buat GitHub Release ─────────────────────────────────
+      - name: "🎉 Buat GitHub Release"
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: "D'Kost v${{ needs.build_release.outputs.version_name }}"
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') || contains(github.ref_name, 'rc') }}
+          body: |
+            ## 🏠 D'Kost v${{ needs.build_release.outputs.version_name }}
+
+            Aplikasi manajemen kost untuk penyewa — temukan kamar, bayar tagihan, dan kelola sewa dengan mudah.
+
+            ### 📋 Perubahan
+            ${{ steps.changelog.outputs.changes }}
+
+            ### 📱 Cara Install APK
+            1. Download file **APK** di bawah
+            2. Buka file APK di Android (aktifkan *Install dari sumber tidak dikenal*)
+            3. Ikuti petunjuk instalasi
+
+            > **AAB** digunakan untuk upload ke Google Play Store.
+
+            ---
+            🔐 Signed build: ${{ needs.build_release.outputs.has_keystore == 'true' && '✅ Ya (release keystore)' || '⚠️ Tidak (unsigned)' }}
+            🤖 Build otomatis oleh GitHub Actions | Run #${{ github.run_number }}
+          files: |
+            release-files/*.apk
+            release-files/*.aab
+
+      - name: "📢 Ringkasan Release"
+        run: |
+          echo "## 🎉 Release Berhasil Dibuat!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Info | Detail |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Versi | v${{ needs.build_release.outputs.version_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | #${{ needs.build_release.outputs.build_number }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tag | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Signed | ${{ needs.build_release.outputs.has_keystore }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Release URL | ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY

@@ -62,7 +62,7 @@ class _EditProfilPageState extends State<EditProfilPage> {
             const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
         onPressed: () async {
           final shouldPop = await _controller.onWillPop(context);
-          if (shouldPop && context.mounted) Navigator.pop(context);
+          if (shouldPop && mounted) Navigator.pop(context);
         },
       ),
       centerTitle: true,
@@ -155,7 +155,7 @@ class _EditProfilPageState extends State<EditProfilPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1BBA8A),
                 disabledBackgroundColor:
-                    const Color(0xFF1BBA8A).withOpacity(0.5),
+                    const Color(0xFF1BBA8A).withValues(alpha: 0.5),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),

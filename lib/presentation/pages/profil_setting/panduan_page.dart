@@ -85,7 +85,7 @@ class _PanduanPageState extends State<PanduanPage> {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child:
@@ -394,7 +394,7 @@ class _ChatBubble extends StatelessWidget {
               height: 32,
               margin: const EdgeInsets.only(left: 8, bottom: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFF1BBA8A).withOpacity(0.2),
+                color: const Color(0xFF1BBA8A).withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child:
@@ -467,7 +467,7 @@ class _TypingIndicatorState extends State<_TypingIndicator>
                 height: 8,
                 margin: const EdgeInsets.only(right: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1BBA8A).withOpacity(opacity),
+                  color: const Color(0xFF1BBA8A).withValues(alpha: opacity),
                   shape: BoxShape.circle,
                 ),
               );

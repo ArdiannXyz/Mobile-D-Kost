@@ -169,7 +169,7 @@
 //               margin: const EdgeInsets.fromLTRB(16, 0, 16, 14),
 //               height: 44,
 //               decoration: BoxDecoration(
-//                 color: Colors.white.withOpacity(0.15),
+//                 color: Colors.white.withValues(alpha: 0.15),
 //                 borderRadius: BorderRadius.circular(12),
 //               ),
 //               child: Row(
@@ -223,7 +223,7 @@
 //                   decoration: BoxDecoration(
 //                     color: isActive
 //                         ? const Color(0xFF1BBA8A)
-//                         : Colors.white.withOpacity(0.3),
+//                         : Colors.white.withValues(alpha: 0.3),
 //                     borderRadius: BorderRadius.circular(10),
 //                   ),
 //                   child: Text(
@@ -299,13 +299,13 @@
 //           borderRadius: BorderRadius.circular(14),
 //           border: Border.all(
 //             color: !item.sudahDibaca
-//                 ? const Color(0xFF1BBA8A).withOpacity(0.4)
+//                 ? const Color(0xFF1BBA8A).withValues(alpha: 0.4)
 //                 : const Color(0xFFE8E8E8),
 //             width: 1.2,
 //           ),
 //           boxShadow: [
 //             BoxShadow(
-//               color: Colors.black.withOpacity(0.04),
+//               color: Colors.black.withValues(alpha: 0.04),
 //               blurRadius: 8,
 //               offset: const Offset(0, 2),
 //             ),
@@ -319,7 +319,7 @@
 //               width: 42,
 //               height: 42,
 //               decoration: BoxDecoration(
-//                 color: const Color(0xFF1BBA8A).withOpacity(0.1),
+//                 color: const Color(0xFF1BBA8A).withValues(alpha: 0.1),
 //                 borderRadius: BorderRadius.circular(10),
 //               ),
 //               child: Icon(

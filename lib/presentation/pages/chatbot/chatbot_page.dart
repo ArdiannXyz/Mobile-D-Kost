@@ -115,7 +115,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -150,7 +150,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                     Text(
                       _controller.isTyping ? 'Sedang mengetik...' : 'Online',
                       style: TextStyle(
-                        color: const Color(0xFF1BBA8A).withOpacity(0.9),
+                        color: const Color(0xFF1BBA8A).withValues(alpha: 0.9),
                         fontSize: 12,
                       ),
                     ),
@@ -229,7 +229,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -275,7 +275,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
             style: TextStyle(
               fontSize: 10,
               color: isUser
-                  ? Colors.white.withOpacity(0.7)
+                  ? Colors.white.withValues(alpha: 0.7)
                   : const Color(0xFFB0B0C3),
             ),
           ),
@@ -289,12 +289,12 @@ class _ChatbotPageState extends State<ChatbotPage> {
       margin: const EdgeInsets.only(bottom: 4),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: isUser ? Colors.white.withOpacity(0.2) : const Color(0xFFF0FFF4),
+        color: isUser ? Colors.white.withValues(alpha: 0.2) : const Color(0xFFF0FFF4),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: isUser
-              ? Colors.white.withOpacity(0.3)
-              : const Color(0xFF1BBA8A).withOpacity(0.3),
+              ? Colors.white.withValues(alpha: 0.3)
+              : const Color(0xFF1BBA8A).withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -340,7 +340,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
           width: 7,
           height: 7,
           decoration: BoxDecoration(
-            color: const Color(0xFF1BBA8A).withOpacity(0.6),
+            color: const Color(0xFF1BBA8A).withValues(alpha: 0.6),
             shape: BoxShape.circle,
           ),
         );

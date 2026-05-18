@@ -163,7 +163,7 @@ class _SemuaReviewPageState extends State<SemuaReviewPage> {
 }
 
 class _ReviewCard extends StatelessWidget {
-  final review;
+  final dynamic review;
   const _ReviewCard({required this.review});
 
   @override
@@ -184,7 +184,7 @@ class _ReviewCard extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 20,
-            backgroundColor: const Color(0xFF1BBA8A).withOpacity(0.15),
+            backgroundColor: const Color(0xFF1BBA8A).withValues(alpha: 0.15),
             child: Text(
               review.namaUser.isNotEmpty
                   ? review.namaUser[0].toUpperCase()

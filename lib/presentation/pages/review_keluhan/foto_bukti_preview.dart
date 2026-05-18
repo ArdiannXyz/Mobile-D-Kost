@@ -105,7 +105,7 @@ class FotoBuktiPreview extends StatelessWidget {
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.55),
+                color: Colors.black.withValues(alpha: 0.55),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.close, color: Colors.white, size: 16),
@@ -124,7 +124,7 @@ class FotoBuktiPreview extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius:
                     const BorderRadius.vertical(bottom: Radius.circular(10)),
-                color: Colors.black.withOpacity(0.45),
+                color: Colors.black.withValues(alpha: 0.45),
               ),
               child: Text(
                 nama!,

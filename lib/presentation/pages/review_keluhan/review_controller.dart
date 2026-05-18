@@ -126,10 +126,12 @@ class TulisReviewController {
 
   String? validate() {
     if (selectedRating == 0) return 'Pilih rating bintang terlebih dahulu.';
-    if (komentarController.text.trim().isEmpty)
+    if (komentarController.text.trim().isEmpty) {
       return 'Komentar tidak boleh kosong.';
-    if (komentarController.text.trim().length < 5)
+    }
+    if (komentarController.text.trim().length < 5) {
       return 'Komentar minimal 5 karakter.';
+    }
     return null;
   }
 
@@ -296,8 +298,9 @@ class EditReviewController {
 
   String? validate() {
     if (selectedRating == 0) return 'Pilih rating bintang.';
-    if (komentarController.text.trim().isEmpty)
+    if (komentarController.text.trim().isEmpty) {
       return 'Komentar tidak boleh kosong.';
+    }
     return null;
   }
 

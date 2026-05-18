@@ -32,8 +32,12 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
 
   @override
   void dispose() {
-    for (final c in _digitControllers) c.dispose();
-    for (final f in _focusNodes) f.dispose();
+    for (final c in _digitControllers) {
+      c.dispose();
+    }
+    for (final f in _focusNodes) {
+      f.dispose();
+    }
     _controller.dispose();
     super.dispose();
   }

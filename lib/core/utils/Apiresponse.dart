@@ -1,3 +1,4 @@
+// ignore_for_file: file_names
 class ApiResponse<T> {
   final bool success;
   final T? data;

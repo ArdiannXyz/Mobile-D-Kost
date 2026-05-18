@@ -67,7 +67,6 @@ class PaymentService {
     } on ApiException {
       rethrow;
     } catch (e) {
-      if (e is ApiException) rethrow;
       throw ApiException(
         message: 'Gagal membuat pembayaran: ${e.toString()}',
         statusCode: 500,

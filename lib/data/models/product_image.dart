@@ -1,4 +1,4 @@
-import '../../Core/utils/parsing_utils.dart';
+// lib/data/models/product_image.dart
 
 class ProductImage {
   final int idFoto;

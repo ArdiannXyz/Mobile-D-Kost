@@ -6,7 +6,7 @@ import '../../../data/helper/api_exception.dart';
 import 'register_page.dart';
 import 'lupa_password_page.dart';
 import '../home/home_page.dart';
-import '../../../data/services/notifikasi_service.dart';
+
 import '../../../data/services/onesignal_setup.dart';
 
 class LoginController {
@@ -82,9 +82,10 @@ class LoginController {
           token: token,
         );
 
-        // 🔥 pakai token ke service lain
+        // Simpan session (sudah dilakukan di UserService.login)
+        // Token tersimpan di SharedPreferences, semua service
+        // mengambilnya otomatis via ApiHelper.authHeaders.
         MidtransService.setToken(token);
-        NotifikasiService.authToken = token;
         await OneSignalSetup
             .kirimPlayerIdKeBackend(); // ← kirim player ID ke backend
         debugPrint('Token dipakai: $token');

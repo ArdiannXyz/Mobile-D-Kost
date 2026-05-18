@@ -3,7 +3,6 @@
 // ============================================================
 
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -327,19 +326,23 @@ class KeluhanController {
   // ── Validasi lapor baru (butuh bookingAktif) ───────────────
   String? validate() {
     if (bookingAktif == null) return 'Pilih kamar terlebih dahulu.';
-    if (deskripsiController.text.trim().isEmpty)
+    if (deskripsiController.text.trim().isEmpty) {
       return 'Deskripsi keluhan tidak boleh kosong.';
-    if (deskripsiController.text.trim().length < 10)
+    }
+    if (deskripsiController.text.trim().length < 10) {
       return 'Deskripsi keluhan minimal 10 karakter.';
+    }
     return null;
   }
 
   // ── Validasi edit (tidak butuh bookingAktif) ───────────────
   String? validateEdit() {
-    if (deskripsiController.text.trim().isEmpty)
+    if (deskripsiController.text.trim().isEmpty) {
       return 'Deskripsi keluhan tidak boleh kosong.';
-    if (deskripsiController.text.trim().length < 10)
+    }
+    if (deskripsiController.text.trim().length < 10) {
       return 'Deskripsi keluhan minimal 10 karakter.';
+    }
     return null;
   }
 
@@ -508,8 +511,9 @@ class KeluhanController {
     } on ApiException catch (e) {
       if (context.mounted) _showErrorSnackbar(context, e.message);
     } catch (_) {
-      if (context.mounted)
+      if (context.mounted) {
         _showErrorSnackbar(context, 'Terjadi kesalahan. Coba lagi nanti.');
+      }
     } finally {
       isSubmitting = false;
       onStateChanged();

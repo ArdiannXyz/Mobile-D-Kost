@@ -91,6 +91,7 @@ class EditProfilController {
     try {
       final userId = await ApiHelper.getUserId();
       if (userId == null) {
+        if (!context.mounted) return;
         _showErrorSnackbar(
             context, 'Sesi tidak ditemukan. Silakan login ulang.');
         return;
@@ -135,7 +136,7 @@ class EditProfilController {
 
     if (result == 'batal') return true;
     if (result == 'simpan') {
-      await simpan(context);
+      if (context.mounted) await simpan(context);
       return false;
     }
     return false;

@@ -238,9 +238,9 @@ class KamarDetailController {
       final juta = (harga / 1000000).floor();
       final sisa = (harga % 1000000 / 1000).floor();
       if (sisa == 0) {
-        return 'Rp.${juta}.000.000';
+        return 'Rp.$juta.000.000';
       } else {
-        return 'Rp.${juta}.${sisa.toString().padLeft(3, '0')}.000';
+        return 'Rp.$juta.${sisa.toString().padLeft(3, "0")}.000';
       }
     } else if (harga >= 1000) {
       return 'Rp.${(harga / 1000).toStringAsFixed(0)}.000';

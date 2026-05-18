@@ -9,9 +9,11 @@ import 'package:flutter/services.dart';
 import '../../../main.dart'; // ✅ Import routeObserver
 
 // ── GlobalKey untuk akses refresh dari luar ──────────────────
+// ignore: library_private_types_in_public_api
 final GlobalKey<_KeluhanListPageRefreshState> keluhanRefreshKey =
     GlobalKey<_KeluhanListPageRefreshState>();
 
+// ignore: library_private_types_in_public_api
 final GlobalKey<_TagihanPageRefreshState> tagihanRefreshKey =
     GlobalKey<_TagihanPageRefreshState>();
 

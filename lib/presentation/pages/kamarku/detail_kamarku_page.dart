@@ -1,5 +1,5 @@
 // ============================================================
-// FILE: lib/presentation/pages/kamarku/booking_pages.dart
+// FILE: lib/presentation/pages/kamarku/detail_kamarku_page.dart
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -403,9 +403,9 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: color.withOpacity(0.4)),
+                  border: Border.all(color: color.withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   isLunas ? 'Lunas' : 'Belum Bayar',
@@ -434,7 +434,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
           ),
 
           // ── Jatuh tempo ──────────────────────────────────
-          if (tagihan.tglJatuhTempo != null) ...[
+          ...[
             const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -442,7 +442,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
                 const Text('Jatuh Tempo',
                     style: TextStyle(fontSize: 13, color: Color(0xFF555555))),
                 Text(
-                  _controller.formatTanggal(tagihan.tglJatuhTempo!),
+                  _controller.formatTanggal(tagihan.tglJatuhTempo),
                   style:
                       const TextStyle(fontSize: 13, color: Color(0xFF1A1A2E)),
                 ),
@@ -903,7 +903,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1BBA8A),
                 disabledBackgroundColor:
-                    const Color(0xFF1BBA8A).withOpacity(0.5),
+                    const Color(0xFF1BBA8A).withValues(alpha: 0.5),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
@@ -1259,7 +1259,7 @@ class _PilihMetodeSheetState extends State<_PilihMetodeSheet> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF2ECC71),
                     disabledBackgroundColor:
-                        const Color(0xFF1BBA8A).withOpacity(0.5),
+                        const Color(0xFF1BBA8A).withValues(alpha: 0.5),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),

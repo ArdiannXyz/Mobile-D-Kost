@@ -257,7 +257,7 @@ class _TulisReviewPageState extends State<TulisReviewPage> {
               : () => _controller.submit(context),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF1BBA8A),
-            disabledBackgroundColor: const Color(0xFF1BBA8A).withOpacity(0.5),
+            disabledBackgroundColor: const Color(0xFF1BBA8A).withValues(alpha: 0.5),
             foregroundColor: Colors.white,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

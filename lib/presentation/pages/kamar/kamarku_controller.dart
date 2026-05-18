@@ -32,15 +32,15 @@ class KamarkuController {
       bookings = await BookingService.getBookingAktif(userId);
 
       // ── DEBUG ──────────────────────────────────────────────
-      print('=== KAMARKU DEBUG ===');
-      print('Total bookings: ${bookings.length}');
+      debugPrint('=== KAMARKU DEBUG ===');
+      debugPrint('Total bookings: ${bookings.length}');
       for (var b in bookings) {
-        print('ID: ${b.idBooking}');
-        print('fotoKamar: ${b.fotoKamar}');
-        print('nomorKamar: ${b.nomorKamar}');
-        print('tipeKamar: ${b.tipeKamar}');
+        debugPrint('ID: ${b.idBooking}');
+        debugPrint('fotoKamar: ${b.fotoKamar}');
+        debugPrint('nomorKamar: ${b.nomorKamar}');
+        debugPrint('tipeKamar: ${b.tipeKamar}');
       }
-      print('=====================');
+      debugPrint('=====================');
       // ── END DEBUG ──────────────────────────────────────────
     } on ApiException catch (e) {
       errorMessage = e.message;

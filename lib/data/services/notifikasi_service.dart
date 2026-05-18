@@ -1,27 +1,23 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import '../../../data/helper/api_constants.dart';
+import '../helper/api_constants.dart';
+import '../helper/api_helper.dart';
 import '../models/notifikasi_model.dart';
 
 class NotifikasiService {
-  // ── authToken diisi dari LoginController setelah login ────
-  // Sama persis dengan pola NotifikasiApiService.authToken = token
-  static String authToken = '';
-
-  // ── Header standar dengan Sanctum token ──────────────────
-  static Map<String, String> get _headers => {
-        'Authorization': 'Bearer $authToken',
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
+  // ── Header diambil dari ApiHelper (SharedPreferences) ───
+  // Tidak perlu static authToken lagi — token selalu sinkron
+  // dengan sesi yang aktif dan otomatis ter-reset saat logout.
+  static Future<Map<String, String>> get _headers => ApiHelper.authHeaders;
 
   // ── GET /api/notifikasi ───────────────────────────────────
   static Future<Map<String, dynamic>> getNotifikasi() async {
     try {
+      final headers = await _headers;
       final response = await http.get(
         Uri.parse(ApiConstants.notifikasiList),
-        headers: _headers,
+        headers: headers,
       );
 
       final body = jsonDecode(response.body);
@@ -48,9 +44,10 @@ class NotifikasiService {
   // ── POST /api/notifikasi/{id}/baca ────────────────────────
   static Future<bool> tandaiBaca(int id) async {
     try {
+      final headers = await _headers;
       final response = await http.post(
         Uri.parse(ApiConstants.notifikasiBaca(id)),
-        headers: _headers,
+        headers: headers,
       );
       return response.statusCode == 200;
     } catch (e) {
@@ -62,9 +59,10 @@ class NotifikasiService {
   // ── POST /api/notifikasi/baca-semua ──────────────────────
   static Future<bool> tandaiSemuaBaca() async {
     try {
+      final headers = await _headers;
       final response = await http.post(
         Uri.parse(ApiConstants.notifikasiBacaSemua),
-        headers: _headers,
+        headers: headers,
       );
       return response.statusCode == 200;
     } catch (e) {
@@ -76,9 +74,10 @@ class NotifikasiService {
   // ── POST /api/onesignal-player-id ─────────────────────────
   static Future<bool> simpanPlayerId(String playerId) async {
     try {
+      final headers = await _headers;
       final response = await http.post(
         Uri.parse(ApiConstants.oneSignalPlayerId),
-        headers: _headers,
+        headers: headers,
         body: jsonEncode({'player_id': playerId}),
       );
       debugPrint('simpanPlayerId status: ${response.statusCode}');

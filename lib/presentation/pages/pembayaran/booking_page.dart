@@ -532,7 +532,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1BBA8A),
                 disabledBackgroundColor:
-                    const Color(0xFF1BBA8A).withOpacity(0.5),
+                    const Color(0xFF1BBA8A).withValues(alpha: 0.5),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14)),
@@ -559,7 +559,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
