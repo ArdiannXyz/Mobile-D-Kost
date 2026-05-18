@@ -1,69 +1,94 @@
-# name: Flutter CI
+name: Flutter CI - Kost-Kosan App
 
-# on:
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
 
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
+jobs:
+  # ─────────────────────────────────────────────
+  # JOB 1: Code Quality Check (Lint & Format)
+  # ─────────────────────────────────────────────
+  code_quality:
+    name: 🔍 Code Quality Check
+    runs-on: ubuntu-latest
 
-#     steps:
-#       # Step 1: Checkout repository
-#       - uses: actions/checkout@v4
-#         with:
-#           token: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
 
-#       # Step 2: Setup Flutter SDK
-#       - uses: subosito/flutter-action@v2
-#         with:
-#           flutter-version: '3.29.1'
+      - name: ☕ Setup Java (required for Flutter)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
 
-#       # Step 3: Cache Flutter dependencies
-#       - name: Cache Flutter dependencies
-#         uses: actions/cache@v3
-#         with:
-#           path: |
-#             ~/.pub-cache
-#           key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-#           restore-keys: |
-#             ${{ runner.os }}-pub-
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.41.4" # Ganti sesuai versi Flutter project kamu
+          channel: "stable"
+          cache: true
 
-#       # Step 4: Install dependencies
-#       - name: Install dependencies
-#         run: flutter pub get
+      - name: 📦 Install dependencies
+        run: flutter pub get
 
-#       # Step 5: Check Dart version
-#       - name: Check Dart version
-#         run: dart --version
+      - name: 🎨 Check code formatting
+        run: dart format --output=none --set-exit-if-changed .
 
-#       # ✅ Step 6: Format code and auto-commit
-#       - name: Format code and auto-commit
-#         run: |
-#           flutter pub global activate dart_style || true
-#           flutter pub global run dart_style:format .
-#           git config user.name "github-actions[bot]"
-#           git config user.email "github-actions[bot]@users.noreply.github.com"
-#           git add .
-#           git diff --cached --quiet || (git commit -m "chore: auto-format code via CI" && git push || true)
+      - name: 🔎 Run Flutter Analyze (lint)
+        run: flutter analyze --no-fatal-infos
 
-#       # Step 7: Analyze code
-#       - name: Analyze code
-#         run: flutter analyze || true
+  # ─────────────────────────────────────────────
+  # JOB 2: Build & Test
+  # ─────────────────────────────────────────────
+  build_and_test:
+    name: 🏗️ Build & Test
+    runs-on: ubuntu-latest
+    needs: code_quality # Hanya jalan kalau code_quality lolos
 
-#       # Step 8: Run tests
-#       - name: Run tests
-#         run: flutter test
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
 
-#       # # Step 9: Build APK (optional, uncomment if needed)
-#       # - name: Build APK
-#       #   run: flutter build apk --release
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
 
-#       # # Step 10: Upload APK (optional, uncomment if needed)
-#       # - name: Upload APK
-#       #   uses: actions/upload-artifact@v3
-#       #   with:
-#       #     name: release-apk
-#       #     path: build/app/outputs/flutter-apk/app-release.apk
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0" # Ganti sesuai versi Flutter project kamu
+          channel: "stable"
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🧪 Run unit tests
+        run: flutter test --coverage
+
+      - name: 📊 Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/lcov.info
+          retention-days: 7
+
+      - name: 🏗️ Build APK (debug)
+        run: flutter build apk --debug
+
+      - name: 📤 Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kost-app-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7
