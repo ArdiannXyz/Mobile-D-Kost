@@ -289,7 +289,9 @@ class _ChatbotPageState extends State<ChatbotPage> {
       margin: const EdgeInsets.only(bottom: 4),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: isUser ? Colors.white.withValues(alpha: 0.2) : const Color(0xFFF0FFF4),
+        color: isUser
+            ? Colors.white.withValues(alpha: 0.2)
+            : const Color(0xFFF0FFF4),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: isUser

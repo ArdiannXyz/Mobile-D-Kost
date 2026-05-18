@@ -160,7 +160,8 @@ class BookingService {
   static Future<Map<String, dynamic>> batalBooking(int id) async {
     final headers = await ApiHelper.authHeaders;
     final response = await http.put(
-      Uri.parse('${ApiConstants.baseUrl}booking/$id/batal'), // endpoint batal belum di ApiConstants
+      Uri.parse(
+          '${ApiConstants.baseUrl}booking/$id/batal'), // endpoint batal belum di ApiConstants
       headers: headers,
     );
 
@@ -188,7 +189,8 @@ class BookingService {
         .toList();
 
     final response = await http.post(
-      Uri.parse('${ApiConstants.baseUrl}booking/$idBooking/furnitur'), // endpoint furnitur belum di ApiConstants
+      Uri.parse(
+          '${ApiConstants.baseUrl}booking/$idBooking/furnitur'), // endpoint furnitur belum di ApiConstants
       headers: headers,
       body: jsonEncode({'furnitur': furniturList}),
     );
@@ -210,7 +212,8 @@ class BookingService {
   static Future<Map<String, dynamic>> akhiriSewa(int idBooking) async {
     final headers = await ApiHelper.authHeaders;
     final response = await http.post(
-      Uri.parse('${ApiConstants.baseUrl}booking/$idBooking/selesai'), // endpoint selesai belum di ApiConstants
+      Uri.parse(
+          '${ApiConstants.baseUrl}booking/$idBooking/selesai'), // endpoint selesai belum di ApiConstants
       headers: headers,
     );
 
