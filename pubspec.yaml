@@ -86,7 +86,7 @@ flutter:
     - assets/images/logout.png                # Icon logout
     - assets/images/launcher.png
     - assets/images/guidebook.png 
-    - assets/images/notifikasi.png     
+    # - assets/images/notifikasi.png     
 
 # ── Splash Screen ───────────────────────────────────────────────
 flutter_native_splash:
