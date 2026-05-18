@@ -36,14 +36,13 @@ class _KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
 
   @override
   void dispose() {
-    routeObserver.unsubscribe(this); 
+    routeObserver.unsubscribe(this);
     super.dispose();
   }
 
-  
   @override
   void didPopNext() {
-    _controller.loadKeluhanList();// refresh saat kembali ke halaman ini
+    _controller.loadKeluhanList(); // refresh saat kembali ke halaman ini
   }
 
   @override
@@ -66,8 +65,7 @@ class _KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
           width: double.infinity,
           decoration: const BoxDecoration(
             color: Color(0xFF1BBA8A),
-            borderRadius: BorderRadius.only(
-            ),
+            borderRadius: BorderRadius.only(),
             boxShadow: [
               BoxShadow(
                 color: Color(0x222ECC71),
@@ -112,8 +110,8 @@ class _KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
               GestureDetector(
                 onTap: () => _controller.goToLaporKeluhan(context),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1BBA8A),
                     borderRadius: BorderRadius.circular(11),
@@ -138,7 +136,8 @@ class _KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
 
   Widget _buildContent() {
     if (_controller.isLoadingList) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFF1BBA8A)));
+      return const Center(
+          child: CircularProgressIndicator(color: Color(0xFF1BBA8A)));
     }
     if (_controller.errorList != null) {
       return Center(
@@ -147,16 +146,19 @@ class _KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.wifi_off_rounded, size: 56, color: Color(0xFFB0B0C3)),
+              const Icon(Icons.wifi_off_rounded,
+                  size: 56, color: Color(0xFFB0B0C3)),
               const SizedBox(height: 12),
-              Text(_controller.errorList!, style: const TextStyle(color: Color(0xFF9E9E9E))),
+              Text(_controller.errorList!,
+                  style: const TextStyle(color: Color(0xFF9E9E9E))),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _controller.loadKeluhanList,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1BBA8A),
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                 ),
                 child: const Text('Coba Lagi'),
               ),
@@ -170,16 +172,25 @@ class _KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.hourglass_empty, size: 64, color: Color(0xFFB0B0C3)),
+            const Icon(Icons.hourglass_empty,
+                size: 64, color: Color(0xFFB0B0C3)),
             const SizedBox(height: 14),
-            const Text('Belum ada keluhan', style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 14)),
+            const Text('Belum ada keluhan',
+                style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 14)),
             const SizedBox(height: 16),
             GestureDetector(
               onTap: () => _controller.goToLaporKeluhan(context),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(color: const Color(0xFF1BBA8A), borderRadius: BorderRadius.circular(20)),
-                child: const Text('Lapor Sekarang', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
+                    color: const Color(0xFF1BBA8A),
+                    borderRadius: BorderRadius.circular(20)),
+                child: const Text('Lapor Sekarang',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600)),
               ),
             ),
           ],
@@ -198,7 +209,8 @@ class _KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
             keluhan: keluhan,
             statusLabel: _controller.statusLabel(keluhan.statusKeluhan),
             statusColor: _controller.statusColor(keluhan.statusKeluhan),
-            onTap: () => _controller.showEditDialog(context, keluhan), // ← tambah
+            onTap: () =>
+                _controller.showEditDialog(context, keluhan), // ← tambah
           );
         },
       ),
@@ -229,7 +241,10 @@ class _KeluhanCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
-          boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 8, offset: Offset(0, 2))],
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x0A000000), blurRadius: 8, offset: Offset(0, 2))
+          ],
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,20 +260,32 @@ class _KeluhanCard extends StatelessWidget {
                 children: [
                   Text(
                     keluhan.deskripsiMasalah,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E)),
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1A1A2E)),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Tanggal Lapor : ${_formatTanggal(keluhan.tglLapor)}',
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
+                    style:
+                        const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Text('Status : ', style: TextStyle(fontSize: 12, color: Color(0xFF555555), fontWeight: FontWeight.w500)),
-                      Text(statusLabel, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: statusColor)),
+                      const Text('Status : ',
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF555555),
+                              fontWeight: FontWeight.w500)),
+                      Text(statusLabel,
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: statusColor)),
                     ],
                   ),
                 ],
@@ -278,14 +305,20 @@ class _KeluhanCard extends StatelessWidget {
       try {
         final base64Str = foto.split(',').last;
         final bytes = base64Decode(base64Str);
-        return Image.memory(bytes, width: 80, height: 80, fit: BoxFit.cover,
+        return Image.memory(bytes,
+            width: 80,
+            height: 80,
+            fit: BoxFit.cover,
             errorBuilder: (_, __, ___) => _placeholder());
       } catch (_) {
         return _placeholder();
       }
     }
 
-    return Image.network(foto, width: 80, height: 80, fit: BoxFit.cover,
+    return Image.network(foto,
+        width: 80,
+        height: 80,
+        fit: BoxFit.cover,
         errorBuilder: (_, __, ___) => _placeholder());
   }
 
@@ -294,14 +327,15 @@ class _KeluhanCard extends StatelessWidget {
       width: 80,
       height: 80,
       color: const Color(0xFFE8F5E9),
-      child: const Icon(Icons.image_outlined, color: Color(0xFF1BBA8A), size: 28),
+      child:
+          const Icon(Icons.image_outlined, color: Color(0xFF1BBA8A), size: 28),
     );
   }
 
   String _formatTanggal(String raw) {
     try {
       final dt = DateTime.parse(raw.replaceAll(' ', 'T'));
-      return '${dt.day.toString().padLeft(2,'0')} - ${dt.month.toString().padLeft(2,'0')} - ${dt.year}';
+      return '${dt.day.toString().padLeft(2, '0')} - ${dt.month.toString().padLeft(2, '0')} - ${dt.year}';
     } catch (_) {
       return raw;
     }

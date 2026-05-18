@@ -60,8 +60,7 @@ class PanduanController {
   void init() {
     _addBotMessage(
       'Halo! Saya asisten D\'Kost yang siap membantu Anda.',
-      content:
-          'Anda bisa bertanya tentang:\n\n'
+      content: 'Anda bisa bertanya tentang:\n\n'
           '• Cara booking kamar\n'
           '• Cara cek & bayar tagihan\n'
           '• Cara lapor keluhan\n'
@@ -98,8 +97,10 @@ class PanduanController {
   // ── Generate Respons Bot (lokal, tanpa API) ────────────────
   Map<String, dynamic> _generateResponse(String query) {
     // Booking kamar
-    if (query.contains('booking') || query.contains('pesan') ||
-        query.contains('kamar') || query.contains('sewa')) {
+    if (query.contains('booking') ||
+        query.contains('pesan') ||
+        query.contains('kamar') ||
+        query.contains('sewa')) {
       return {
         'text': 'Berikut cara memesan kamar di D\'Kost:',
         'steps': [
@@ -114,8 +115,10 @@ class PanduanController {
     }
 
     // Tagihan & pembayaran
-    if (query.contains('tagihan') || query.contains('bayar') ||
-        query.contains('pembayaran') || query.contains('cicil')) {
+    if (query.contains('tagihan') ||
+        query.contains('bayar') ||
+        query.contains('pembayaran') ||
+        query.contains('cicil')) {
       return {
         'text': 'Informasi tagihan dan pembayaran D\'Kost:',
         'steps': [
@@ -130,8 +133,10 @@ class PanduanController {
     }
 
     // Keluhan
-    if (query.contains('keluhan') || query.contains('lapor') ||
-        query.contains('masalah') || query.contains('rusak')) {
+    if (query.contains('keluhan') ||
+        query.contains('lapor') ||
+        query.contains('masalah') ||
+        query.contains('rusak')) {
       return {
         'text': 'Cara melaporkan keluhan di D\'Kost:',
         'steps': [
@@ -147,9 +152,12 @@ class PanduanController {
     }
 
     // Furnitur
-    if (query.contains('furnitur') || query.contains('furniture') ||
-        query.contains('tambah') || query.contains('lemari') ||
-        query.contains('kasur') || query.contains('meja')) {
+    if (query.contains('furnitur') ||
+        query.contains('furniture') ||
+        query.contains('tambah') ||
+        query.contains('lemari') ||
+        query.contains('kasur') ||
+        query.contains('meja')) {
       return {
         'text': 'Informasi furnitur tambahan D\'Kost:',
         'steps': [
@@ -164,9 +172,12 @@ class PanduanController {
     }
 
     // Kontak
-    if (query.contains('kontak') || query.contains('hubungi') ||
-        query.contains('nomor') || query.contains('telpon') ||
-        query.contains('admin') || query.contains('cs')) {
+    if (query.contains('kontak') ||
+        query.contains('hubungi') ||
+        query.contains('nomor') ||
+        query.contains('telpon') ||
+        query.contains('admin') ||
+        query.contains('cs')) {
       return {
         'text': 'Informasi kontak D\'Kost:',
         'contacts': [
@@ -187,28 +198,31 @@ class PanduanController {
     }
 
     // Tentang D'Kost
-    if (query.contains('tentang') || query.contains('dkost') ||
-        query.contains('aplikasi') || query.contains('info')) {
+    if (query.contains('tentang') ||
+        query.contains('dkost') ||
+        query.contains('aplikasi') ||
+        query.contains('info')) {
       return {
         'text': 'Tentang D\'Kost',
         'content':
             'D\'Kost adalah aplikasi manajemen kost digital yang memudahkan penyewa dalam:\n\n'
-            '• Mencari dan memesan kamar kost\n'
-            '• Mengelola tagihan bulanan\n'
-            '• Melaporkan keluhan fasilitas\n'
-            '• Memberikan ulasan kamar\n\n'
-            'Versi: 1.0.0\n'
-            'Dikembangkan untuk kemudahan penyewa kost.',
+                '• Mencari dan memesan kamar kost\n'
+                '• Mengelola tagihan bulanan\n'
+                '• Melaporkan keluhan fasilitas\n'
+                '• Memberikan ulasan kamar\n\n'
+                'Versi: 1.0.0\n'
+                'Dikembangkan untuk kemudahan penyewa kost.',
       };
     }
 
     // Menu / help
-    if (query.contains('menu') || query.contains('help') ||
-        query.contains('bantuan') || query.contains('panduan')) {
+    if (query.contains('menu') ||
+        query.contains('help') ||
+        query.contains('bantuan') ||
+        query.contains('panduan')) {
       return {
         'text': 'Pilih topik yang ingin Anda ketahui:',
-        'content':
-            '• booking  — Cara memesan kamar\n'
+        'content': '• booking  — Cara memesan kamar\n'
             '• tagihan  — Cara cek & bayar tagihan\n'
             '• keluhan  — Cara lapor masalah\n'
             '• furnitur — Info furnitur tambahan\n'
@@ -221,7 +235,7 @@ class PanduanController {
     return {
       'text':
           'Maaf, saya belum mengerti pertanyaan Anda. Silakan ketik salah satu topik: '
-          'booking, tagihan, keluhan, furnitur, kontak, atau tentang.',
+              'booking, tagihan, keluhan, furnitur, kontak, atau tentang.',
     };
   }
 

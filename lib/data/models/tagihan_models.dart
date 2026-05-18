@@ -57,8 +57,8 @@ class TagihanModel {
   TagihanModel({
     required this.idTagihan,
     required this.idBooking,
-    this.namaKamar, 
-    this.fotoKamar, 
+    this.namaKamar,
+    this.fotoKamar,
     required this.periodeAwal,
     required this.periodeAkhir,
     required this.periodeBulan,

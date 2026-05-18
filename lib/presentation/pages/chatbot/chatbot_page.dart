@@ -17,7 +17,7 @@ class ChatbotPage extends StatefulWidget {
 
 class _ChatbotPageState extends State<ChatbotPage> {
   late final ChatbotController _controller;
-  final _textController   = TextEditingController();
+  final _textController = TextEditingController();
   final _scrollController = ScrollController();
 
   @override
@@ -56,26 +56,25 @@ class _ChatbotPageState extends State<ChatbotPage> {
     );
   }
 
-Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
-  return GridView.count(
-    crossAxisCount: 2,        // ← 2 kolom
-    crossAxisSpacing: 8,
-    mainAxisSpacing: 8,
-    childAspectRatio: 0.60,   // ← sesuaikan tinggi card
-    shrinkWrap: true,          // ← penting! biar muat di dalam Column
-    physics: const NeverScrollableScrollPhysics(), // ← scroll dari ListView parent
-    children: kamarList.map((item) {
-      final kamar = KamarModel.fromJson(item);
-      return KamarCard(
-        kamar: kamar,
-        mode:  KamarCardMode.grid,
-        onTap: () => _controller.goToKamarDetail(context, kamar.idKamar),
-      );
-    }).toList(),
-  );
-}
-
-
+  Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
+    return GridView.count(
+      crossAxisCount: 2, // ← 2 kolom
+      crossAxisSpacing: 8,
+      mainAxisSpacing: 8,
+      childAspectRatio: 0.60, // ← sesuaikan tinggi card
+      shrinkWrap: true, // ← penting! biar muat di dalam Column
+      physics:
+          const NeverScrollableScrollPhysics(), // ← scroll dari ListView parent
+      children: kamarList.map((item) {
+        final kamar = KamarModel.fromJson(item);
+        return KamarCard(
+          kamar: kamar,
+          mode: KamarCardMode.grid,
+          onTap: () => _controller.goToKamarDetail(context, kamar.idKamar),
+        );
+      }).toList(),
+    );
+  }
 
   // ── Header ─────────────────────────────────────────────────
   Widget _buildHeader() {
@@ -84,15 +83,15 @@ Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
       decoration: const BoxDecoration(
         color: Color(0xFFFFFFFF),
         borderRadius: BorderRadius.only(
-          bottomLeft:  Radius.circular(18),
+          bottomLeft: Radius.circular(18),
           bottomRight: Radius.circular(18),
         ),
       ),
       padding: EdgeInsets.only(
-        top:    MediaQuery.of(context).padding.top + 12,
+        top: MediaQuery.of(context).padding.top + 12,
         bottom: 16,
-        left:   16,
-        right:  16,
+        left: 16,
+        right: 16,
       ),
       child: Row(
         children: [
@@ -174,9 +173,9 @@ Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
     }
 
     return ListView.builder(
-      controller:  _scrollController,
-      padding:     const EdgeInsets.fromLTRB(16, 12, 16, 8),
-      itemCount:   _controller.messages.length,
+      controller: _scrollController,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      itemCount: _controller.messages.length,
       itemBuilder: (context, index) {
         return _buildBubble(_controller.messages[index]);
       },
@@ -219,14 +218,13 @@ Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.72,
               ),
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                 color: isUser ? const Color(0xFF1BBA8A) : Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft:     const Radius.circular(16),
-                  topRight:    const Radius.circular(16),
-                  bottomLeft:  Radius.circular(isUser ? 16 : 4),
+                  topLeft: const Radius.circular(16),
+                  topRight: const Radius.circular(16),
+                  bottomLeft: Radius.circular(isUser ? 16 : 4),
                   bottomRight: Radius.circular(isUser ? 4 : 16),
                 ),
                 boxShadow: [
@@ -265,12 +263,10 @@ Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
           const SizedBox(height: 1),
           ...msg.dataList!.map((item) => _buildDataItem(item, isUser)),
         ],
-
-         if (msg.kamarList != null && msg.kamarList!.isNotEmpty) ...[
-        const SizedBox(height: 1),
-        _buildKamarCards(msg.kamarList!),
-         ],
-
+        if (msg.kamarList != null && msg.kamarList!.isNotEmpty) ...[
+          const SizedBox(height: 1),
+          _buildKamarCards(msg.kamarList!),
+        ],
         const SizedBox(height: 4),
         Align(
           alignment: Alignment.bottomRight,
@@ -293,9 +289,7 @@ Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
       margin: const EdgeInsets.only(bottom: 4),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: isUser
-            ? Colors.white.withOpacity(0.2)
-            : const Color(0xFFF0FFF4),
+        color: isUser ? Colors.white.withOpacity(0.2) : const Color(0xFFF0FFF4),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: isUser
@@ -321,16 +315,16 @@ Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
 
   String _formatKey(String key) {
     const map = {
-      'nomor'     : '🏠 Kamar',
-      'tipe'      : '📋 Tipe',
-      'harga'     : '💰 Harga',
-      'fasilitas' : '✨ Fasilitas',
-      'rating'    : '⭐ Rating',
-      'komentar'  : '💬 Komentar',
-      'tanggal'   : '📅 Tanggal',
-      'nama'      : '🛋️ Nama',
-      'jumlah'    : '📦 Jumlah',
-      'biaya'     : '💵 Biaya',
+      'nomor': '🏠 Kamar',
+      'tipe': '📋 Tipe',
+      'harga': '💰 Harga',
+      'fasilitas': '✨ Fasilitas',
+      'rating': '⭐ Rating',
+      'komentar': '💬 Komentar',
+      'tanggal': '📅 Tanggal',
+      'nama': '🛋️ Nama',
+      'jumlah': '📦 Jumlah',
+      'biaya': '💵 Biaya',
     };
     return map[key] ?? key;
   }
@@ -396,7 +390,9 @@ Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
     return Container(
       color: Colors.white,
       padding: EdgeInsets.fromLTRB(
-        16, 8, 16,
+        16,
+        8,
+        16,
         MediaQuery.of(context).padding.bottom + 12,
       ),
       child: Row(
@@ -409,18 +405,20 @@ Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
                 border: Border.all(color: const Color(0xFFE8E8E8)),
               ),
               child: TextField(
-                controller:  _textController,
-                enabled:     !_controller.isTyping,
-                maxLength:   500,
-                buildCounter: (_, {required currentLength,
-                    required isFocused, maxLength}) => null,
+                controller: _textController,
+                enabled: !_controller.isTyping,
+                maxLength: 500,
+                buildCounter: (_,
+                        {required currentLength,
+                        required isFocused,
+                        maxLength}) =>
+                    null,
                 decoration: const InputDecoration(
-                  hintText:       'Tulis Pesan....',
-                  hintStyle:      TextStyle(
-                      color: Color(0xFFB0B0C3), fontSize: 14),
-                  border:         InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                      horizontal: 18, vertical: 12),
+                  hintText: 'Tulis Pesan....',
+                  hintStyle: TextStyle(color: Color(0xFFB0B0C3), fontSize: 14),
+                  border: InputBorder.none,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                 ),
                 onSubmitted: (_) => _sendMessage(_textController.text),
               ),
@@ -434,8 +432,8 @@ Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
                 ? null
                 : () => _sendMessage(_textController.text),
             child: Icon(
-               //Icons.send_rounded,  // ← icon send saja, tidak pakai Container
-              Icons.send, 
+              //Icons.send_rounded,  // ← icon send saja, tidak pakai Container
+              Icons.send,
               color: _controller.isTyping
                   ? const Color(0xFFB0B0C3)
                   : const Color(0xFF1BBA8A),
@@ -460,7 +458,7 @@ Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 300),
-          curve:    Curves.easeOut,
+          curve: Curves.easeOut,
         );
       }
     });

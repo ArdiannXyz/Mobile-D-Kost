@@ -28,7 +28,8 @@ class UserService {
     } on ApiException {
       rethrow;
     } catch (e) {
-      throw ApiException(message: 'Gagal mengambil data user.', statusCode: 500);
+      throw ApiException(
+          message: 'Gagal mengambil data user.', statusCode: 500);
     }
   }
 
@@ -46,7 +47,7 @@ class UserService {
         Uri.parse(ApiConstants.updateUser(id)),
         headers: headers,
         body: jsonEncode({
-          'nama' : nama,
+          'nama': nama,
           'email': email,
           'no_hp': noHp,
           if (alamat != null) 'alamat': alamat,
@@ -57,7 +58,8 @@ class UserService {
     } on ApiException {
       rethrow;
     } catch (e) {
-      throw ApiException(message: 'Gagal memperbarui data user.', statusCode: 500);
+      throw ApiException(
+          message: 'Gagal memperbarui data user.', statusCode: 500);
     }
   }
 
@@ -76,11 +78,11 @@ class UserService {
         Uri.parse(ApiConstants.register),
         headers: ApiHelper.publicHeaders,
         body: jsonEncode({
-          'nama'    : nama,
-          'email'   : email,
-          'no_hp'   : noHp,
+          'nama': nama,
+          'email': email,
+          'no_hp': noHp,
           'password': password,
-          'role'    : 'penyewa',
+          'role': 'penyewa',
           if (alamat != null && alamat.isNotEmpty) 'alamat': alamat,
         }),
       );
@@ -88,7 +90,8 @@ class UserService {
     } on ApiException {
       rethrow;
     } catch (e) {
-      throw ApiException(message: 'Registrasi gagal. Coba lagi nanti.', statusCode: 500);
+      throw ApiException(
+          message: 'Registrasi gagal. Coba lagi nanti.', statusCode: 500);
     }
   }
 
@@ -109,7 +112,8 @@ class UserService {
     } on ApiException {
       rethrow;
     } catch (e) {
-      throw ApiException(message: 'Verifikasi email gagal. Coba lagi.', statusCode: 500);
+      throw ApiException(
+          message: 'Verifikasi email gagal. Coba lagi.', statusCode: 500);
     }
   }
 
@@ -128,15 +132,16 @@ class UserService {
       if (data['error'] == false && data['user'] != null) {
         await ApiHelper.saveSession(
           userId: data['user']['id_user'],
-          role  : data['user']['role'],
-          token : data['token'] ?? '',
+          role: data['user']['role'],
+          token: data['token'] ?? '',
         );
       }
       return data;
     } on ApiException {
       rethrow;
     } catch (e) {
-      throw ApiException(message: 'Login gagal. Coba lagi nanti.', statusCode: 500);
+      throw ApiException(
+          message: 'Login gagal. Coba lagi nanti.', statusCode: 500);
     }
   }
 
@@ -179,8 +184,8 @@ class UserService {
       if (data['error'] == false && data['user'] != null) {
         await ApiHelper.saveSession(
           userId: data['user']['id_user'],
-          role  : data['user']['role'],
-          token : data['token'] ?? '',
+          role: data['user']['role'],
+          token: data['token'] ?? '',
         );
       }
 
@@ -214,7 +219,7 @@ class UserService {
     } catch (_) {
       // Tetap clear session meskipun request gagal
     } finally {
-      await signOutGoogle();          // ← baru: clear Google session
+      await signOutGoogle(); // ← baru: clear Google session
       await ApiHelper.clearSession(); // clear Sanctum token & prefs
     }
   }
@@ -232,7 +237,8 @@ class UserService {
       rethrow;
     } catch (e) {
       throw ApiException(
-          message: 'Gagal mengirim permintaan reset password.', statusCode: 500);
+          message: 'Gagal mengirim permintaan reset password.',
+          statusCode: 500);
     }
   }
 
@@ -254,22 +260,24 @@ class UserService {
       throw ApiException(message: 'Verifikasi OTP gagal.', statusCode: 500);
     }
   }
-static Future<Map<String, dynamic>> resendOtpRegister({
-  required String email,
-}) async {
-  try {
-    final response = await http.post(
-      Uri.parse(ApiConstants.resendOtpRegister),
-      headers: ApiHelper.publicHeaders,
-      body: jsonEncode({'email': email}),
-    );
-    return ApiHelper.handleResponse(response);
-  } on ApiException {
-    rethrow;
-  } catch (e) {
-    throw ApiException(message: 'Gagal mengirim ulang OTP.', statusCode: 500);
+
+  static Future<Map<String, dynamic>> resendOtpRegister({
+    required String email,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.resendOtpRegister),
+        headers: ApiHelper.publicHeaders,
+        body: jsonEncode({'email': email}),
+      );
+      return ApiHelper.handleResponse(response);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException(message: 'Gagal mengirim ulang OTP.', statusCode: 500);
+    }
   }
-}
+
   // ── POST: Ganti Password ───────────────────────────────────
   static Future<Map<String, dynamic>> gantiPassword({
     required String email,
@@ -281,8 +289,8 @@ static Future<Map<String, dynamic>> resendOtpRegister({
         Uri.parse(ApiConstants.gantiPassword),
         headers: ApiHelper.publicHeaders,
         body: jsonEncode({
-          'email'                : email,
-          'password'             : password,
+          'email': email,
+          'password': password,
           'password_confirmation': passwordConfirmation,
         }),
       );

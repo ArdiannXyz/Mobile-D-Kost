@@ -162,13 +162,12 @@ class _LupaPasswordPageState extends State<LupaPasswordPage> {
                               : () => _controller.submitReset(context),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1BBA8A),
-                            disabledBackgroundColor: const Color(0xFF1BBA8A)
-                                .withValues(alpha: 0.5),
+                            disabledBackgroundColor:
+                                const Color(0xFF1BBA8A).withValues(alpha: 0.5),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 16),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             elevation: 0,
                           ),
                           child: _controller.isLoading
@@ -245,8 +244,7 @@ class _LupaPasswordPageState extends State<LupaPasswordPage> {
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(color: Color(0xFF1BBA8A), width: 1.5),
       ),
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 }

@@ -32,12 +32,12 @@ class KeluhanController {
   List<BookingModel> bookingAktifList = [];
   BookingModel? bookingAktif;
 
-  final TextEditingController tanggalController   = TextEditingController();
+  final TextEditingController tanggalController = TextEditingController();
   final TextEditingController deskripsiController = TextEditingController();
 
-  XFile?     fotoBuktiXFile;
+  XFile? fotoBuktiXFile;
   Uint8List? fotoBuktiBytes;
-  String?    fotoBuktiNama;
+  String? fotoBuktiNama;
 
   DateTime selectedDate = DateTime.now();
   final VoidCallback onStateChanged;
@@ -50,96 +50,102 @@ class KeluhanController {
   }
 
   void saveOriginalValues() {
-  _originalDeskripsi = deskripsiController.text;
-  _originalFotoXFile = fotoBuktiXFile;
+    _originalDeskripsi = deskripsiController.text;
+    _originalFotoXFile = fotoBuktiXFile;
   }
 
   bool get hasChanges =>
-    deskripsiController.text.trim() != _originalDeskripsi.trim() ||
-    fotoBuktiXFile != _originalFotoXFile;
+      deskripsiController.text.trim() != _originalDeskripsi.trim() ||
+      fotoBuktiXFile != _originalFotoXFile;
 
   Future<void> handleBackPressed(BuildContext context) async {
-  if (!hasChanges) {
-    Navigator.pop(context);
-    return;
-  }
+    if (!hasChanges) {
+      Navigator.pop(context);
+      return;
+    }
 
-  final result = await showDialog<String>(
-    context: context,
-    barrierColor: Colors.black45,
-    builder: (_) => Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Hapus Draf?',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A2E),
+    final result = await showDialog<String>(
+      context: context,
+      barrierColor: Colors.black45,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Hapus Draf?',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A1A2E),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Perubahan yang belum disimpan akan hilang.',
-              style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'hapus'),
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.red.shade400,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              const SizedBox(height: 8),
+              const Text(
+                'Perubahan yang belum disimpan akan hilang.',
+                style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'hapus'),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.red.shade400,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text('Hapus',
+                        style: TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w500)),
                   ),
-                  child: const Text('Hapus',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                ),
-                const SizedBox(width: 10),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'simpan'),
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF1BBA8A),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  const SizedBox(width: 10),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'simpan'),
+                    style: TextButton.styleFrom(
+                      backgroundColor: const Color(0xFF1BBA8A),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text('Simpan',
+                        style: TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w500)),
                   ),
-                  child: const Text('Simpan',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
 
-  if (!context.mounted) return;
+    if (!context.mounted) return;
 
-  if (result == 'hapus') {
-    Navigator.pop(context);
-  } else if (result == 'simpan') {
-    // Akan dipanggil dari page masing-masing
-    onSimpanFromDialog?.call(context);
+    if (result == 'hapus') {
+      Navigator.pop(context);
+    } else if (result == 'simpan') {
+      // Akan dipanggil dari page masing-masing
+      onSimpanFromDialog?.call(context);
+    }
+    // null → tetap di halaman
   }
-  // null → tetap di halaman
-}
 
 // Callback opsional untuk tombol Simpan di dialog
-Future<void> Function(BuildContext)? onSimpanFromDialog;
+  Future<void> Function(BuildContext)? onSimpanFromDialog;
 
   // ── Load daftar keluhan ────────────────────────────────────
   Future<void> loadKeluhanList() async {
@@ -156,12 +162,12 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
       }
 
       final token = await ApiHelper.getToken();
-      final url   = ApiConstants.keluhanList(userId);
+      final url = ApiConstants.keluhanList(userId);
 
       final response = await http.get(
         Uri.parse(url),
         headers: {
-          'Accept'      : 'application/json',
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
         },
@@ -208,7 +214,7 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
 
       if (bookingAktifList.isNotEmpty) {
         bookingAktif = bookingAktifList.first;
-        pageState    = KeluhanPageState.hasBooking;
+        pageState = KeluhanPageState.hasBooking;
       } else {
         pageState = KeluhanPageState.noBooking;
       }
@@ -241,14 +247,14 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
   // ── Pilih Tanggal ──────────────────────────────────────────
   Future<void> pickDate(BuildContext context) async {
     final picked = await showDatePicker(
-      context    : context,
+      context: context,
       initialDate: selectedDate,
-      firstDate  : DateTime(2020),
-      lastDate   : DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: const ColorScheme.light(
-            primary  : Color(0xFF2ECC71),
+            primary: Color(0xFF2ECC71),
             onPrimary: Colors.white,
           ),
         ),
@@ -256,7 +262,7 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
       ),
     );
     if (picked != null) {
-      selectedDate           = picked;
+      selectedDate = picked;
       tanggalController.text = DateFormat('dd/MM/yyyy').format(picked);
       onStateChanged();
     }
@@ -277,17 +283,17 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
     final picked = await picker.pickImage(source: source, imageQuality: 80);
     if (picked == null) return;
 
-    final bytes    = await picked.readAsBytes();
+    final bytes = await picked.readAsBytes();
     fotoBuktiXFile = picked;
     fotoBuktiBytes = bytes;
-    fotoBuktiNama  = picked.name;
+    fotoBuktiNama = picked.name;
     onStateChanged();
   }
 
   void removeFoto() {
     fotoBuktiXFile = null;
     fotoBuktiBytes = null;
-    fotoBuktiNama  = null;
+    fotoBuktiNama = null;
     onStateChanged();
   }
 
@@ -301,13 +307,17 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
         actions: [
           TextButton.icon(
             onPressed: () => Navigator.pop(context, ImageSource.camera),
-            icon : const Icon(Icons.camera_alt_outlined, color: Color(0xFF2ECC71)),
-            label: const Text('Kamera', style: TextStyle(color: Color(0xFF2ECC71))),
+            icon:
+                const Icon(Icons.camera_alt_outlined, color: Color(0xFF2ECC71)),
+            label: const Text('Kamera',
+                style: TextStyle(color: Color(0xFF2ECC71))),
           ),
           TextButton.icon(
             onPressed: () => Navigator.pop(context, ImageSource.gallery),
-            icon : const Icon(Icons.photo_library_outlined, color: Color(0xFF2ECC71)),
-            label: const Text('Galeri', style: TextStyle(color: Color(0xFF2ECC71))),
+            icon: const Icon(Icons.photo_library_outlined,
+                color: Color(0xFF2ECC71)),
+            label: const Text('Galeri',
+                style: TextStyle(color: Color(0xFF2ECC71))),
           ),
         ],
       ),
@@ -341,7 +351,9 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Lanjutkan?',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600,
+            style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
                 color: Color(0xFF1A1A2E))),
         content: const Text(
           'Pastikan data yang Anda masukkan sudah benar.',
@@ -351,10 +363,9 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF9E9E9E)),
-            child: const Text('Batalkan',
-                style: TextStyle(fontSize: 13)),
+            style:
+                TextButton.styleFrom(foregroundColor: const Color(0xFF9E9E9E)),
+            child: const Text('Batalkan', style: TextStyle(fontSize: 13)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -384,9 +395,12 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
         context: context,
         barrierColor: Colors.black45,
         builder: (_) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Text('Tidak bisa diedit',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600,
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
                   color: Color(0xFF1A1A2E))),
           content: Text(
             'Keluhan yang sudah berstatus "${statusLabel(keluhan.statusKeluhan)}" tidak dapat diubah lagi.',
@@ -400,7 +414,8 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
                 backgroundColor: const Color(0xFF2ECC71),
                 foregroundColor: Colors.white,
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
               ),
@@ -420,7 +435,9 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Edit keluhan?',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600,
+            style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
                 color: Color(0xFF1A1A2E))),
         content: const Text(
           'Anda akan mengedit keluhan yang masih berstatus Menunggu.',
@@ -430,8 +447,8 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF9E9E9E)),
+            style:
+                TextButton.styleFrom(foregroundColor: const Color(0xFF9E9E9E)),
             child: const Text('Batal', style: TextStyle(fontSize: 13)),
           ),
           ElevatedButton(
@@ -477,9 +494,9 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
 
     try {
       final success = await KeluhanService.createKeluhan(
-        idKamar         : bookingAktif!.idKamar,
+        idKamar: bookingAktif!.idKamar,
         deskripsiMasalah: deskripsiController.text.trim(),
-        fotoBuktiXFile  : fotoBuktiXFile,
+        fotoBuktiXFile: fotoBuktiXFile,
       );
       if (!context.mounted) return;
       if (success) {
@@ -514,16 +531,16 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
     onStateChanged();
 
     try {
-      final token  = await ApiHelper.getToken();
+      final token = await ApiHelper.getToken();
       final userId = await ApiHelper.getUserId();
-      final url    = '${ApiConstants.baseUrl}keluhan/$idKeluhan';
+      final url = '${ApiConstants.baseUrl}keluhan/$idKeluhan';
 
       final request = http.MultipartRequest('POST', Uri.parse(url));
       request.headers.addAll({
-        'Accept'       : 'application/json',
+        'Accept': 'application/json',
         'Authorization': 'Bearer $token',
       });
-      request.fields['_method']           = 'PUT';
+      request.fields['_method'] = 'PUT';
       request.fields['deskripsi_masalah'] = deskripsiController.text.trim();
       if (userId != null) request.fields['id_user'] = userId.toString();
 
@@ -549,8 +566,7 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
             context, data['message'] ?? 'Gagal memperbarui keluhan.');
       }
     } catch (e) {
-      if (context.mounted)
-        _showErrorSnackbar(context, 'Terjadi kesalahan: $e');
+      if (context.mounted) _showErrorSnackbar(context, 'Terjadi kesalahan: $e');
     } finally {
       isSubmitting = false;
       onStateChanged();
@@ -597,7 +613,8 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
               ),
             ),
             const SizedBox(height: 24),
-            const Divider(height: 0.5, thickness: 0.5, color: Color(0xFFE0E0E0)),
+            const Divider(
+                height: 0.5, thickness: 0.5, color: Color(0xFFE0E0E0)),
             IntrinsicHeight(
               child: Row(
                 children: [
@@ -612,8 +629,8 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
                               bottomLeft: Radius.circular(20)),
                         ),
                       ),
-                      child: const Text('Batal',
-                          style: TextStyle(fontSize: 14)),
+                      child:
+                          const Text('Batal', style: TextStyle(fontSize: 14)),
                     ),
                   ),
                   const VerticalDivider(
@@ -648,11 +665,11 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
     onStateChanged();
 
     try {
-      final token    = await ApiHelper.getToken();
+      final token = await ApiHelper.getToken();
       final response = await http.delete(
         Uri.parse('${ApiConstants.baseUrl}keluhan/$idKeluhan'),
         headers: {
-          'Accept'       : 'application/json',
+          'Accept': 'application/json',
           'Authorization': 'Bearer $token',
         },
       );
@@ -668,8 +685,7 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
             context, data['message'] ?? 'Gagal menghapus keluhan.');
       }
     } catch (e) {
-      if (context.mounted)
-        _showErrorSnackbar(context, 'Terjadi kesalahan: $e');
+      if (context.mounted) _showErrorSnackbar(context, 'Terjadi kesalahan: $e');
     } finally {
       isSubmitting = false;
       onStateChanged();
@@ -687,19 +703,27 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
 
   String statusLabel(String status) {
     switch (status) {
-      case 'pending':  return 'Menunggu';
-      case 'diproses': return 'Diproses';
-      case 'selesai':  return 'Selesai';
-      default:         return status;
+      case 'pending':
+        return 'Menunggu';
+      case 'diproses':
+        return 'Diproses';
+      case 'selesai':
+        return 'Selesai';
+      default:
+        return status;
     }
   }
 
   Color statusColor(String status) {
     switch (status) {
-      case 'pending':  return const Color(0xFFF39C12);
-      case 'diproses': return const Color(0xFF3498DB);
-      case 'selesai':  return const Color(0xFF2ECC71);
-      default:         return const Color(0xFF9E9E9E);
+      case 'pending':
+        return const Color(0xFFF39C12);
+      case 'diproses':
+        return const Color(0xFF3498DB);
+      case 'selesai':
+        return const Color(0xFF2ECC71);
+      default:
+        return const Color(0xFF9E9E9E);
     }
   }
 
@@ -709,19 +733,17 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
       ..clearSnackBars()
       ..showSnackBar(SnackBar(
         content: Row(children: [
-          const Icon(Icons.check_circle_rounded,
-              color: Colors.white, size: 20),
+          const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(msg,
-                style: const TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w500)),
+                style:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
           ),
         ]),
         backgroundColor: const Color(0xFF1DB954),
-        behavior       : SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14)),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         duration: const Duration(seconds: 3),
         elevation: 0,
@@ -734,19 +756,17 @@ Future<void> Function(BuildContext)? onSimpanFromDialog;
       ..clearSnackBars()
       ..showSnackBar(SnackBar(
         content: Row(children: [
-          const Icon(Icons.info_rounded,
-              color: Colors.white, size: 20),
+          const Icon(Icons.info_rounded, color: Colors.white, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(msg,
-                style: const TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w500)),
+                style:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
           ),
         ]),
         backgroundColor: const Color(0xFFE24B4A),
-        behavior       : SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14)),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         duration: const Duration(seconds: 4),
         elevation: 0,

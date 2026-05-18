@@ -8,11 +8,11 @@ class RegisterController {
   bool isLoading = false;
   bool obscurePassword = true;
 
-  final TextEditingController nameController     = TextEditingController();
-  final TextEditingController emailController    = TextEditingController();
-  final TextEditingController phoneController    = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController alamatController   = TextEditingController();
+  final TextEditingController alamatController = TextEditingController();
 
   final VoidCallback onStateChanged;
   RegisterController({required this.onStateChanged});
@@ -31,9 +31,9 @@ class RegisterController {
   }
 
   String? validate() {
-    final nama     = nameController.text.trim();
-    final email    = emailController.text.trim();
-    final phone    = phoneController.text.trim();
+    final nama = nameController.text.trim();
+    final email = emailController.text.trim();
+    final phone = phoneController.text.trim();
     final password = passwordController.text;
 
     if (nama.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty) {
@@ -62,8 +62,7 @@ class RegisterController {
     }
 
     // ── Password: harus ada simbol ────────────────────────
-    if (!RegExp(r'[!@#\$&*~%^()_\-+=\[\]{};:"\\|,.<>/?]')
-        .hasMatch(password)) {
+    if (!RegExp(r'[!@#\$&*~%^()_\-+=\[\]{};:"\\|,.<>/?]').hasMatch(password)) {
       return 'Password harus mengandung minimal 1 simbol (contoh: @, #, !)';
     }
 
@@ -82,11 +81,11 @@ class RegisterController {
 
     try {
       final data = await UserService.registerUser(
-        nama    : nameController.text.trim(),
-        email   : emailController.text.trim(),
-        noHp    : phoneController.text.trim(),
+        nama: nameController.text.trim(),
+        email: emailController.text.trim(),
+        noHp: phoneController.text.trim(),
         password: passwordController.text,
-        alamat  : alamatController.text.trim(),
+        alamat: alamatController.text.trim(),
       );
 
       if (!context.mounted) return;

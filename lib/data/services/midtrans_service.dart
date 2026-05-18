@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class MidtransService {
-
   // ── Base URL ───────────────────────────────────────────────
   // Pilih salah satu, comment sisanya:
 
   //static const String baseUrl = 'http://127.0.0.1:8000/api';        // Browser
   //static const String baseUrl = 'http://10.0.2.2:8000/api';      // Emulator Android
   // static const String baseUrl = 'http://192.168.x.x:8000/api';   // HP Fisik
-  static const String baseUrl = 'https://bacteriophagic-marcelle-semiconical.ngrok-free.dev/api'; // Ngrok
+  static const String baseUrl =
+      'https://bacteriophagic-marcelle-semiconical.ngrok-free.dev/api'; // Ngrok
 
   static String? _authToken;
 

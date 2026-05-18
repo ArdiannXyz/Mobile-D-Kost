@@ -14,15 +14,15 @@ class ApiHelper {
 
   // ── SharedPreferences Keys ─────────────────────────────────
   static const String _keyIsLoggedIn = 'isLoggedIn';
-  static const String _keyUserId     = 'user_id';
-  static const String _keyToken      = 'token';
-  static const String _keyRole       = 'role';
+  static const String _keyUserId = 'user_id';
+  static const String _keyToken = 'token';
+  static const String _keyRole = 'role';
 
   // ── Headers ────────────────────────────────────────────────
   static Map<String, String> get publicHeaders => {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  };
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
 
   static Future<Map<String, String>> get authHeaders async {
     final token = await getToken();

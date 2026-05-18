@@ -109,7 +109,6 @@ class KamarCard extends StatelessWidget {
                     ],
                   ),
 
-                  
                   if (mode == KamarCardMode.grid) ...[
                     const SizedBox(height: 8),
                     SizedBox(

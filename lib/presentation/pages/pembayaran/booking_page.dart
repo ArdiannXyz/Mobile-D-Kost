@@ -29,8 +29,8 @@ class _BookingFormPageState extends State<BookingFormPage> {
     super.didChangeDependencies();
     if (!_initialized) {
       _initialized = true;
-      final args = ModalRoute.of(context)!.settings.arguments
-          as Map<String, dynamic>;
+      final args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       _controller = BookingController(
         args: args,
         onStateChanged: () {
@@ -64,8 +64,8 @@ class _BookingFormPageState extends State<BookingFormPage> {
 
       // 2. Langsung charge ke Midtrans dengan metode yang dipilih
       final paymentResult = await PaymentService.createPayment(
-        idTagihan : idTagihan,
-        method    : _selectedMethod!,
+        idTagihan: idTagihan,
+        method: _selectedMethod!,
       );
 
       if (!mounted) return;
@@ -75,8 +75,8 @@ class _BookingFormPageState extends State<BookingFormPage> {
         context,
         MaterialPageRoute(
           builder: (_) => PaymentInstructionPage(
-            result    : paymentResult,
-            idTagihan : idTagihan,
+            result: paymentResult,
+            idTagihan: idTagihan,
           ),
         ),
       );
@@ -102,8 +102,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
           ? const Center(
               child: CircularProgressIndicator(color: Color(0xFF1BBA8A)))
           : _buildBody(),
-      bottomNavigationBar:
-          _controller.isLoading ? null : _buildBottomBar(),
+      bottomNavigationBar: _controller.isLoading ? null : _buildBottomBar(),
     );
   }
 
@@ -174,8 +173,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            _controller.formatHarga(
-                                _controller.hargaPerBulan),
+                            _controller.formatHarga(_controller.hargaPerBulan),
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -286,15 +284,14 @@ class _BookingFormPageState extends State<BookingFormPage> {
                 const SizedBox(height: 12),
                 _buildBiayaRow(
                   label: 'Biaya kamar (${_controller.durasi} bln)',
-                  value: _controller
-                      .formatHarga(_controller.totalBiayaKamar),
+                  value: _controller.formatHarga(_controller.totalBiayaKamar),
                 ),
                 if (_controller.totalBiayaFurnitur > 0) ...[
                   const SizedBox(height: 6),
                   _buildBiayaRow(
                     label: 'Biaya furnitur',
-                    value: _controller
-                        .formatHarga(_controller.totalBiayaFurnitur),
+                    value:
+                        _controller.formatHarga(_controller.totalBiayaFurnitur),
                   ),
                 ],
                 const SizedBox(height: 12),
@@ -379,16 +376,13 @@ class _BookingFormPageState extends State<BookingFormPage> {
             child: const Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.info_outline,
-                    size: 16, color: Color(0xFFF39C12)),
+                Icon(Icons.info_outline, size: 16, color: Color(0xFFF39C12)),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Dengan melanjutkan, kamu menyetujui syarat dan ketentuan sewa kamar yang berlaku.',
                     style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF795548),
-                        height: 1.5),
+                        fontSize: 12, color: Color(0xFF795548), height: 1.5),
                   ),
                 ),
               ],
@@ -425,14 +419,10 @@ class _BookingFormPageState extends State<BookingFormPage> {
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFFE8F5E9)
-              : const Color(0xFFF5F7FA),
+          color: isSelected ? const Color(0xFFE8F5E9) : const Color(0xFFF5F7FA),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isSelected
-                ? const Color(0xFF1BBA8A)
-                : Colors.transparent,
+            color: isSelected ? const Color(0xFF1BBA8A) : Colors.transparent,
             width: 1.5,
           ),
         ),
@@ -463,9 +453,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
                 method.label,
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: isSelected
-                      ? FontWeight.w600
-                      : FontWeight.normal,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   color: isSelected
                       ? const Color(0xFF1A1A2E)
                       : const Color(0xFF4A4A4A),
@@ -481,14 +469,11 @@ class _BookingFormPageState extends State<BookingFormPage> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected
-                      ? const Color(0xFF1BBA8A)
-                      : Colors.grey[350]!,
+                  color:
+                      isSelected ? const Color(0xFF1BBA8A) : Colors.grey[350]!,
                   width: 2,
                 ),
-                color: isSelected
-                    ? const Color(0xFF1BBA8A)
-                    : Colors.white,
+                color: isSelected ? const Color(0xFF1BBA8A) : Colors.white,
               ),
               child: isSelected
                   ? const Icon(Icons.check, size: 12, color: Colors.white)
@@ -502,17 +487,14 @@ class _BookingFormPageState extends State<BookingFormPage> {
 
   // ── Bottom Bar ────────────────────────────────────────────
   Widget _buildBottomBar() {
-    final isLoading =
-        _controller.isSubmitting || _isProcessingPayment;
+    final isLoading = _controller.isSubmitting || _isProcessingPayment;
 
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-              color: Color(0x15000000),
-              blurRadius: 12,
-              offset: Offset(0, -3)),
+              color: Color(0x15000000), blurRadius: 12, offset: Offset(0, -3)),
         ],
       ),
       padding: EdgeInsets.only(
@@ -584,8 +566,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
                               _selectedMethod!.label
                                   .replaceAll(' Virtual Account', ' VA'),
                               style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500),
+                                  fontSize: 11, fontWeight: FontWeight.w500),
                             ),
                           ),
                         ],
@@ -601,13 +582,20 @@ class _BookingFormPageState extends State<BookingFormPage> {
   // ── Helpers ───────────────────────────────────────────────
   String _logoPath(PaymentMethodType type) {
     switch (type) {
-      case PaymentMethodType.bcaVa:     return 'assets/banks/bca.png';
-      case PaymentMethodType.bniVa:     return 'assets/banks/bni.png';
-      case PaymentMethodType.briVa:     return 'assets/banks/bri.png';
-      case PaymentMethodType.permataVa: return 'assets/banks/permata.png';
-      case PaymentMethodType.qris:      return 'assets/payment/qris.png';
-      case PaymentMethodType.gopay:     return 'assets/payment/gopay.png';
-      case PaymentMethodType.shopeepay: return 'assets/payment/shopeepay.png';
+      case PaymentMethodType.bcaVa:
+        return 'assets/banks/bca.png';
+      case PaymentMethodType.bniVa:
+        return 'assets/banks/bni.png';
+      case PaymentMethodType.briVa:
+        return 'assets/banks/bri.png';
+      case PaymentMethodType.permataVa:
+        return 'assets/banks/permata.png';
+      case PaymentMethodType.qris:
+        return 'assets/payment/qris.png';
+      case PaymentMethodType.gopay:
+        return 'assets/payment/gopay.png';
+      case PaymentMethodType.shopeepay:
+        return 'assets/payment/shopeepay.png';
     }
   }
 
@@ -620,9 +608,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [
           BoxShadow(
-              color: Color(0x08000000),
-              blurRadius: 8,
-              offset: Offset(0, 2)),
+              color: Color(0x08000000), blurRadius: 8, offset: Offset(0, 2)),
         ],
       ),
       child: child,
@@ -633,9 +619,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
     return Text(
       title,
       style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: Color(0xFF1A1A2E)),
+          fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
     );
   }
 
@@ -649,8 +633,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
         Icon(icon, size: 16, color: const Color(0xFF1BBA8A)),
         const SizedBox(width: 8),
         Text(label,
-            style:
-                const TextStyle(fontSize: 13, color: Color(0xFF9E9E9E))),
+            style: const TextStyle(fontSize: 13, color: Color(0xFF9E9E9E))),
         const Spacer(),
         Text(value,
             style: const TextStyle(
@@ -666,11 +649,9 @@ class _BookingFormPageState extends State<BookingFormPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label,
-            style:
-                const TextStyle(fontSize: 13, color: Color(0xFF9E9E9E))),
+            style: const TextStyle(fontSize: 13, color: Color(0xFF9E9E9E))),
         Text(value,
-            style:
-                const TextStyle(fontSize: 13, color: Color(0xFF1A1A2E))),
+            style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A2E))),
       ],
     );
   }
@@ -707,8 +688,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
         color: const Color(0xFFE8F5E9),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: const Icon(Icons.bed_outlined,
-          color: Color(0xFF2ECC71), size: 32),
+      child: const Icon(Icons.bed_outlined, color: Color(0xFF2ECC71), size: 32),
     );
   }
 }

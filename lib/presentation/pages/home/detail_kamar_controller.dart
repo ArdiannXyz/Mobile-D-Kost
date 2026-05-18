@@ -63,8 +63,19 @@ class KamarDetailController {
   String formatTanggal(DateTime? date) {
     if (date == null) return 'Pilih tanggal';
     const bulan = [
-      '', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-      'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+      '',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Agu',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des'
     ];
     return '${date.day} ${bulan[date.month]} ${date.year}';
   }
@@ -136,9 +147,8 @@ class KamarDetailController {
 
       final userId = await ApiHelper.getUserId();
       if (userId != null) {
-        _myExistingReview = reviewList
-            .where((r) => r.idUser == userId)
-            .firstOrNull;
+        _myExistingReview =
+            reviewList.where((r) => r.idUser == userId).firstOrNull;
       }
     } catch (_) {
       reviewList = [];
@@ -247,12 +257,12 @@ class KamarDetailController {
       context,
       '/booking-form',
       arguments: {
-        'kamar_id'  : kamarId,
-        'durasi'    : durasiSewa,
-        'tgl_mulai' : tglMulaiSewa?.toIso8601String(),
-        'tgl_akhir' : tglAkhirSewa?.toIso8601String(),
-        'furnitur'  : selectedFurnitur,
-        'total'     : totalBiaya,
+        'kamar_id': kamarId,
+        'durasi': durasiSewa,
+        'tgl_mulai': tglMulaiSewa?.toIso8601String(),
+        'tgl_akhir': tglAkhirSewa?.toIso8601String(),
+        'furnitur': selectedFurnitur,
+        'total': totalBiaya,
       },
     ).then((_) => refreshStatusOnly());
   }

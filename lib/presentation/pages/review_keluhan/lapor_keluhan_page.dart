@@ -38,8 +38,8 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: _buildAppBar(),
       body: switch (_controller.pageState) {
-        KeluhanPageState.loading    => _buildLoadingState(),
-        KeluhanPageState.noBooking  => _buildNoBookingState(),
+        KeluhanPageState.loading => _buildLoadingState(),
+        KeluhanPageState.noBooking => _buildNoBookingState(),
         KeluhanPageState.hasBooking => _buildBody(),
       },
     );
@@ -51,17 +51,15 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
       backgroundColor: const Color(0xFF1BBA8A),
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new,
-            color: Colors.white, size: 18),
+        icon:
+            const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
         onPressed: () => _controller.goBack(context),
       ),
       centerTitle: true,
       title: const Text(
         'Lapor Keluhan',
         style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600),
+            color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -138,8 +136,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
                 ),
                 child: const Text(
                   'Kembali',
-                  style: TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -161,7 +158,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
               children: [
                 _buildLabel('Pilih Kamar'),
                 const SizedBox(height: 8),
-                _buildKamarDropdown(),   // ← dropdown ganti read-only field
+                _buildKamarDropdown(), // ← dropdown ganti read-only field
 
                 const SizedBox(height: 16),
 
@@ -220,8 +217,8 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
                           color: Colors.white, strokeWidth: 2),
                     )
                   : const Text('Laporkan',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600)),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             ),
           ),
         ),
@@ -249,8 +246,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
             const SizedBox(width: 10),
             Text(
               'Kamar ${list.first.nomorKamar ?? list.first.idKamar}',
-              style: const TextStyle(
-                  fontSize: 14, color: Color(0xFF1A1A2E)),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
             ),
           ],
         ),
@@ -269,8 +265,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
         child: DropdownButton<int>(
           value: _controller.bookingAktif?.idBooking,
           isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down,
-              color: Color(0xFF9E9E9E)),
+          icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF9E9E9E)),
           style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
           items: list.map((b) {
             return DropdownMenuItem<int>(
@@ -354,15 +349,14 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
             Expanded(
               child: Text(
                 _controller.fotoBuktiNama ?? 'foto_bukti',
-                style: const TextStyle(
-                    fontSize: 13, color: Color(0xFF1A1A2E)),
+                style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A2E)),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             GestureDetector(
               onTap: _controller.removeFoto,
-              child: const Icon(Icons.close,
-                  size: 18, color: Color(0xFF9E9E9E)),
+              child:
+                  const Icon(Icons.close, size: 18, color: Color(0xFF9E9E9E)),
             ),
           ],
         ),
@@ -372,8 +366,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
     return GestureDetector(
       onTap: () => _controller.pickFoto(context),
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
@@ -385,8 +378,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
                 color: Color(0xFF9E9E9E), size: 20),
             SizedBox(width: 8),
             Text('Pilih foto bukti',
-                style:
-                    TextStyle(fontSize: 13, color: Color(0xFFB0B0C3))),
+                style: TextStyle(fontSize: 13, color: Color(0xFFB0B0C3))),
           ],
         ),
       ),
@@ -409,8 +401,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
     return InputDecoration(
       filled: true,
       fillColor: Colors.white,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
@@ -421,8 +412,7 @@ class _LaporKeluhanPageState extends State<LaporKeluhanPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide:
-            const BorderSide(color: Color(0xFF1BBA8A), width: 1.5),
+        borderSide: const BorderSide(color: Color(0xFF1BBA8A), width: 1.5),
       ),
     );
   }

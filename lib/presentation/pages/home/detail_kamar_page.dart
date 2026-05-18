@@ -105,7 +105,9 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
           _buildSection(
             title: 'Deskripsi Kamar',
             child: Text(
-              kamar.deskripsi.isEmpty ? 'Tidak ada deskripsi.' : kamar.deskripsi,
+              kamar.deskripsi.isEmpty
+                  ? 'Tidak ada deskripsi.'
+                  : kamar.deskripsi,
               style: const TextStyle(
                   fontSize: 13, color: Color(0xFF555555), height: 1.6),
             ),
@@ -266,11 +268,9 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
               ),
             ],
           ),
-
           const SizedBox(height: 16),
           const Divider(height: 1, color: Color(0xFFF0F0F0)),
           const SizedBox(height: 14),
-
           Row(
             children: [
               Expanded(
@@ -320,9 +320,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
                   ],
                 ),
               ),
-
               const SizedBox(width: 12),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,7 +391,6 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
               ),
             ],
           ),
-
           if (_controller.tglAkhirSewa != null) ...[
             const SizedBox(height: 10),
             Container(
@@ -504,9 +501,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
     final reviews = _controller.displayedReviews;
     final totalReviews = _controller.reviewList.length;
     final avgRating = totalReviews > 0
-        ? _controller.reviewList
-                .map((r) => r.rating)
-                .reduce((a, b) => a + b) /
+        ? _controller.reviewList.map((r) => r.rating).reduce((a, b) => a + b) /
             totalReviews
         : 0.0;
 
@@ -565,8 +560,8 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 7),
                             decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: const Color(0xFF1BBA8A)),
+                              border:
+                                  Border.all(color: const Color(0xFF1BBA8A)),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
@@ -620,9 +615,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-              color: Color(0x15000000),
-              blurRadius: 12,
-              offset: Offset(0, -3)),
+              color: Color(0x15000000), blurRadius: 12, offset: Offset(0, -3)),
         ],
       ),
       padding: EdgeInsets.only(
@@ -640,8 +633,8 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
             backgroundColor:
                 tersedia ? const Color(0xFF1BBA8A) : const Color(0xFFB0B0C3),
             foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 0,
           ),
           child: Text(
@@ -736,8 +729,7 @@ class _KamarDetailPageState extends State<KamarDetailPage> with RouteAware {
     );
   }
 
-  String _cap(String s) =>
-      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+  String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -760,8 +752,8 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
 
     // Pisahkan furnitur tersedia dan habis
     final furniturTersedia = c.furniturList.where((f) => f.jumlah > 0).toList();
-    final furniturHabis    = c.furniturList.where((f) => f.jumlah <= 0).toList();
-    final allFurnitur      = [...furniturTersedia, ...furniturHabis];
+    final furniturHabis = c.furniturList.where((f) => f.jumlah <= 0).toList();
+    final allFurnitur = [...furniturTersedia, ...furniturHabis];
 
     return Container(
       decoration: const BoxDecoration(
@@ -868,8 +860,8 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                 const Spacer(),
                 if (furniturTersedia.isNotEmpty)
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE8F5E9),
                       borderRadius: BorderRadius.circular(10),
@@ -895,8 +887,7 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Center(
                 child: Text('Tidak ada furnitur tersedia',
-                    style: TextStyle(
-                        color: Color(0xFF9E9E9E), fontSize: 13)),
+                    style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13)),
               ),
             )
           else
@@ -906,20 +897,20 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: allFurnitur.length,
                 itemBuilder: (_, index) {
-                  final f     = allFurnitur[index];
+                  final f = allFurnitur[index];
                   final habis = f.jumlah <= 0;
-                  final qty   = c.getFurniturQty(f.idFurnitur);
+                  final qty = c.getFurniturQty(f.idFurnitur);
                   return _FurniturItem(
-                    furnitur   : f,
-                    qty        : qty,
-                    isHabis    : habis,
-                    onTambah   : habis || qty >= f.jumlah
+                    furnitur: f,
+                    qty: qty,
+                    isHabis: habis,
+                    onTambah: habis || qty >= f.jumlah
                         ? null
                         : () {
                             c.tambahFurnitur(f.idFurnitur);
                             setState(() {});
                           },
-                    onKurang   : qty > 0
+                    onKurang: qty > 0
                         ? () {
                             c.kurangFurnitur(f.idFurnitur);
                             setState(() {});
@@ -980,8 +971,7 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
                   ),
                   child: const Text(
                     'Pesan Sekarang',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -999,12 +989,11 @@ class _BookingBottomSheetState extends State<_BookingBottomSheet> {
           color: const Color(0xFFE8F5E9),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: const Icon(Icons.bed_outlined,
-            color: Color(0xFF1BBA8A), size: 28),
+        child:
+            const Icon(Icons.bed_outlined, color: Color(0xFF1BBA8A), size: 28),
       );
 
-  String _cap(String s) =>
-      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+  String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1040,16 +1029,14 @@ class _FurniturItem extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: isHabis
-                    ? const Color(0xFFF5F5F5)
-                    : const Color(0xFFE8F5E9),
+                color:
+                    isHabis ? const Color(0xFFF5F5F5) : const Color(0xFFE8F5E9),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 Icons.chair_outlined,
-                color: isHabis
-                    ? const Color(0xFFBDBDBD)
-                    : const Color(0xFF1BBA8A),
+                color:
+                    isHabis ? const Color(0xFFBDBDBD) : const Color(0xFF1BBA8A),
                 size: 20,
               ),
             ),
@@ -1068,8 +1055,8 @@ class _FurniturItem extends StatelessWidget {
                   const SizedBox(height: 1),
                   Text(
                     '${formatHarga(furnitur.hargaSewaTambahan)}/bulan',
-                    style: const TextStyle(
-                        fontSize: 11, color: Color(0xFF9E9E9E)),
+                    style:
+                        const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
                   ),
                   const SizedBox(height: 2),
                   Row(
@@ -1085,9 +1072,7 @@ class _FurniturItem extends StatelessWidget {
                       ),
                       const SizedBox(width: 3),
                       Text(
-                        isHabis
-                            ? 'Stok habis'
-                            : 'Tersedia: ${furnitur.jumlah}',
+                        isHabis ? 'Stok habis' : 'Tersedia: ${furnitur.jumlah}',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
@@ -1146,9 +1131,8 @@ class _CounterBtn extends StatelessWidget {
         width: 28,
         height: 28,
         decoration: BoxDecoration(
-          color: onTap != null
-              ? const Color(0xFF1BBA8A)
-              : const Color(0xFFE0E0E0),
+          color:
+              onTap != null ? const Color(0xFF1BBA8A) : const Color(0xFFE0E0E0),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Icon(icon,
@@ -1217,9 +1201,7 @@ class _ReviewItem extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(review.komentar,
                     style: const TextStyle(
-                        fontSize: 13,
-                        color: Color(0xFF555555),
-                        height: 1.4)),
+                        fontSize: 13, color: Color(0xFF555555), height: 1.4)),
               ],
             ),
           ),

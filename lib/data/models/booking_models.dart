@@ -46,50 +46,50 @@ class BookingModel {
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     return BookingModel(
-      idBooking         : json['id_booking'],
-      idUser            : json['id_user'],
-      idKamar           : json['id_kamar'],
-      tglBooking        : json['tgl_booking'] ?? '',
-      durasiSewaBulan   : json['durasi_sewa_bulan'] ?? 1,
-      tglMulaiSewa      : json['tgl_mulai_sewa'] ?? '',
-      tglAkhirSewa      : json['tgl_akhir_sewa'] ?? '',
-      totalBiayaBulanan : double.tryParse(
-                            json['total_biaya_bulanan'].toString()) ?? 0,
-      statusBooking     : json['status_booking'] ?? 'menunggu_pembayaran',
+      idBooking: json['id_booking'],
+      idUser: json['id_user'],
+      idKamar: json['id_kamar'],
+      tglBooking: json['tgl_booking'] ?? '',
+      durasiSewaBulan: json['durasi_sewa_bulan'] ?? 1,
+      tglMulaiSewa: json['tgl_mulai_sewa'] ?? '',
+      tglAkhirSewa: json['tgl_akhir_sewa'] ?? '',
+      totalBiayaBulanan:
+          double.tryParse(json['total_biaya_bulanan'].toString()) ?? 0,
+      statusBooking: json['status_booking'] ?? 'menunggu_pembayaran',
       // ── expired_at: parse string ISO 8601 → DateTime (UTC-aware) ──
-      expiredAt         : json['expired_at'] != null
-                            ? DateTime.tryParse(json['expired_at'])?.toLocal()
-                            : null,
-      nomorKamar        : json['nomor_kamar'],
-      tipeKamar         : json['tipe_kamar'],
-      fotoKamar         : json['foto_primary'] ?? json['foto_kamar'],
-      furniturList      : (json['furnitur'] as List? ?? [])
-                            .map((e) => BookingFurniturItem.fromJson(e))
-                            .toList(),
-      tagihan           : json['tagihan'] != null
-                            ? TagihanSummary.fromJson(json['tagihan'])
-                            : null,
+      expiredAt: json['expired_at'] != null
+          ? DateTime.tryParse(json['expired_at'])?.toLocal()
+          : null,
+      nomorKamar: json['nomor_kamar'],
+      tipeKamar: json['tipe_kamar'],
+      fotoKamar: json['foto_primary'] ?? json['foto_kamar'],
+      furniturList: (json['furnitur'] as List? ?? [])
+          .map((e) => BookingFurniturItem.fromJson(e))
+          .toList(),
+      tagihan: json['tagihan'] != null
+          ? TagihanSummary.fromJson(json['tagihan'])
+          : null,
     );
   }
   factory BookingModel.fromJsonAktif(Map<String, dynamic> json) {
     return BookingModel(
-      idBooking         : json['id_booking'],
-      idUser            : json['id_user'] ?? 0,
-      idKamar           : json['id_kamar'],
-      tglBooking        : json['tgl_booking'] ?? '',
-      durasiSewaBulan   : json['durasi_sewa_bulan'] ?? 0,
-      tglMulaiSewa      : json['tgl_mulai_sewa'] ?? '',
-      tglAkhirSewa      : json['tgl_akhir_sewa'] ?? '',
-      totalBiayaBulanan : double.tryParse(
-                            json['total_biaya_bulanan']?.toString() ?? '0') ?? 0,
-      statusBooking     : json['status_booking'] ?? 'aktif',
-      expiredAt         : json['expired_at'] != null
-                            ? DateTime.tryParse(json['expired_at'])?.toLocal()
-                            : null,
-      nomorKamar        : json['nomor_kamar'],
-      tipeKamar         : json['tipe_kamar'],
-      furniturList      : [],
-      tagihan           : null,
+      idBooking: json['id_booking'],
+      idUser: json['id_user'] ?? 0,
+      idKamar: json['id_kamar'],
+      tglBooking: json['tgl_booking'] ?? '',
+      durasiSewaBulan: json['durasi_sewa_bulan'] ?? 0,
+      tglMulaiSewa: json['tgl_mulai_sewa'] ?? '',
+      tglAkhirSewa: json['tgl_akhir_sewa'] ?? '',
+      totalBiayaBulanan:
+          double.tryParse(json['total_biaya_bulanan']?.toString() ?? '0') ?? 0,
+      statusBooking: json['status_booking'] ?? 'aktif',
+      expiredAt: json['expired_at'] != null
+          ? DateTime.tryParse(json['expired_at'])?.toLocal()
+          : null,
+      nomorKamar: json['nomor_kamar'],
+      tipeKamar: json['tipe_kamar'],
+      furniturList: [],
+      tagihan: null,
     );
   }
   // ── Helper: apakah booking sudah expired ──────────────────
@@ -124,11 +124,11 @@ class BookingFurniturItem {
 
   factory BookingFurniturItem.fromJson(Map<String, dynamic> json) {
     return BookingFurniturItem(
-      idFurnitur        : json['id_furnitur'],
-      namaFurnitur      : json['nama_furnitur'] ?? '',
-      jumlah            : json['jumlah'] ?? 1,
-      hargaSewaTambahan : double.tryParse(
-                            json['harga_sewa_tambahan'].toString()) ?? 0,
+      idFurnitur: json['id_furnitur'],
+      namaFurnitur: json['nama_furnitur'] ?? '',
+      jumlah: json['jumlah'] ?? 1,
+      hargaSewaTambahan:
+          double.tryParse(json['harga_sewa_tambahan'].toString()) ?? 0,
     );
   }
 
@@ -154,10 +154,10 @@ class TagihanSummary {
 
   factory TagihanSummary.fromJson(Map<String, dynamic> json) {
     return TagihanSummary(
-      idTagihan     : json['id_tagihan'],
-      totalTagihan  : double.tryParse(json['total_tagihan'].toString()) ?? 0,
-      statusTagihan : json['status_tagihan'] ?? 'belum_bayar',
-      tglJatuhTempo : json['tgl_jatuh_tempo'] ?? '',
+      idTagihan: json['id_tagihan'],
+      totalTagihan: double.tryParse(json['total_tagihan'].toString()) ?? 0,
+      statusTagihan: json['status_tagihan'] ?? 'belum_bayar',
+      tglJatuhTempo: json['tgl_jatuh_tempo'] ?? '',
     );
   }
 
@@ -165,7 +165,8 @@ class TagihanSummary {
   bool get isOverdue {
     try {
       final jatuhTempo = DateTime.parse(tglJatuhTempo);
-      return DateTime.now().isAfter(jatuhTempo) && statusTagihan == 'belum_bayar';
+      return DateTime.now().isAfter(jatuhTempo) &&
+          statusTagihan == 'belum_bayar';
     } catch (_) {
       return false;
     }

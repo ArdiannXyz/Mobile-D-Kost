@@ -4,7 +4,6 @@ import 'notifikasi_service.dart';
 
 class OneSignalSetup {
   static const String _appId = '2a99cc5f-1669-4a7d-913a-ffc2cb9cd6a2';
-  
 
   // ── Panggil di main.dart sebelum runApp() ─────────────────
   static Future<void> init() async {
@@ -39,7 +38,7 @@ class OneSignalSetup {
   static Future<void> kirimPlayerIdKeBackend() async {
     try {
       final playerId = OneSignal.User.pushSubscription.id;
-      
+
       debugPrint('=== ONESIGNAL DEBUG ===');
       debugPrint('Token: ${NotifikasiService.authToken}');
       debugPrint('Player ID: $playerId');

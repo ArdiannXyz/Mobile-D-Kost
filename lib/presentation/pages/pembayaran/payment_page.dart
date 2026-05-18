@@ -1,5 +1,5 @@
 // ============================================================
-// FILE: lib/presentation/payment/payment_page.dart  
+// FILE: lib/presentation/payment/payment_page.dart
 // Redirector — untuk backward compatibility route lama
 // ============================================================
 
@@ -15,13 +15,11 @@ class PaymentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments
-        as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
 
     // Jika dipanggil tanpa args yang benar, balik saja
-    if (args == null ||
-        args['result'] == null ||
-        args['id_tagihan'] == null) {
+    if (args == null || args['result'] == null || args['id_tagihan'] == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Pembayaran')),
         body: const Center(
@@ -32,8 +30,8 @@ class PaymentPage extends StatelessWidget {
 
     // Forward ke halaman baru
     return PaymentInstructionPage(
-      result    : args['result'] as PaymentResult,
-      idTagihan : args['id_tagihan'] as int,
+      result: args['result'] as PaymentResult,
+      idTagihan: args['id_tagihan'] as int,
     );
   }
 }

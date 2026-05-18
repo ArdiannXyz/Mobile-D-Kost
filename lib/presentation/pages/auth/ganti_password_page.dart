@@ -170,13 +170,12 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
                               : () => _controller.gantiPassword(context),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1BBA8A),
-                            disabledBackgroundColor: const Color(0xFF1BBA8A)
-                                .withValues(alpha: 0.5),
+                            disabledBackgroundColor:
+                                const Color(0xFF1BBA8A).withValues(alpha: 0.5),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 16),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             elevation: 0,
                           ),
                           child: _controller.isLoading
@@ -259,17 +258,15 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
         TextField(
           controller: controller,
           obscureText: isObscure,
-          maxLength: 50,                          // ← batas 50 karakter
-          inputFormatters: const [],              // password bebas karakter
-          style: const TextStyle(
-              color: Color(0xFF1A1A2E), fontSize: 14),
+          maxLength: 50, // ← batas 50 karakter
+          inputFormatters: const [], // password bebas karakter
+          style: const TextStyle(color: Color(0xFF1A1A2E), fontSize: 14),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle:
-                const TextStyle(color: Color(0xFFB0B0C3), fontSize: 14),
+            hintStyle: const TextStyle(color: Color(0xFFB0B0C3), fontSize: 14),
             filled: true,
             fillColor: const Color(0xFFF5F7FA),
-            counterText: '',                      // sembunyikan counter
+            counterText: '', // sembunyikan counter
             prefixIcon: const Icon(
               Icons.lock_outline,
               color: Color(0xFFB0B0C3),
@@ -295,11 +292,11 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                  color: Color(0xFF2ECC71), width: 1.5),
+              borderSide:
+                  const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
             ),
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16, vertical: 14),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
         ),
       ],

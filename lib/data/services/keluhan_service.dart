@@ -40,11 +40,11 @@ class KeluhanService {
   static Future<bool> createKeluhan({
     required int idKamar,
     required String deskripsiMasalah,
-    XFile? fotoBuktiXFile,              // ← ganti dari File? ke XFile?
+    XFile? fotoBuktiXFile, // ← ganti dari File? ke XFile?
   }) async {
     try {
       final userId = await ApiHelper.getUserId();
-      final token  = await ApiHelper.getToken();
+      final token = await ApiHelper.getToken();
 
       final request = http.MultipartRequest(
         'POST',
@@ -56,8 +56,8 @@ class KeluhanService {
         if (token != null) 'Authorization': 'Bearer $token',
       });
 
-      request.fields['id_user']           = userId.toString();
-      request.fields['id_kamar']          = idKamar.toString();
+      request.fields['id_user'] = userId.toString();
+      request.fields['id_kamar'] = idKamar.toString();
       request.fields['deskripsi_masalah'] = deskripsiMasalah;
 
       // Upload foto — fromBytes agar kompatibel Web & Mobile
@@ -79,8 +79,7 @@ class KeluhanService {
     } on ApiException {
       rethrow;
     } catch (_) {
-      throw ApiException(
-          message: 'Gagal mengirim keluhan.', statusCode: 500);
+      throw ApiException(message: 'Gagal mengirim keluhan.', statusCode: 500);
     }
   }
 }

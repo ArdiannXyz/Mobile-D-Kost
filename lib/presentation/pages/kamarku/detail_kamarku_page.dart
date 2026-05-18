@@ -8,7 +8,6 @@ import '../../../data/models/kamar_models.dart';
 import '../../../data/models/furnitur_models.dart';
 import '../../../data/models/payment_model.dart';
 
-
 // ══════════════════════════════════════════════════════════════
 // 1. DETAIL KAMARKU PAGE
 // ══════════════════════════════════════════════════════════════
@@ -27,8 +26,10 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
   void initState() {
     super.initState();
     _controller = DetailKamarkuController(
-      bookingId     : widget.bookingId,
-      onStateChanged: () { if (mounted) setState(() {}); },
+      bookingId: widget.bookingId,
+      onStateChanged: () {
+        if (mounted) setState(() {});
+      },
     );
     _controller.loadDetail().then((_) {
       _controller.startCountdown(() {
@@ -58,7 +59,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
           : _controller.errorMessage != null
               ? _errorView(_controller.errorMessage!, _controller.loadDetail)
               : RefreshIndicator(
-                  color    : const Color(0xFF1BBA8A),
+                  color: const Color(0xFF1BBA8A),
                   onRefresh: _controller.refresh,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -93,22 +94,20 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
     final isAktif = _controller.booking?.statusBooking == 'aktif';
     return AppBar(
       backgroundColor: const Color(0xFF1BBA8A),
-      elevation      : 0,
+      elevation: 0,
       leading: IconButton(
-        icon     : const Icon(Icons.arrow_back_ios_new,
-            color: Colors.white, size: 18),
+        icon:
+            const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
         onPressed: () => Navigator.pop(context),
       ),
       centerTitle: true,
       title: const Text('Detail Kamarku',
           style: TextStyle(
-              color     : Colors.white,
-              fontSize  : 16,
-              fontWeight: FontWeight.w600)),
+              color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
       actions: [
         if (isAktif && !_controller.isLoading)
           IconButton(
-            icon   : const Icon(Icons.add_shopping_cart_outlined,
+            icon: const Icon(Icons.add_shopping_cart_outlined,
                 color: Colors.white),
             tooltip: 'Tambah Furnitur',
             onPressed: _controller.isSubmitting
@@ -121,7 +120,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
 
   // ── Info Pemesanan + Countdown Timer ──────────────────────
   Widget _buildInfoPemesanan() {
-    final b          = _controller.booking!;
+    final b = _controller.booking!;
     final isMenunggu = b.statusBooking == 'menunggu_pembayaran';
     final isLunas = b.tagihan?.statusTagihan == 'lunas';
 
@@ -131,16 +130,13 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
         children: [
           const Text('Info Pemesanan',
               style: TextStyle(
-                  fontSize  : 14,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color     : Color(0xFF1A1A2E))),
+                  color: Color(0xFF1A1A2E))),
           const SizedBox(height: 10),
-          _infoRow('Tanggal Booking',
-              _controller.formatTanggal(b.tglBooking)),
-          _infoRow('Mulai Sewa',
-              _controller.formatTanggal(b.tglMulaiSewa)),
-          _infoRow('Akhir Sewa',
-              _controller.formatTanggal(b.tglAkhirSewa)),
+          _infoRow('Tanggal Booking', _controller.formatTanggal(b.tglBooking)),
+          _infoRow('Mulai Sewa', _controller.formatTanggal(b.tglMulaiSewa)),
+          _infoRow('Akhir Sewa', _controller.formatTanggal(b.tglAkhirSewa)),
           _infoRow(
             'Status',
             _controller.statusLabel(b.statusBooking),
@@ -149,11 +145,11 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
 
           // ── Countdown — hanya saat menunggu_pembayaran ──
           // ── Countdown — hanya saat menunggu_pembayaran DAN belum lunas ──
-            
-            if (isMenunggu && !isLunas) ...[
+
+          if (isMenunggu && !isLunas) ...[
             const SizedBox(height: 12),
             Container(
-              width  : double.infinity,
+              width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               decoration: BoxDecoration(
                 color: _controller.isExpired
@@ -170,7 +166,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
                 children: [
                   Icon(
                     Icons.timer_outlined,
-                    size : 18,
+                    size: 18,
                     color: _controller.isExpired
                         ? const Color(0xFFE74C3C)
                         : const Color(0xFFF39C12),
@@ -192,7 +188,7 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
                   Text(
                     _controller.countdownText,
                     style: TextStyle(
-                      fontSize  : 16,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: _controller.isExpired
                           ? const Color(0xFFE74C3C)
@@ -208,69 +204,70 @@ class _DetailKamarkuPageState extends State<DetailKamarkuPage> {
     );
   }
 
-Widget _buildKamarCard() {
-  final b = _controller.booking!;
-  return GestureDetector(                                    // ← tambah ini
-    onTap: () => Navigator.pushNamed(
-      context,
-      '/kamar-detail',
-      arguments: {'id': b.idKamar},
-    ),
-    child: _card(
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: b.fotoKamar != null
-                ? Image.network(
-                    b.fotoKamar!,
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _kamarPlaceholder(),
-                  )
-                : _kamarPlaceholder(),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Kos ${_cap(b.tipeKamar ?? '')} ${b.nomorKamar ?? ''}',
-                  style: const TextStyle(
-                      fontSize  : 14,
-                      fontWeight: FontWeight.bold,
-                      color     : Color(0xFF1A1A2E)),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  _controller.formatHarga(b.totalBiayaBulanan),
-                  style: const TextStyle(
-                      fontSize  : 14,
-                      fontWeight: FontWeight.bold,
-                      color     : Color(0xFF1A1A2E)),
-                ),
-              ],
-            ),
-          ),
-          // ← indikator bisa diklik
-          const Icon(
-            Icons.arrow_forward_ios_rounded,
-            size : 14,
-            color: Color(0xFFB0B0C3),
-          ),
-        ],
+  Widget _buildKamarCard() {
+    final b = _controller.booking!;
+    return GestureDetector(
+      // ← tambah ini
+      onTap: () => Navigator.pushNamed(
+        context,
+        '/kamar-detail',
+        arguments: {'id': b.idKamar},
       ),
-    ),
-  );
-}
+      child: _card(
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: b.fotoKamar != null
+                  ? Image.network(
+                      b.fotoKamar!,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _kamarPlaceholder(),
+                    )
+                  : _kamarPlaceholder(),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Kos ${_cap(b.tipeKamar ?? '')} ${b.nomorKamar ?? ''}',
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1A1A2E)),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    _controller.formatHarga(b.totalBiayaBulanan),
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1A1A2E)),
+                  ),
+                ],
+              ),
+            ),
+            // ← indikator bisa diklik
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 14,
+              color: Color(0xFFB0B0C3),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   // ── Furnitur — dengan tombol Tambah inline jika aktif ─────
   Widget _buildFurniturSection() {
-    final b       = _controller.booking!;
+    final b = _controller.booking!;
     final isAktif = b.statusBooking == 'aktif';
-  
+
     return _card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,9 +276,9 @@ Widget _buildKamarCard() {
             children: [
               const Text('Furnitur Tambahan',
                   style: TextStyle(
-                      fontSize  : 13,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color     : Color(0xFF1A1A2E))),
+                      color: Color(0xFF1A1A2E))),
               const Spacer(),
               // ── Tombol tambah furnitur inline ──────────────
               if (isAktif)
@@ -290,10 +287,10 @@ Widget _buildKamarCard() {
                       ? null
                       : () => _controller.showTambahFurniturDialog(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color       : const Color(0xFFE8F5E9),
+                      color: const Color(0xFFE8F5E9),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Row(
@@ -303,8 +300,8 @@ Widget _buildKamarCard() {
                         SizedBox(width: 4),
                         Text('Tambah',
                             style: TextStyle(
-                                fontSize  : 12,
-                                color     : Color(0xFF1BBA8A),
+                                fontSize: 12,
+                                color: Color(0xFF1BBA8A),
                                 fontWeight: FontWeight.w500)),
                       ],
                     ),
@@ -318,10 +315,10 @@ Widget _buildKamarCard() {
                 child: Row(
                   children: [
                     Container(
-                      width : 48,
+                      width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color       : const Color(0xFFE8F5E9),
+                        color: const Color(0xFFE8F5E9),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(Icons.chair_outlined,
@@ -334,20 +331,17 @@ Widget _buildKamarCard() {
                         children: [
                           Text(f.namaFurnitur,
                               style: const TextStyle(
-                                  fontSize  : 13,
-                                  fontWeight: FontWeight.w500)),
+                                  fontSize: 13, fontWeight: FontWeight.w500)),
                           Text('${f.jumlah}x',
                               style: const TextStyle(
-                                  fontSize: 12,
-                                  color   : Color(0xFF9E9E9E))),
+                                  fontSize: 12, color: Color(0xFF9E9E9E))),
                         ],
                       ),
                     ),
                     Text(
                       _controller.formatHarga(f.subtotal),
                       style: const TextStyle(
-                          fontSize  : 13,
-                          fontWeight: FontWeight.w600),
+                          fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -365,15 +359,15 @@ Widget _buildKamarCard() {
         children: [
           const Text('Total Pembayaran',
               style: TextStyle(
-                  fontSize  : 14,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color     : Color(0xFF1A1A2E))),
+                  color: Color(0xFF1A1A2E))),
           Text(
             _controller.formatHarga(b.totalBiayaBulanan),
             style: const TextStyle(
-                fontSize  : 14,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color     : Color(0xFF1BBA8A)),
+                color: Color(0xFF1BBA8A)),
           ),
         ],
       ),
@@ -389,12 +383,9 @@ Widget _buildKamarCard() {
     if (tagihan == null) return const SizedBox.shrink();
 
     final isLunas = tagihan.statusTagihan == 'lunas';
-    final color   = isLunas
-        ? const Color(0xFF1BBA8A)
-        : const Color(0xFFF39C12);
-    final b       = _controller.booking!;
-    final namaKamar =
-        'Kos ${_cap(b.tipeKamar ?? '')} ${b.nomorKamar ?? ''}';
+    final color = isLunas ? const Color(0xFF1BBA8A) : const Color(0xFFF39C12);
+    final b = _controller.booking!;
+    final namaKamar = 'Kos ${_cap(b.tipeKamar ?? '')} ${b.nomorKamar ?? ''}';
 
     return _card(
       child: Column(
@@ -405,24 +396,21 @@ Widget _buildKamarCard() {
             children: [
               const Text('Tagihan Bulan Ini',
                   style: TextStyle(
-                      fontSize  : 14,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color     : Color(0xFF1A1A2E))),
+                      color: Color(0xFF1A1A2E))),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color       : color.withOpacity(0.1),
+                  color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(6),
-                  border      : Border.all(color: color.withOpacity(0.4)),
+                  border: Border.all(color: color.withOpacity(0.4)),
                 ),
                 child: Text(
                   isLunas ? 'Lunas' : 'Belum Bayar',
                   style: TextStyle(
-                      fontSize  : 11,
-                      color     : color,
-                      fontWeight: FontWeight.w600),
+                      fontSize: 11, color: color, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -434,14 +422,13 @@ Widget _buildKamarCard() {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Total Tagihan',
-                  style: TextStyle(
-                      fontSize: 13, color: Color(0xFF555555))),
+                  style: TextStyle(fontSize: 13, color: Color(0xFF555555))),
               Text(
                 _controller.formatHarga(tagihan.totalTagihan),
                 style: const TextStyle(
-                    fontSize  : 13,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color     : Color(0xFF1A1A2E)),
+                    color: Color(0xFF1A1A2E)),
               ),
             ],
           ),
@@ -453,12 +440,11 @@ Widget _buildKamarCard() {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Jatuh Tempo',
-                    style: TextStyle(
-                        fontSize: 13, color: Color(0xFF555555))),
+                    style: TextStyle(fontSize: 13, color: Color(0xFF555555))),
                 Text(
                   _controller.formatTanggal(tagihan.tglJatuhTempo!),
-                  style: const TextStyle(
-                      fontSize: 13, color: Color(0xFF1A1A2E)),
+                  style:
+                      const TextStyle(fontSize: 13, color: Color(0xFF1A1A2E)),
                 ),
               ],
             ),
@@ -470,19 +456,20 @@ Widget _buildKamarCard() {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                    onPressed: () => _controller.goToPayment(
-                      context,
-                      idTagihan : tagihan.idTagihan,
-                      totalBayar: tagihan.totalTagihan,
-                      namaKamar : namaKamar,
-                      onNeedMethod: () => showModalBottomSheet<PaymentMethodType>(
-                        context: context,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                        ),
-                        builder: (_) => const _PilihMetodeSheet(),
-                      ),
+                onPressed: () => _controller.goToPayment(
+                  context,
+                  idTagihan: tagihan.idTagihan,
+                  totalBayar: tagihan.totalTagihan,
+                  namaKamar: namaKamar,
+                  onNeedMethod: () => showModalBottomSheet<PaymentMethodType>(
+                    context: context,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
                     ),
+                    builder: (_) => const _PilihMetodeSheet(),
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1BBA8A),
                   foregroundColor: Colors.white,
@@ -504,160 +491,157 @@ Widget _buildKamarCard() {
   // ══════════════════════════════════════════════════════════════
 // Bottom Bar — beda tampilan per status booking
 // ══════════════════════════════════════════════════════════════
-Widget? _buildBottomBar() {
-  final b = _controller.booking;
-  if (b == null || _controller.isLoading) return null;
+  Widget? _buildBottomBar() {
+    final b = _controller.booking;
+    if (b == null || _controller.isLoading) return null;
 
-  // ── Status menunggu_pembayaran: Batal + Bayar (asli) ──
-  if (b.statusBooking == 'menunggu_pembayaran') {
-    final idTagihan = b.tagihan?.idTagihan;
-    final totalBayar = _controller.totalBiaya;
-    final namaKamar =
-        'Kos ${_cap(b.tipeKamar ?? '')} ${b.nomorKamar ?? ''}';
+    // ── Status menunggu_pembayaran: Batal + Bayar (asli) ──
+    if (b.statusBooking == 'menunggu_pembayaran') {
+      final idTagihan = b.tagihan?.idTagihan;
+      final totalBayar = _controller.totalBiaya;
+      final namaKamar = 'Kos ${_cap(b.tipeKamar ?? '')} ${b.nomorKamar ?? ''}';
 
-    // ── Jika tagihan sudah lunas, sembunyikan bottom bar ──
-    final isLunas = b.tagihan?.statusTagihan == 'lunas';
-    if (isLunas) return null;
-    
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 12,
-        bottom: MediaQuery.of(context).padding.bottom + 12,
-      ),
-      child: Row(
-        children: [
-          // ── Tombol Batal (hanya muncul jika belum expired) ──
-          if (!_controller.isExpired) ...[
-            ElevatedButton(
-              onPressed: () => _controller.batalBooking(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 14),
-              ),
-              child: const Text('Batal',
-                  style: TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w600)),
-            ),
-            const SizedBox(width: 12),
-          ],
-          // ── Tombol Bayar Sekarang ─────────────────────
-          Expanded(
-            child: SizedBox(
-              height: 48,
-              child: ElevatedButton(
-                onPressed: (idTagihan == null || _controller.isExpired)
-                    ? null
-                    : () => _controller.goToPayment(
-                          context,
-                          idTagihan: idTagihan,
-                          totalBayar: totalBayar,
-                          namaKamar: namaKamar,
-                          onNeedMethod: () =>
-                              showModalBottomSheet<PaymentMethodType>(
-                            context: context,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(20)),
-                            ),
-                            builder: (_) => const _PilihMetodeSheet(),
-                          ),
-                        ),
+      // ── Jika tagihan sudah lunas, sembunyikan bottom bar ──
+      final isLunas = b.tagihan?.statusTagihan == 'lunas';
+      if (isLunas) return null;
+
+      return Container(
+        color: Colors.white,
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 12,
+          bottom: MediaQuery.of(context).padding.bottom + 12,
+        ),
+        child: Row(
+          children: [
+            // ── Tombol Batal (hanya muncul jika belum expired) ──
+            if (!_controller.isExpired) ...[
+              ElevatedButton(
+                onPressed: () => _controller.batalBooking(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1BBA8A),
-                  disabledBackgroundColor: const Color(0xFF9E9E9E),
+                  backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 ),
-                child: const Text('Bayar Sekarang',
-                    style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w600)),
+                child: const Text('Batal',
+                    style:
+                        TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              ),
+              const SizedBox(width: 12),
+            ],
+            // ── Tombol Bayar Sekarang ─────────────────────
+            Expanded(
+              child: SizedBox(
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: (idTagihan == null || _controller.isExpired)
+                      ? null
+                      : () => _controller.goToPayment(
+                            context,
+                            idTagihan: idTagihan,
+                            totalBayar: totalBayar,
+                            namaKamar: namaKamar,
+                            onNeedMethod: () =>
+                                showModalBottomSheet<PaymentMethodType>(
+                              context: context,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20)),
+                              ),
+                              builder: (_) => const _PilihMetodeSheet(),
+                            ),
+                          ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1BBA8A),
+                    disabledBackgroundColor: const Color(0xFF9E9E9E),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                  ),
+                  child: const Text('Bayar Sekarang',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
+    }
 
-  // ── Status aktif: + Furnitur + Akhiri Sewa ────────────
-  if (b.statusBooking == 'aktif') {
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 12,
-        bottom: MediaQuery.of(context).padding.bottom + 12,
-      ),
-      child: Row(
-        children: [
-          // ── Tambah Furnitur ──────────────────────────
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: _controller.isSubmitting
-                  ? null
-                  : () => _controller.showTambahFurniturDialog(context),
-              icon: const Icon(Icons.add_shopping_cart_outlined,
-                  size: 18),
-              label: const Text('+ Furnitur'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF1BBA8A),
-                side: const BorderSide(color: Color(0xFF1BBA8A)),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                padding: const EdgeInsets.symmetric(vertical: 13),
-                textStyle: const TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w600),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // ── Akhiri Sewa ──────────────────────────────
-          Expanded(
-            child: SizedBox(
-              height: 48,
-              child: ElevatedButton.icon(
+    // ── Status aktif: + Furnitur + Akhiri Sewa ────────────
+    if (b.statusBooking == 'aktif') {
+      return Container(
+        color: Colors.white,
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 12,
+          bottom: MediaQuery.of(context).padding.bottom + 12,
+        ),
+        child: Row(
+          children: [
+            // ── Tambah Furnitur ──────────────────────────
+            Expanded(
+              child: OutlinedButton.icon(
                 onPressed: _controller.isSubmitting
                     ? null
-                    : () => _controller.akhiriSewa(context),
-                icon: _controller.isSubmitting
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2))
-                    : const Icon(Icons.exit_to_app_rounded, size: 18),
-                label: const Text('Akhiri Sewa'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade600,
-                  foregroundColor: Colors.white,
+                    : () => _controller.showTambahFurniturDialog(context),
+                icon: const Icon(Icons.add_shopping_cart_outlined, size: 18),
+                label: const Text('+ Furnitur'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF1BBA8A),
+                  side: const BorderSide(color: Color(0xFF1BBA8A)),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 13),
                   textStyle: const TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            const SizedBox(width: 12),
+            // ── Akhiri Sewa ──────────────────────────────
+            Expanded(
+              child: SizedBox(
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: _controller.isSubmitting
+                      ? null
+                      : () => _controller.akhiriSewa(context),
+                  icon: _controller.isSubmitting
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2))
+                      : const Icon(Icons.exit_to_app_rounded, size: 18),
+                  label: const Text('Akhiri Sewa'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade600,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                    textStyle: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
-  return null;
+    return null;
   }
 }
-
 
 // ══════════════════════════════════════════════════════════════
 // 2. CHECKOUT PAGE — tidak diubah sama sekali
@@ -689,12 +673,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
   void initState() {
     super.initState();
     _controller = CheckoutController(
-      kamar           : widget.kamar,
-      durasiSewa      : widget.durasiSewa,
+      kamar: widget.kamar,
+      durasiSewa: widget.durasiSewa,
       selectedFurnitur: widget.selectedFurnitur,
-      furniturList    : widget.furniturList,
-      tglMulaiSewa    : widget.tglMulaiSewa,
-      onStateChanged  : () { if (mounted) setState(() {}); },
+      furniturList: widget.furniturList,
+      tglMulaiSewa: widget.tglMulaiSewa,
+      onStateChanged: () {
+        if (mounted) setState(() {});
+      },
     );
   }
 
@@ -731,15 +717,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
         children: [
           const Text('Info Pemesanan',
               style: TextStyle(
-                  fontSize  : 14,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color     : Color(0xFF1A1A2E))),
+                  color: Color(0xFF1A1A2E))),
           const SizedBox(height: 10),
-          
           _infoRow('Tanggal Booking',
               _controller.formatTanggal(DateTime.now().toIso8601String())),
-          _infoRow('Mulai Sewa',
-              _controller.formatTanggal(widget.tglMulaiSewa)),
+          _infoRow(
+              'Mulai Sewa', _controller.formatTanggal(widget.tglMulaiSewa)),
           _infoRow('Akhir Sewa', _controller.tglAkhirSewa),
           _infoRow('Durasi', '${widget.durasiSewa} Bulan'),
         ],
@@ -772,23 +757,23 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 Text(
                   'Kos ${_cap(kamar.tipeKamar)} ${kamar.nomorKamar}',
                   style: const TextStyle(
-                      fontSize  : 14,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color     : Color(0xFF1A1A2E)),
+                      color: Color(0xFF1A1A2E)),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${widget.durasiSewa} Bulan',
-                  style: const TextStyle(
-                      fontSize: 12, color: Color(0xFF9E9E9E)),
+                  style:
+                      const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   _controller.formatHarga(_controller.totalKamar),
                   style: const TextStyle(
-                      fontSize  : 14,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color     : Color(0xFF1BBA8A)),
+                      color: Color(0xFF1BBA8A)),
                 ),
               ],
             ),
@@ -805,19 +790,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
         children: [
           const Text('Furnitur Tambahan',
               style: TextStyle(
-                  fontSize  : 13,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color     : Color(0xFF1A1A2E))),
+                  color: Color(0xFF1A1A2E))),
           const SizedBox(height: 10),
           ..._controller.furniturItems.map((f) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   children: [
                     Container(
-                      width : 40,
+                      width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color       : const Color(0xFFE8F5E9),
+                        color: const Color(0xFFE8F5E9),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(Icons.chair_outlined,
@@ -830,12 +815,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         children: [
                           Text(f.nama,
                               style: const TextStyle(
-                                  fontSize  : 13,
-                                  fontWeight: FontWeight.w500)),
+                                  fontSize: 13, fontWeight: FontWeight.w500)),
                           Text('${f.jumlah}x',
                               style: const TextStyle(
-                                  fontSize: 11,
-                                  color   : Color(0xFF9E9E9E))),
+                                  fontSize: 11, color: Color(0xFF9E9E9E))),
                         ],
                       ),
                     ),
@@ -859,9 +842,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
         children: [
           const Text('Rincian Pembayaran',
               style: TextStyle(
-                  fontSize  : 14,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color     : Color(0xFF1A1A2E))),
+                  color: Color(0xFF1A1A2E))),
           const SizedBox(height: 12),
           _rincianRow(
             'Biaya kamar (${widget.durasiSewa} bln)',
@@ -885,29 +868,28 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget _buildBottomBar() {
     return Container(
-      color  : Colors.white,
+      color: Colors.white,
       padding: EdgeInsets.only(
-        left  : 16,
-        right : 16,
-        top   : 12,
+        left: 16,
+        right: 16,
+        top: 12,
         bottom: MediaQuery.of(context).padding.bottom + 12,
       ),
       child: Row(
         children: [
           Expanded(
             child: Column(
-              mainAxisSize      : MainAxisSize.min,
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('Total :',
-                    style: TextStyle(
-                        fontSize: 12, color: Color(0xFF9E9E9E))),
+                    style: TextStyle(fontSize: 12, color: Color(0xFF9E9E9E))),
                 Text(
                   _controller.formatHarga(_controller.totalPembayaran),
                   style: const TextStyle(
-                      fontSize  : 15,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color     : Color(0xFF1A1A2E)),
+                      color: Color(0xFF1A1A2E)),
                 ),
               ],
             ),
@@ -919,7 +901,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ? null
                   : () => _controller.buatPesanan(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor        : const Color(0xFF1BBA8A),
+                backgroundColor: const Color(0xFF1BBA8A),
                 disabledBackgroundColor:
                     const Color(0xFF1BBA8A).withOpacity(0.5),
                 foregroundColor: Colors.white,
@@ -930,14 +912,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
               child: _controller.isSubmitting
                   ? const SizedBox(
-                      width : 20,
+                      width: 20,
                       height: 20,
-                      child : CircularProgressIndicator(
+                      child: CircularProgressIndicator(
                           color: Colors.white, strokeWidth: 2))
                   : const Text('Buat Pesanan',
-                      style: TextStyle(
-                          fontSize  : 15,
-                          fontWeight: FontWeight.w600)),
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -953,35 +934,30 @@ class _CheckoutPageState extends State<CheckoutPage> {
 PreferredSizeWidget _appBar(String title) {
   return AppBar(
     backgroundColor: const Color(0xFF1BBA8A),
-    elevation      : 0,
+    elevation: 0,
     leading: Builder(
       builder: (ctx) => IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new,
-            color: Colors.white, size: 18),
+        icon:
+            const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
         onPressed: () => Navigator.pop(ctx),
       ),
     ),
     centerTitle: true,
     title: Text(title,
         style: const TextStyle(
-            color     : Colors.white,
-            fontSize  : 16,
-            fontWeight: FontWeight.w600)),
+            color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
   );
 }
 
 Widget _card({required Widget child}) {
   return Container(
-    width  : double.infinity,
+    width: double.infinity,
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
-      color       : Colors.white,
+      color: Colors.white,
       borderRadius: BorderRadius.circular(12),
-      boxShadow   : const [
-        BoxShadow(
-            color     : Color(0x0A000000),
-            blurRadius: 6,
-            offset    : Offset(0, 2))
+      boxShadow: const [
+        BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2))
       ],
     ),
     child: child,
@@ -997,16 +973,14 @@ Widget _infoRow(String label, String value, {Color? valueColor}) {
         SizedBox(
           width: 130,
           child: Text(label,
-              style: const TextStyle(
-                  fontSize: 13, color: Color(0xFF555555))),
+              style: const TextStyle(fontSize: 13, color: Color(0xFF555555))),
         ),
-        const Text(': ',
-            style: TextStyle(color: Color(0xFF555555))),
+        const Text(': ', style: TextStyle(color: Color(0xFF555555))),
         Expanded(
           child: Text(value,
               style: TextStyle(
-                  fontSize  : 13,
-                  color     : valueColor ?? const Color(0xFF1A1A2E),
+                  fontSize: 13,
+                  color: valueColor ?? const Color(0xFF1A1A2E),
                   fontWeight: FontWeight.w500)),
         ),
       ],
@@ -1022,15 +996,14 @@ Widget _rincianRow(String label, String value, {bool isBold = false}) {
       children: [
         Text(label,
             style: TextStyle(
-                fontSize  : 13,
-                color     : isBold
-                    ? const Color(0xFF1A1A2E)
-                    : const Color(0xFF555555),
+                fontSize: 13,
+                color:
+                    isBold ? const Color(0xFF1A1A2E) : const Color(0xFF555555),
                 fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
         Text(value,
             style: TextStyle(
-                fontSize  : 13,
-                color     : const Color(0xFF1A1A2E),
+                fontSize: 13,
+                color: const Color(0xFF1A1A2E),
                 fontWeight: isBold ? FontWeight.bold : FontWeight.w500)),
       ],
     ),
@@ -1039,14 +1012,13 @@ Widget _rincianRow(String label, String value, {bool isBold = false}) {
 
 Widget _kamarPlaceholder() {
   return Container(
-    width : 80,
+    width: 80,
     height: 80,
     decoration: BoxDecoration(
-      color       : const Color(0xFFE8F5E9),
+      color: const Color(0xFFE8F5E9),
       borderRadius: BorderRadius.circular(10),
     ),
-    child: const Icon(Icons.bed_outlined,
-        color: Color(0xFF1BBA8A), size: 32),
+    child: const Icon(Icons.bed_outlined, color: Color(0xFF1BBA8A), size: 32),
   );
 }
 
@@ -1057,8 +1029,7 @@ Widget _errorView(String message, VoidCallback onRetry) {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.error_outline,
-              size: 56, color: Color(0xFFB0B0C3)),
+          const Icon(Icons.error_outline, size: 56, color: Color(0xFFB0B0C3)),
           const SizedBox(height: 12),
           Text(message,
               textAlign: TextAlign.center,
@@ -1080,10 +1051,9 @@ Widget _errorView(String message, VoidCallback onRetry) {
   );
 }
 
-String _cap(String s) =>
-    s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 
-    class _PilihMetodeSheet extends StatefulWidget {
+class _PilihMetodeSheet extends StatefulWidget {
   const _PilihMetodeSheet();
 
   @override
@@ -1095,13 +1065,20 @@ class _PilihMetodeSheetState extends State<_PilihMetodeSheet> {
 
   String _logoPath(PaymentMethodType type) {
     switch (type) {
-      case PaymentMethodType.bcaVa:     return 'assets/banks/bca.png';
-      case PaymentMethodType.bniVa:     return 'assets/banks/bni.png';
-      case PaymentMethodType.briVa:     return 'assets/banks/bri.png';
-      case PaymentMethodType.permataVa: return 'assets/banks/permata.png';
-      case PaymentMethodType.qris:      return 'assets/payment/qris.png';
-      case PaymentMethodType.gopay:     return 'assets/payment/gopay.png';
-      case PaymentMethodType.shopeepay: return 'assets/payment/shopeepay.png';
+      case PaymentMethodType.bcaVa:
+        return 'assets/banks/bca.png';
+      case PaymentMethodType.bniVa:
+        return 'assets/banks/bni.png';
+      case PaymentMethodType.briVa:
+        return 'assets/banks/bri.png';
+      case PaymentMethodType.permataVa:
+        return 'assets/banks/permata.png';
+      case PaymentMethodType.qris:
+        return 'assets/payment/qris.png';
+      case PaymentMethodType.gopay:
+        return 'assets/payment/gopay.png';
+      case PaymentMethodType.shopeepay:
+        return 'assets/payment/shopeepay.png';
     }
   }
 
@@ -1130,9 +1107,8 @@ class _PilihMetodeSheetState extends State<_PilihMetodeSheet> {
                     : const Color(0xFFF5F7FA),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: isSelected
-                      ? const Color(0xFF1BBA8A)
-                      : Colors.transparent,
+                  color:
+                      isSelected ? const Color(0xFF1BBA8A) : Colors.transparent,
                   width: 1.5,
                 ),
               ),
@@ -1145,7 +1121,9 @@ class _PilihMetodeSheetState extends State<_PilihMetodeSheet> {
                       _logoPath(method),
                       fit: BoxFit.contain,
                       errorBuilder: (_, __, ___) => const Icon(
-                          Icons.account_balance, size: 20, color: Colors.grey),
+                          Icons.account_balance,
+                          size: 20,
+                          color: Colors.grey),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -1154,9 +1132,8 @@ class _PilihMetodeSheetState extends State<_PilihMetodeSheet> {
                       method.label,
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                         color: isSelected
                             ? const Color(0xFF1A1A2E)
                             : const Color(0xFF4A4A4A),
@@ -1175,9 +1152,8 @@ class _PilihMetodeSheetState extends State<_PilihMetodeSheet> {
                             : Colors.grey.shade300,
                         width: 2,
                       ),
-                      color: isSelected
-                          ? const Color(0xFF1BBA8A)
-                          : Colors.white,
+                      color:
+                          isSelected ? const Color(0xFF1BBA8A) : Colors.white,
                     ),
                     child: isSelected
                         ? const Icon(Icons.check, size: 12, color: Colors.white)
@@ -1192,111 +1168,112 @@ class _PilihMetodeSheetState extends State<_PilihMetodeSheet> {
     );
   }
 
-@override
-Widget build(BuildContext context) {
-  return DraggableScrollableSheet(
-    initialChildSize: 0.6,
-    minChildSize    : 0.4,
-    maxChildSize    : 0.92,
-    expand          : false,
-    builder: (_, scrollController) => Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          // ── Handle bar ─────────────────────────────────
-          Container(
-            width : 40, height: 4,
-            margin: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE0E0E0),
-              borderRadius: BorderRadius.circular(2),
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.92,
+      expand: false,
+      builder: (_, scrollController) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            // ── Handle bar ─────────────────────────────────
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE0E0E0),
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: const Align(
-              alignment: Alignment.centerLeft,
-              child: Text('Pilih Metode Pembayaran',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1A2E))),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // ── Scrollable list ────────────────────────────
-          Expanded(
-            child: SingleChildScrollView(
-              controller: scrollController,
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildGroup('Transfer Bank', [
-                    PaymentMethodType.bcaVa,
-                    PaymentMethodType.bniVa,
-                    PaymentMethodType.briVa,
-                    PaymentMethodType.permataVa,
-                  ]),
-                  const SizedBox(height: 10),
-                  const Divider(height: 1),
-                  const SizedBox(height: 10),
-                  _buildGroup('QRIS', [PaymentMethodType.qris]),
-                  const SizedBox(height: 10),
-                  const Divider(height: 1),
-                  const SizedBox(height: 10),
-                  _buildGroup('Dompet Digital', [
-                    PaymentMethodType.gopay,
-                    PaymentMethodType.shopeepay,
-                  ]),
-                  const SizedBox(height: 16),
+              child: const Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Pilih Metode Pembayaran',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1A1A2E))),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // ── Scrollable list ────────────────────────────
+            Expanded(
+              child: SingleChildScrollView(
+                controller: scrollController,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildGroup('Transfer Bank', [
+                      PaymentMethodType.bcaVa,
+                      PaymentMethodType.bniVa,
+                      PaymentMethodType.briVa,
+                      PaymentMethodType.permataVa,
+                    ]),
+                    const SizedBox(height: 10),
+                    const Divider(height: 1),
+                    const SizedBox(height: 10),
+                    _buildGroup('QRIS', [PaymentMethodType.qris]),
+                    const SizedBox(height: 10),
+                    const Divider(height: 1),
+                    const SizedBox(height: 10),
+                    _buildGroup('Dompet Digital', [
+                      PaymentMethodType.gopay,
+                      PaymentMethodType.shopeepay,
+                    ]),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Tombol fixed di bawah ──────────────────────
+            Container(
+              padding: EdgeInsets.fromLTRB(
+                  16, 12, 16, MediaQuery.of(context).padding.bottom + 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                      color: Color(0x15000000),
+                      blurRadius: 8,
+                      offset: Offset(0, -3)),
                 ],
               ),
-            ),
-          ),
-
-          // ── Tombol fixed di bawah ──────────────────────
-          Container(
-            padding: EdgeInsets.fromLTRB(
-                16, 12, 16, MediaQuery.of(context).padding.bottom + 16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                    color: Color(0x15000000),
-                    blurRadius: 8,
-                    offset: Offset(0, -3)),
-              ],
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: _selected == null
-                    ? null
-                    : () => Navigator.pop(context, _selected),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2ECC71),
-                  disabledBackgroundColor:
-                      const Color(0xFF1BBA8A).withOpacity(0.5),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: _selected == null
+                      ? null
+                      : () => Navigator.pop(context, _selected),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2ECC71),
+                    disabledBackgroundColor:
+                        const Color(0xFF1BBA8A).withOpacity(0.5),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                  ),
+                  child: const Text('Lanjut Bayar',
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                 ),
-                child: const Text('Lanjut Bayar',
-                    style: TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.w600)),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

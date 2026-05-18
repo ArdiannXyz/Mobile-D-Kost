@@ -37,8 +37,8 @@ class PaymentService {
       final headers = await ApiHelper.authHeaders;
 
       final body = <String, dynamic>{
-        'id_tagihan'   : idTagihan,
-        'payment_type' : method.paymentType,
+        'id_tagihan': idTagihan,
+        'payment_type': method.paymentType,
       };
 
       // Tambahkan bank jika VA
@@ -87,8 +87,8 @@ class PaymentService {
 
       final result = ApiHelper.handleResponse(response);
       return result['data']?['transaction_status'] ??
-             result['status'] ??
-             'pending';
+          result['status'] ??
+          'pending';
     } on ApiException {
       rethrow;
     } catch (_) {
@@ -117,64 +117,72 @@ class PaymentService {
   }
 
   /// Ambil data pembayaran pending yang sudah ada berdasarkan id_tagihan
-    static Future<PaymentResult> getExistingPayment(int idTagihan) async {
-      try {
-        final headers  = await ApiHelper.authHeaders;
-        final response = await http.get(
-          Uri.parse('${ApiConstants.baseUrl}pembayaran/pending/$idTagihan'),
-          headers: headers,
-        );
+  static Future<PaymentResult> getExistingPayment(int idTagihan) async {
+    try {
+      final headers = await ApiHelper.authHeaders;
+      final response = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}pembayaran/pending/$idTagihan'),
+        headers: headers,
+      );
 
-        final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-        if (response.statusCode == 200 && data['success'] == true) {
-          return parsePaymentResult(data['data'] as Map<String, dynamic>);
-        }
+      if (response.statusCode == 200 && data['success'] == true) {
+        return parsePaymentResult(data['data'] as Map<String, dynamic>);
+      }
 
-        // Tidak ada pending → coba buat baru pakai metode terakhir
-        final lastMethod = data['last_method'] as String?;
-        final lastBank   = data['last_bank']   as String?;
+      // Tidak ada pending → coba buat baru pakai metode terakhir
+      final lastMethod = data['last_method'] as String?;
+      final lastBank = data['last_bank'] as String?;
 
-        if (lastMethod == null) {
-              throw ApiException(
-                message   : 'no_previous_method',
-                statusCode: 404,
-              );
-            }
-
-        // Konversi ke PaymentMethodType
-        final method = _resolveMethod(lastMethod, lastBank);
-
-        return await createPayment(
-          idTagihan: idTagihan,
-          method   : method,
-        );
-      } on ApiException {
-        rethrow;
-      } catch (e) {
-        if (e is ApiException) rethrow;
+      if (lastMethod == null) {
         throw ApiException(
-          message   : 'Gagal memuat pembayaran: ${e.toString()}',
-          statusCode: 500,
+          message: 'no_previous_method',
+          statusCode: 404,
         );
       }
-    }
 
-    static PaymentMethodType _resolveMethod(String paymentType, String? bank) {
-      switch (paymentType) {
-        case 'bank_transfer':
-          switch (bank) {
-            case 'bca':     return PaymentMethodType.bcaVa;
-            case 'bni':     return PaymentMethodType.bniVa;
-            case 'bri':     return PaymentMethodType.briVa;
-            case 'permata': return PaymentMethodType.permataVa;
-            default:        return PaymentMethodType.bcaVa;
-          }
-        case 'qris':      return PaymentMethodType.qris;
-        case 'gopay':     return PaymentMethodType.gopay;
-        case 'shopeepay': return PaymentMethodType.shopeepay;
-        default:          return PaymentMethodType.qris;
-      }
+      // Konversi ke PaymentMethodType
+      final method = _resolveMethod(lastMethod, lastBank);
+
+      return await createPayment(
+        idTagihan: idTagihan,
+        method: method,
+      );
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException(
+        message: 'Gagal memuat pembayaran: ${e.toString()}',
+        statusCode: 500,
+      );
     }
+  }
+
+  static PaymentMethodType _resolveMethod(String paymentType, String? bank) {
+    switch (paymentType) {
+      case 'bank_transfer':
+        switch (bank) {
+          case 'bca':
+            return PaymentMethodType.bcaVa;
+          case 'bni':
+            return PaymentMethodType.bniVa;
+          case 'bri':
+            return PaymentMethodType.briVa;
+          case 'permata':
+            return PaymentMethodType.permataVa;
+          default:
+            return PaymentMethodType.bcaVa;
+        }
+      case 'qris':
+        return PaymentMethodType.qris;
+      case 'gopay':
+        return PaymentMethodType.gopay;
+      case 'shopeepay':
+        return PaymentMethodType.shopeepay;
+      default:
+        return PaymentMethodType.qris;
+    }
+  }
 }
-

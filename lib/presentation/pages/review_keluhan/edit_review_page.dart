@@ -20,7 +20,9 @@ class _EditReviewPageState extends State<EditReviewPage> {
       reviewId: widget.existingReview.idReview,
       kamarId: widget.existingReview.idKamar,
       existingReview: widget.existingReview,
-      onStateChanged: () { if (mounted) setState(() {}); },
+      onStateChanged: () {
+        if (mounted) setState(() {});
+      },
     );
   }
 
@@ -44,12 +46,16 @@ class _EditReviewPageState extends State<EditReviewPage> {
           backgroundColor: const Color(0xFF1BBA8A),
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+            icon: const Icon(Icons.arrow_back_ios_new,
+                color: Colors.white, size: 18),
             onPressed: () => _controller.handleBackPressed(context),
           ),
           centerTitle: true,
           title: const Text('Edit Ulasan',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600)),
         ),
         body: Column(
           children: [
@@ -83,17 +89,21 @@ class _EditReviewPageState extends State<EditReviewPage> {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(5, (i) => GestureDetector(
-          onTap: () => _controller.setRating(i + 1),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Icon(
-              i < _controller.selectedRating ? Icons.star_rounded : Icons.star_outline_rounded,
-              size: 38,
-              color: const Color(0xFFFFC107),
-            ),
-          ),
-        )),
+        children: List.generate(
+            5,
+            (i) => GestureDetector(
+                  onTap: () => _controller.setRating(i + 1),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: Icon(
+                      i < _controller.selectedRating
+                          ? Icons.star_rounded
+                          : Icons.star_outline_rounded,
+                      size: 38,
+                      color: const Color(0xFFFFC107),
+                    ),
+                  ),
+                )),
       ),
     );
   }
@@ -129,7 +139,9 @@ class _EditReviewPageState extends State<EditReviewPage> {
     return Container(
       color: Colors.white,
       padding: EdgeInsets.only(
-        left: 16, right: 16, top: 12,
+        left: 16,
+        right: 16,
+        top: 12,
         bottom: MediaQuery.of(context).padding.bottom + 12,
       ),
       child: Column(
@@ -144,16 +156,22 @@ class _EditReviewPageState extends State<EditReviewPage> {
                   : () => _controller.simpan(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1BBA8A),
-                disabledBackgroundColor: const Color(0xFF1BBA8A).withOpacity(0.5),
+                disabledBackgroundColor:
+                    const Color(0xFF1BBA8A).withOpacity(0.5),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 elevation: 0,
               ),
               child: _controller.isSubmitting
-                  ? const SizedBox(width: 20, height: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
                   : const Text('Simpan Perubahan',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
             ),
           ),
           const SizedBox(height: 10),
@@ -168,14 +186,19 @@ class _EditReviewPageState extends State<EditReviewPage> {
                 backgroundColor: Colors.red.shade400,
                 disabledBackgroundColor: Colors.red.shade200,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 elevation: 0,
               ),
               child: _controller.isDeleting
-                  ? const SizedBox(width: 20, height: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
                   : const Text('Hapus Ulasan',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
             ),
           ),
         ],

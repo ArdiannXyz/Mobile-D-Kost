@@ -96,7 +96,8 @@ class LupaPasswordController {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+            const Icon(Icons.check_circle_outline,
+                color: Colors.white, size: 20),
             const SizedBox(width: 10),
             Expanded(child: Text(message)),
           ],

@@ -14,8 +14,7 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
 
   final List<TextEditingController> _digitControllers =
       List.generate(6, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes =
-      List.generate(6, (_) => FocusNode());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
   @override
   void initState() {
@@ -170,8 +169,7 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
                             height: 56,
                             child: KeyboardListener(
                               focusNode: FocusNode(),
-                              onKeyEvent: (event) =>
-                                  _onKeyEvent(index, event),
+                              onKeyEvent: (event) => _onKeyEvent(index, event),
                               child: TextField(
                                 controller: _digitControllers[index],
                                 focusNode: _focusNodes[index],
@@ -227,12 +225,11 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
                                   children: [
                                     const TextSpan(
                                       text: 'Kirim ulang dalam ',
-                                      style: TextStyle(
-                                          color: Color(0xFF9E9E9E)),
+                                      style:
+                                          TextStyle(color: Color(0xFF9E9E9E)),
                                     ),
                                     TextSpan(
-                                      text:
-                                          '${_controller.cooldownSeconds}s',
+                                      text: '${_controller.cooldownSeconds}s',
                                       style: const TextStyle(
                                         color: Color(0xFF1BBA8A),
                                         fontWeight: FontWeight.w600,
@@ -242,8 +239,7 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
                                 ),
                               )
                             : TextButton(
-                                onPressed: () =>
-                                    _controller.resendOtp(context),
+                                onPressed: () => _controller.resendOtp(context),
                                 child: const Text(
                                   'Kirim ulang kode OTP',
                                   style: TextStyle(
@@ -266,13 +262,12 @@ class _MasukOtpPageState extends State<MasukOtpPage> {
                               : () => _controller.submitOtp(context),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1BBA8A),
-                            disabledBackgroundColor: const Color(0xFF1BBA8A)
-                                .withValues(alpha: 0.5),
+                            disabledBackgroundColor:
+                                const Color(0xFF1BBA8A).withValues(alpha: 0.5),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 16),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             elevation: 0,
                           ),
                           child: _controller.isLoading

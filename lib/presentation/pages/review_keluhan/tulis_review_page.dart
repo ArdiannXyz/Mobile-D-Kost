@@ -95,8 +95,7 @@ class _TulisReviewPageState extends State<TulisReviewPage> {
                 const SizedBox(height: 8),
                 const Text(
                   'Hanya penghuni kamar ini yang dapat memberikan ulasan.',
-                  style:
-                      TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
+                  style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -112,8 +111,8 @@ class _TulisReviewPageState extends State<TulisReviewPage> {
                         borderRadius: BorderRadius.circular(12)),
                   ),
                   child: const Text('Kembali',
-                      style: TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w600)),
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                 ),
               ],
             ),
@@ -187,8 +186,7 @@ class _TulisReviewPageState extends State<TulisReviewPage> {
       child: Column(
         children: [
           const Text('Seberapa puas Anda?',
-              style: TextStyle(
-                  fontSize: 13, color: Color(0xFF9E9E9E))),
+              style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E))),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -234,8 +232,7 @@ class _TulisReviewPageState extends State<TulisReviewPage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide:
-              const BorderSide(color: Color(0xFF1BBA8A), width: 1.5),
+          borderSide: const BorderSide(color: Color(0xFF1BBA8A), width: 1.5),
         ),
         contentPadding: const EdgeInsets.all(14),
       ),
@@ -260,11 +257,10 @@ class _TulisReviewPageState extends State<TulisReviewPage> {
               : () => _controller.submit(context),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF1BBA8A),
-            disabledBackgroundColor:
-                const Color(0xFF1BBA8A).withOpacity(0.5),
+            disabledBackgroundColor: const Color(0xFF1BBA8A).withOpacity(0.5),
             foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 0,
           ),
           child: _controller.isSubmitting
@@ -274,8 +270,7 @@ class _TulisReviewPageState extends State<TulisReviewPage> {
                   child: CircularProgressIndicator(
                       color: Colors.white, strokeWidth: 2))
               : const Text('Posting',
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
         ),
       ),
     );

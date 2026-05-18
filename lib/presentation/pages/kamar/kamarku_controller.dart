@@ -18,40 +18,39 @@ class KamarkuController {
 
   KamarkuController({required this.onStateChanged});
 
-Future<void> loadBookings() async {
-  isLoading    = true;
-  errorMessage = null;
-  onStateChanged();
-
-  try {
-    final userId = await ApiHelper.getUserId();
-    if (userId == null) {
-      errorMessage = 'Sesi tidak ditemukan.';
-      return;
-    }
-    bookings = await BookingService.getBookingAktif(userId);
-
-    // ── DEBUG ──────────────────────────────────────────────
-    print('=== KAMARKU DEBUG ===');
-    print('Total bookings: ${bookings.length}');
-    for (var b in bookings) {
-      print('ID: ${b.idBooking}');
-      print('fotoKamar: ${b.fotoKamar}');
-      print('nomorKamar: ${b.nomorKamar}');
-      print('tipeKamar: ${b.tipeKamar}');
-    }
-    print('=====================');
-    // ── END DEBUG ──────────────────────────────────────────
-
-  } on ApiException catch (e) {
-    errorMessage = e.message;
-  } catch (_) {
-    errorMessage = 'Gagal memuat data kamarku.';
-  } finally {
-    isLoading = false;
+  Future<void> loadBookings() async {
+    isLoading = true;
+    errorMessage = null;
     onStateChanged();
+
+    try {
+      final userId = await ApiHelper.getUserId();
+      if (userId == null) {
+        errorMessage = 'Sesi tidak ditemukan.';
+        return;
+      }
+      bookings = await BookingService.getBookingAktif(userId);
+
+      // ── DEBUG ──────────────────────────────────────────────
+      print('=== KAMARKU DEBUG ===');
+      print('Total bookings: ${bookings.length}');
+      for (var b in bookings) {
+        print('ID: ${b.idBooking}');
+        print('fotoKamar: ${b.fotoKamar}');
+        print('nomorKamar: ${b.nomorKamar}');
+        print('tipeKamar: ${b.tipeKamar}');
+      }
+      print('=====================');
+      // ── END DEBUG ──────────────────────────────────────────
+    } on ApiException catch (e) {
+      errorMessage = e.message;
+    } catch (_) {
+      errorMessage = 'Gagal memuat data kamarku.';
+    } finally {
+      isLoading = false;
+      onStateChanged();
+    }
   }
-}
 
   // ── Bangun URL foto dari path relatif ──────────────────────
   String? buildFotoUrl(String? fotoPath) {
@@ -79,23 +78,35 @@ Future<void> loadBookings() async {
 
   String statusLabel(String status) {
     switch (status) {
-      case 'menunggu_pembayaran': return 'Menunggu Pembayaran';
-      case 'aktif':               return 'Aktif';
-      case 'selesai':             return 'Selesai';
-      case 'batal':               return 'Dibatalkan';
-      case 'expired':             return 'Kadaluarsa';
-      default:                    return status;
+      case 'menunggu_pembayaran':
+        return 'Menunggu Pembayaran';
+      case 'aktif':
+        return 'Aktif';
+      case 'selesai':
+        return 'Selesai';
+      case 'batal':
+        return 'Dibatalkan';
+      case 'expired':
+        return 'Kadaluarsa';
+      default:
+        return status;
     }
   }
 
   Color statusColor(String status) {
     switch (status) {
-      case 'menunggu_pembayaran': return const Color(0xFFF39C12);
-      case 'aktif':               return const Color(0xFF1BBA8A);
-      case 'selesai':             return const Color(0xFF3498DB);
-      case 'batal':               return const Color(0xFFE74C3C);
-      case 'expired':             return const Color(0xFF9E9E9E);
-      default:                    return const Color(0xFF9E9E9E);
+      case 'menunggu_pembayaran':
+        return const Color(0xFFF39C12);
+      case 'aktif':
+        return const Color(0xFF1BBA8A);
+      case 'selesai':
+        return const Color(0xFF3498DB);
+      case 'batal':
+        return const Color(0xFFE74C3C);
+      case 'expired':
+        return const Color(0xFF9E9E9E);
+      default:
+        return const Color(0xFF9E9E9E);
     }
   }
 

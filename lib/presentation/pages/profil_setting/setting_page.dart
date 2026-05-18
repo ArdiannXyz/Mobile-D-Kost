@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'setting_controller.dart';
 import 'package:dkost/main.dart';
 
-
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
 
@@ -35,22 +34,22 @@ class _SettingPageState extends State<SettingPage> with RouteAware {
     _controller.init();
   }
 
-        @override
-      void didChangeDependencies() {
-        super.didChangeDependencies();
-        routeObserver.subscribe(this, ModalRoute.of(context)!);
-      }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
 
-      @override
-      void dispose() {
-        routeObserver.unsubscribe(this); 
-        super.dispose();
-      }
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
 
-      @override
-      void didPopNext() {
-        _controller.init();
-      }
+  @override
+  void didPopNext() {
+    _controller.init();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,16 +81,13 @@ class _SettingPageState extends State<SettingPage> with RouteAware {
                       assetIcon: 'assets/images/guidebook.png',
                       label: 'FAQ',
                       onTap: () => _controller.goToPanduan(context),
-                    ), 
-                     _MenuItem(
-                      assetIcon:
-                          'assets/images/change-password-icon.png',
+                    ),
+                    _MenuItem(
+                      assetIcon: 'assets/images/change-password-icon.png',
                       label: 'Lupa Password',
-                      onTap: () =>
-                          _controller.goToLupaPassword(context),
+                      onTap: () => _controller.goToLupaPassword(context),
                     ),
                   ]),
-                  
                   _buildMenuGroup([
                     _MenuItem(
                       assetIcon: 'assets/images/logout.png',
@@ -117,7 +113,7 @@ class _SettingPageState extends State<SettingPage> with RouteAware {
       decoration: const BoxDecoration(
         color: Color(0xFF1BBA8A),
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(18),  // ← sesuaikan angkanya
+          bottomLeft: Radius.circular(18), // ← sesuaikan angkanya
           bottomRight: Radius.circular(18),
         ),
       ),
@@ -127,7 +123,9 @@ class _SettingPageState extends State<SettingPage> with RouteAware {
       ),
       child: Column(
         children: [
-         SizedBox(height: 10,),
+          SizedBox(
+            height: 10,
+          ),
           // Avatar
           Container(
             width: 90,
@@ -189,27 +187,31 @@ class _SettingPageState extends State<SettingPage> with RouteAware {
   }
 
   // ── Menu Group ────────────────────────────────────────────
-Widget _buildMenuGroup(List<_MenuItem> items) {
-  return Column(
-    children: items.map((item) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4), // ← gap antar card
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12), // ← rounded per item
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x0A000000),
-              blurRadius: 4,
-              offset: Offset(0, 1),
-            ),
-          ],
-        ),
-        child: _buildMenuTile(item),
-      ),
-    )).toList(),
-  );
-}
+  Widget _buildMenuGroup(List<_MenuItem> items) {
+    return Column(
+      children: items
+          .map((item) => Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 4), // ← gap antar card
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius:
+                        BorderRadius.circular(12), // ← rounded per item
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x0A000000),
+                        blurRadius: 4,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: _buildMenuTile(item),
+                ),
+              ))
+          .toList(),
+    );
+  }
 
   Widget _buildMenuTile(_MenuItem item) {
     return InkWell(

@@ -4,12 +4,12 @@
 
 class ChatMessage {
   final String text;
-  final bool   isUser;
-  final bool   isLoading;
+  final bool isUser;
+  final bool isLoading;
   final List<Map<String, dynamic>>? dataList;
   final List<Map<String, dynamic>>? kamarList; // ← TAMBAH INI
   final String? type;
-  final bool   fromCache;
+  final bool fromCache;
   final DateTime createdAt;
 
   ChatMessage({

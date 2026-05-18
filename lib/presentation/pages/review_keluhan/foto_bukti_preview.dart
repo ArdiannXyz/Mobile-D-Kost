@@ -59,14 +59,12 @@ class FotoBuktiPreview extends StatelessWidget {
               SizedBox(height: 8),
               Text(
                 'Tambah Foto Bukti',
-                style:
-                    TextStyle(color: Color(0xFF9E9E9E), fontSize: 13),
+                style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13),
               ),
               SizedBox(height: 4),
               Text(
                 'Opsional',
-                style:
-                    TextStyle(color: Color(0xFFB0B0C3), fontSize: 11),
+                style: TextStyle(color: Color(0xFFB0B0C3), fontSize: 11),
               ),
             ],
           ),
@@ -79,7 +77,8 @@ class FotoBuktiPreview extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
-          child: Image.memory(        // ← Image.memory, bukan Image.file
+          child: Image.memory(
+            // ← Image.memory, bukan Image.file
             bytes!,
             width: double.infinity,
             height: 160,
@@ -109,8 +108,7 @@ class FotoBuktiPreview extends StatelessWidget {
                 color: Colors.black.withOpacity(0.55),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.close,
-                  color: Colors.white, size: 16),
+              child: const Icon(Icons.close, color: Colors.white, size: 16),
             ),
           ),
         ),
@@ -122,11 +120,10 @@ class FotoBuktiPreview extends StatelessWidget {
             left: 0,
             right: 0,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(
-                    bottom: Radius.circular(10)),
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(10)),
                 color: Colors.black.withOpacity(0.45),
               ),
               child: Text(

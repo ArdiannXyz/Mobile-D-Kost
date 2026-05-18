@@ -49,8 +49,7 @@ class _SearchPageState extends State<SearchPage> {
           Expanded(
             child: _controller.isLoading
                 ? const Center(
-                    child: CircularProgressIndicator(
-                        color: Color(0xFF1BBA8A)))
+                    child: CircularProgressIndicator(color: Color(0xFF1BBA8A)))
                 : _controller.currentMode == sc.SearchMode.suggestion
                     ? _buildSuggestionView()
                     : _buildResultsView(),
@@ -86,16 +85,14 @@ class _SearchPageState extends State<SearchPage> {
               child: TextField(
                 controller: _controller.searchTextController,
                 focusNode: _controller.searchFocusNode,
-                style: const TextStyle(
-                    fontSize: 14, color: Color(0xFF1A1A2E)),
+                style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
                 decoration: InputDecoration(
                   hintText: 'Cari nomor atau tipe kamar...',
-                  hintStyle: const TextStyle(
-                      color: Color(0xFFBBBBBB), fontSize: 13),
+                  hintStyle:
+                      const TextStyle(color: Color(0xFFBBBBBB), fontSize: 13),
                   prefixIcon: const Icon(Icons.search,
                       color: Color(0xFFAAAAAA), size: 20),
-                  suffixIcon: _controller
-                          .searchTextController.text.isNotEmpty
+                  suffixIcon: _controller.searchTextController.text.isNotEmpty
                       ? GestureDetector(
                           onTap: _controller.clearSearch,
                           child: const Icon(Icons.close,
@@ -103,8 +100,8 @@ class _SearchPageState extends State<SearchPage> {
                         )
                       : null,
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 12),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 ),
                 onSubmitted: _controller.performSearch,
                 textInputAction: TextInputAction.search,
@@ -120,10 +117,8 @@ class _SearchPageState extends State<SearchPage> {
     return ListView(
       padding: EdgeInsets.zero,
       children: [
-        if (_controller.searchSuggestions.isNotEmpty)
-          _buildSuggestionList(),
-        if (_controller.searchHistory.isNotEmpty)
-          _buildHistorySection(),
+        if (_controller.searchSuggestions.isNotEmpty) _buildSuggestionList(),
+        if (_controller.searchHistory.isNotEmpty) _buildHistorySection(),
         _buildPopularKeywords(),
         _buildPriceKeywords(),
       ],
@@ -143,11 +138,11 @@ class _SearchPageState extends State<SearchPage> {
                   fontWeight: FontWeight.w600)),
         ),
         ..._controller.searchSuggestions.map((s) => ListTile(
-              leading: const Icon(Icons.search,
-                  color: Color(0xFF1BBA8A), size: 18),
+              leading:
+                  const Icon(Icons.search, color: Color(0xFF1BBA8A), size: 18),
               title: Text(s,
-                  style: const TextStyle(
-                      fontSize: 14, color: Color(0xFF1A1A2E))),
+                  style:
+                      const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E))),
               dense: true,
               onTap: () => _controller.useSuggestion(s),
             )),
@@ -174,7 +169,8 @@ class _SearchPageState extends State<SearchPage> {
                           fontWeight: FontWeight.w600)),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE8F5E9),
                       borderRadius: BorderRadius.circular(10),
@@ -202,15 +198,15 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
         ..._controller.searchHistory.map((h) => ListTile(
-              leading: const Icon(Icons.history,
-                  color: Color(0xFF9E9E9E), size: 18),
+              leading:
+                  const Icon(Icons.history, color: Color(0xFF9E9E9E), size: 18),
               title: Text(h,
-                  style: const TextStyle(
-                      fontSize: 14, color: Color(0xFF1A1A2E))),
+                  style:
+                      const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E))),
               trailing: GestureDetector(
                 onTap: () => _controller.removeFromHistory(h),
-                child: const Icon(Icons.close,
-                    size: 16, color: Color(0xFFB0B0C3)),
+                child:
+                    const Icon(Icons.close, size: 16, color: Color(0xFFB0B0C3)),
               ),
               dense: true,
               onTap: () => _controller.useSuggestion(h),
@@ -241,8 +237,8 @@ class _SearchPageState extends State<SearchPage> {
               return GestureDetector(
                 onTap: () => _controller.useSuggestion(k),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 7),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                   decoration: BoxDecoration(
                     color: const Color(0xFFE8F5E9),
                     borderRadius: BorderRadius.circular(20),
@@ -348,9 +344,7 @@ class _SearchPageState extends State<SearchPage> {
             const SizedBox(width: 6),
             Text(label,
                 style: TextStyle(
-                    fontSize: 12,
-                    color: color,
-                    fontWeight: FontWeight.w500)),
+                    fontSize: 12, color: color, fontWeight: FontWeight.w500)),
           ],
         ),
       ),
@@ -361,8 +355,7 @@ class _SearchPageState extends State<SearchPage> {
     return Column(
       children: [
         Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           color: Colors.white,
           child: Row(
             children: [
@@ -372,16 +365,14 @@ class _SearchPageState extends State<SearchPage> {
                     style: const TextStyle(fontSize: 13),
                     children: [
                       TextSpan(
-                        text:
-                            '${_controller.searchResults.length} kamar',
+                        text: '${_controller.searchResults.length} kamar',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF1A1A2E),
                         ),
                       ),
                       TextSpan(
-                        text:
-                            ' untuk "${_controller.currentQuery}"',
+                        text: ' untuk "${_controller.currentQuery}"',
                         style: const TextStyle(color: Color(0xFF9E9E9E)),
                       ),
                     ],
@@ -448,9 +439,7 @@ class _SearchPageState extends State<SearchPage> {
               'Tidak ada kamar untuk\n"${_controller.currentQuery}"',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                  color: Color(0xFF9E9E9E),
-                  fontSize: 14,
-                  height: 1.5),
+                  color: Color(0xFF9E9E9E), fontSize: 14, height: 1.5),
             ),
             const SizedBox(height: 16),
             TextButton(

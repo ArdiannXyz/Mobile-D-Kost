@@ -18,13 +18,20 @@ enum PaymentMethodType {
 extension PaymentMethodTypeExt on PaymentMethodType {
   String get label {
     switch (this) {
-      case PaymentMethodType.bcaVa:     return 'BCA Virtual Account';
-      case PaymentMethodType.bniVa:     return 'BNI Virtual Account';
-      case PaymentMethodType.briVa:     return 'BRI Virtual Account';
-      case PaymentMethodType.permataVa: return 'Permata Virtual Account';
-      case PaymentMethodType.qris:      return 'QRIS';
-      case PaymentMethodType.gopay:     return 'GoPay';
-      case PaymentMethodType.shopeepay: return 'ShopeePay';
+      case PaymentMethodType.bcaVa:
+        return 'BCA Virtual Account';
+      case PaymentMethodType.bniVa:
+        return 'BNI Virtual Account';
+      case PaymentMethodType.briVa:
+        return 'BRI Virtual Account';
+      case PaymentMethodType.permataVa:
+        return 'Permata Virtual Account';
+      case PaymentMethodType.qris:
+        return 'QRIS';
+      case PaymentMethodType.gopay:
+        return 'GoPay';
+      case PaymentMethodType.shopeepay:
+        return 'ShopeePay';
     }
   }
 
@@ -46,11 +53,16 @@ extension PaymentMethodTypeExt on PaymentMethodType {
 
   String? get bank {
     switch (this) {
-      case PaymentMethodType.bcaVa:     return 'bca';
-      case PaymentMethodType.bniVa:     return 'bni';
-      case PaymentMethodType.briVa:     return 'bri';
-      case PaymentMethodType.permataVa: return 'permata';
-      default:                          return null;
+      case PaymentMethodType.bcaVa:
+        return 'bca';
+      case PaymentMethodType.bniVa:
+        return 'bni';
+      case PaymentMethodType.briVa:
+        return 'bri';
+      case PaymentMethodType.permataVa:
+        return 'permata';
+      default:
+        return null;
     }
   }
 
@@ -99,55 +111,58 @@ class VaPaymentResult extends PaymentResult {
   });
 
   factory VaPaymentResult.fromJson(Map<String, dynamic> json) {
-
     // lihat isi va_numbers
     // Midtrans response untuk bank_transfer:
     //   BCA/BNI/BRI → va_numbers: [{ "bank": "bri", "va_number": "xxx" }]
     //   Mandiri      → bill_key + biller_code (tidak pakai va_numbers)
-    String bank     = '';
+    String bank = '';
     String vaNumber = '';
 
     final vaNumbers = json['va_numbers'] as List? ?? [];
     if (vaNumbers.isNotEmpty) {
-      bank     = vaNumbers[0]['bank']?.toString() ?? '';
+      bank = vaNumbers[0]['bank']?.toString() ?? '';
       vaNumber = vaNumbers[0]['va_number']?.toString() ?? '';
     }
 
-        // Permata pakai field sendiri
+    // Permata pakai field sendiri
     if (bank.isEmpty && json['permata_va_number'] != null) {
-      bank     = 'permata';
+      bank = 'permata';
       vaNumber = json['permata_va_number'].toString();
     }
 
-        print('=== VA fromJson ===');
+    print('=== VA fromJson ===');
     print(json);
     print('permata_va_number: ${json['permata_va_number']}');
     print('va_numbers: ${json['va_numbers']}');
 
     // Fallback
-    if (bank.isEmpty)     bank     = json['bank']?.toString() ?? '';
+    if (bank.isEmpty) bank = json['bank']?.toString() ?? '';
     if (vaNumber.isEmpty) vaNumber = json['va_number']?.toString() ?? '';
 
     return VaPaymentResult(
-      vaNumber    : vaNumber,
-      bank        : bank,
-      orderId     : json['order_id']?.toString() ?? '',
-      grossAmount : double.tryParse(json['gross_amount']?.toString() ?? '0') ?? 0,
-      expiredAt   : _parseExpired(json),
-      status      : json['transaction_status']?.toString() ?? 'pending',
-      methodType  : _bankToMethodType(bank),
-
-      
+      vaNumber: vaNumber,
+      bank: bank,
+      orderId: json['order_id']?.toString() ?? '',
+      grossAmount:
+          double.tryParse(json['gross_amount']?.toString() ?? '0') ?? 0,
+      expiredAt: _parseExpired(json),
+      status: json['transaction_status']?.toString() ?? 'pending',
+      methodType: _bankToMethodType(bank),
     );
   }
 
   static PaymentMethodType _bankToMethodType(String bank) {
     switch (bank.toLowerCase()) {
-      case 'bca':     return PaymentMethodType.bcaVa;
-      case 'bni':     return PaymentMethodType.bniVa;
-      case 'bri':     return PaymentMethodType.briVa;
-      case 'permata': return PaymentMethodType.permataVa;
-      default:        return PaymentMethodType.bcaVa;
+      case 'bca':
+        return PaymentMethodType.bcaVa;
+      case 'bni':
+        return PaymentMethodType.bniVa;
+      case 'bri':
+        return PaymentMethodType.briVa;
+      case 'permata':
+        return PaymentMethodType.permataVa;
+      default:
+        return PaymentMethodType.bcaVa;
     }
   }
 }
@@ -176,7 +191,7 @@ class QrisPaymentResult extends PaymentResult {
     //   ]
     // }
     final actions = json['actions'] as List? ?? [];
-    String qrUrl  = '';
+    String qrUrl = '';
 
     for (final a in actions) {
       if (a['name']?.toString() == 'generate-qr-code') {
@@ -186,13 +201,14 @@ class QrisPaymentResult extends PaymentResult {
     }
 
     return QrisPaymentResult(
-      qrCodeUrl   : qrUrl,
-      qrString    : json['qr_string']?.toString() ?? '',
-      orderId     : json['order_id']?.toString() ?? '',
-      grossAmount : double.tryParse(json['gross_amount']?.toString() ?? '0') ?? 0,
-      expiredAt   : _parseExpired(json),
-      status      : json['transaction_status']?.toString() ?? 'pending',
-      methodType  : PaymentMethodType.qris,
+      qrCodeUrl: qrUrl,
+      qrString: json['qr_string']?.toString() ?? '',
+      orderId: json['order_id']?.toString() ?? '',
+      grossAmount:
+          double.tryParse(json['gross_amount']?.toString() ?? '0') ?? 0,
+      expiredAt: _parseExpired(json),
+      status: json['transaction_status']?.toString() ?? 'pending',
+      methodType: PaymentMethodType.qris,
     );
   }
 }
@@ -223,22 +239,23 @@ class EwalletPaymentResult extends PaymentResult {
     // }
     final actions = json['actions'] as List? ?? [];
     String deeplink = '';
-    String qrUrl    = '';
+    String qrUrl = '';
 
     for (final a in actions) {
       final name = a['name']?.toString() ?? '';
       if (name == 'deeplink-redirect') deeplink = a['url']?.toString() ?? '';
-      if (name == 'generate-qr-code')  qrUrl    = a['url']?.toString() ?? '';
+      if (name == 'generate-qr-code') qrUrl = a['url']?.toString() ?? '';
     }
 
     return EwalletPaymentResult(
-      deeplinkUrl : deeplink,
-      qrCodeUrl   : qrUrl,
-      orderId     : json['order_id']?.toString() ?? '',
-      grossAmount : double.tryParse(json['gross_amount']?.toString() ?? '0') ?? 0,
-      expiredAt   : _parseExpired(json),
-      status      : json['transaction_status']?.toString() ?? 'pending',
-      methodType  : type,
+      deeplinkUrl: deeplink,
+      qrCodeUrl: qrUrl,
+      orderId: json['order_id']?.toString() ?? '',
+      grossAmount:
+          double.tryParse(json['gross_amount']?.toString() ?? '0') ?? 0,
+      expiredAt: _parseExpired(json),
+      status: json['transaction_status']?.toString() ?? 'pending',
+      methodType: type,
     );
   }
 }

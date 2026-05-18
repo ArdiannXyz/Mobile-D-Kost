@@ -24,7 +24,9 @@ class _SemuaReviewPageState extends State<SemuaReviewPage> {
     super.initState();
     _controller = SemuaReviewController(
       kamarId: widget.kamarId,
-      onStateChanged: () { if (mounted) setState(() {}); },
+      onStateChanged: () {
+        if (mounted) setState(() {});
+      },
     );
     _controller.loadReviews();
   }
@@ -43,22 +45,26 @@ class _SemuaReviewPageState extends State<SemuaReviewPage> {
       backgroundColor: const Color(0xFF1BBA8A),
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+        icon:
+            const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
         onPressed: () => _controller.goBack(context),
       ),
       centerTitle: true,
       title: const Text('Semua Ulasan',
-          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+          style: TextStyle(
+              color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
     );
   }
 
   Widget _buildBody() {
     if (_controller.isLoading) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFF1BBA8A)));
+      return const Center(
+          child: CircularProgressIndicator(color: Color(0xFF1BBA8A)));
     }
     if (_controller.errorMessage != null) {
-      return Center(child: Text(_controller.errorMessage!,
-          style: const TextStyle(color: Color(0xFF9E9E9E))));
+      return Center(
+          child: Text(_controller.errorMessage!,
+              style: const TextStyle(color: Color(0xFF9E9E9E))));
     }
 
     return Column(
@@ -82,7 +88,8 @@ class _SemuaReviewPageState extends State<SemuaReviewPage> {
               ),
               const SizedBox(width: 6),
               Text('(${_controller.filteredReviews.length})',
-                  style: const TextStyle(color: Color(0xFF9E9E9E), fontSize: 13)),
+                  style:
+                      const TextStyle(color: Color(0xFF9E9E9E), fontSize: 13)),
             ],
           ),
         ),
@@ -93,9 +100,11 @@ class _SemuaReviewPageState extends State<SemuaReviewPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.rate_review_outlined, size: 56, color: Color(0xFFB0B0C3)),
+                      Icon(Icons.rate_review_outlined,
+                          size: 56, color: Color(0xFFB0B0C3)),
                       SizedBox(height: 12),
-                      Text('Belum ada ulasan', style: TextStyle(color: Color(0xFF9E9E9E))),
+                      Text('Belum ada ulasan',
+                          style: TextStyle(color: Color(0xFF9E9E9E))),
                     ],
                   ),
                 )
@@ -138,7 +147,8 @@ class _SemuaReviewPageState extends State<SemuaReviewPage> {
           color: isSelected ? const Color(0xFF2ECC71) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFF1BBA8A) : const Color(0xFFE0E0E0),
+            color:
+                isSelected ? const Color(0xFF1BBA8A) : const Color(0xFFE0E0E0),
           ),
         ),
         child: Text(label,
@@ -164,7 +174,10 @@ class _ReviewCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2))],
+        boxShadow: const [
+          BoxShadow(
+              color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2))
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,8 +186,11 @@ class _ReviewCard extends StatelessWidget {
             radius: 20,
             backgroundColor: const Color(0xFF1BBA8A).withOpacity(0.15),
             child: Text(
-              review.namaUser.isNotEmpty ? review.namaUser[0].toUpperCase() : 'U',
-              style: const TextStyle(color: Color(0xFF1BBA8A), fontWeight: FontWeight.bold),
+              review.namaUser.isNotEmpty
+                  ? review.namaUser[0].toUpperCase()
+                  : 'U',
+              style: const TextStyle(
+                  color: Color(0xFF1BBA8A), fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(width: 10),
@@ -183,17 +199,26 @@ class _ReviewCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(review.namaUser,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF1A1A2E))),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        color: Color(0xFF1A1A2E))),
                 const SizedBox(height: 4),
                 Row(
-                  children: List.generate(5, (i) => Icon(
-                    i < review.rating ? Icons.star_rounded : Icons.star_outline_rounded,
-                    size: 14, color: const Color(0xFFFFC107),
-                  )),
+                  children: List.generate(
+                      5,
+                      (i) => Icon(
+                            i < review.rating
+                                ? Icons.star_rounded
+                                : Icons.star_outline_rounded,
+                            size: 14,
+                            color: const Color(0xFFFFC107),
+                          )),
                 ),
                 const SizedBox(height: 6),
                 Text(review.komentar,
-                    style: const TextStyle(fontSize: 13, color: Color(0xFF555555), height: 1.4)),
+                    style: const TextStyle(
+                        fontSize: 13, color: Color(0xFF555555), height: 1.4)),
               ],
             ),
           ),

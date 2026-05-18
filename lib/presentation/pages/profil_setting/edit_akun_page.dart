@@ -58,8 +58,8 @@ class _EditProfilPageState extends State<EditProfilPage> {
       backgroundColor: const Color(0xFF1BBA8A),
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new,
-            color: Colors.white, size: 18),
+        icon:
+            const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
         onPressed: () async {
           final shouldPop = await _controller.onWillPop(context);
           if (shouldPop && context.mounted) Navigator.pop(context);
@@ -87,7 +87,6 @@ class _EditProfilPageState extends State<EditProfilPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 // ── Nama: hanya huruf & spasi, max 50 ────────
                 _buildInputField(
                   label: 'Nama',
@@ -132,7 +131,6 @@ class _EditProfilPageState extends State<EditProfilPage> {
                   maxLines: 2,
                   maxLength: 100,
                 ),
-
               ],
             ),
           ),
@@ -172,8 +170,8 @@ class _EditProfilPageState extends State<EditProfilPage> {
                     )
                   : const Text(
                       'Simpan',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
             ),
           ),
@@ -214,20 +212,17 @@ class _EditProfilPageState extends State<EditProfilPage> {
           inputFormatters: inputFormatters,
           style: TextStyle(
             fontSize: 14,
-            color: enabled
-                ? const Color(0xFF1A1A2E)
-                : const Color(0xFF9E9E9E),
+            color: enabled ? const Color(0xFF1A1A2E) : const Color(0xFF9E9E9E),
           ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Color(0xFFB0B0C3)),
             filled: true,
-            fillColor:
-                enabled ? Colors.white : const Color(0xFFF5F5F5),
+            fillColor: enabled ? Colors.white : const Color(0xFFF5F5F5),
             // Counter disembunyikan — batas tetap aktif via maxLength
             counterText: '',
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14, vertical: 12),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
@@ -242,8 +237,8 @@ class _EditProfilPageState extends State<EditProfilPage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                  color: Color(0xFF1BBA8A), width: 1.5),
+              borderSide:
+                  const BorderSide(color: Color(0xFF1BBA8A), width: 1.5),
             ),
           ),
         ),

@@ -5,12 +5,13 @@ import '../../../data/helper/api_exception.dart';
 class GantiPasswordController {
   // ── State ──────────────────────────────────────────────────
   bool isLoading = false;
-  bool obscureNewPassword     = true;
+  bool obscureNewPassword = true;
   bool obscureConfirmPassword = true;
 
   // ── Text Controllers ───────────────────────────────────────
-  final TextEditingController newPasswordController     = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController newPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   String email = '';
 
@@ -44,7 +45,7 @@ class GantiPasswordController {
 
   // ── Validasi (client-side) ─────────────────────────────────
   String? validate() {
-    final newPass     = newPasswordController.text;
+    final newPass = newPasswordController.text;
     final confirmPass = confirmPasswordController.text;
 
     if (newPass.isEmpty || confirmPass.isEmpty) {
@@ -83,9 +84,9 @@ class GantiPasswordController {
 
     try {
       final result = await UserService.gantiPassword(
-        email                : email,
-        password             : newPasswordController.text,
-        passwordConfirmation : confirmPasswordController.text,
+        email: email,
+        password: newPasswordController.text,
+        passwordConfirmation: confirmPasswordController.text,
       );
 
       if (!context.mounted) return;

@@ -23,7 +23,7 @@ import '../../../data/services/payment_service.dart';
 
 // ── Controller: Detail Kamarku ────────────────────────────────
 class DetailKamarkuController {
-  bool isLoading    = true;
+  bool isLoading = true;
   bool isSubmitting = false;
   String? errorMessage;
   BookingModel? booking;
@@ -31,7 +31,7 @@ class DetailKamarkuController {
   final VoidCallback onStateChanged;
 
   // ── Timer countdown ────────────────────────────────────────
-  Timer?   _countdownTimer;
+  Timer? _countdownTimer;
   Duration remainingTime = Duration.zero;
   bool get isExpired => remainingTime.inSeconds <= 0;
 
@@ -41,7 +41,7 @@ class DetailKamarkuController {
   });
 
   Future<void> loadDetail() async {
-    isLoading    = true;
+    isLoading = true;
     errorMessage = null;
     onStateChanged();
     try {
@@ -53,21 +53,21 @@ class DetailKamarkuController {
           final kamar = await KamarService.getKamarDetail(booking!.idKamar);
           if (kamar?.fotoPrimary != null) {
             booking = BookingModel(
-              idBooking        : booking!.idBooking,
-              idUser           : booking!.idUser,
-              idKamar          : booking!.idKamar,
-              tglBooking       : booking!.tglBooking,
-              expiredAt        : booking!.expiredAt,
-              durasiSewaBulan  : booking!.durasiSewaBulan,
-              tglMulaiSewa     : booking!.tglMulaiSewa,
-              tglAkhirSewa     : booking!.tglAkhirSewa,
+              idBooking: booking!.idBooking,
+              idUser: booking!.idUser,
+              idKamar: booking!.idKamar,
+              tglBooking: booking!.tglBooking,
+              expiredAt: booking!.expiredAt,
+              durasiSewaBulan: booking!.durasiSewaBulan,
+              tglMulaiSewa: booking!.tglMulaiSewa,
+              tglAkhirSewa: booking!.tglAkhirSewa,
               totalBiayaBulanan: booking!.totalBiayaBulanan,
-              statusBooking    : booking!.statusBooking,
-              nomorKamar       : booking!.nomorKamar,
-              tipeKamar        : booking!.tipeKamar,
-              fotoKamar        : kamar!.fotoPrimary,
-              furniturList     : booking!.furniturList,
-              tagihan          : booking!.tagihan,
+              statusBooking: booking!.statusBooking,
+              nomorKamar: booking!.nomorKamar,
+              tipeKamar: booking!.tipeKamar,
+              fotoKamar: kamar!.fotoPrimary,
+              furniturList: booking!.furniturList,
+              tagihan: booking!.tagihan,
             );
           }
         } catch (_) {}
@@ -84,34 +84,34 @@ class DetailKamarkuController {
 
   // ── Timer countdown ────────────────────────────────────────
   void startCountdown(VoidCallback onExpired) {
-  final b = booking;
-  if (b == null || b.statusBooking != 'menunggu_pembayaran') return;
+    final b = booking;
+    if (b == null || b.statusBooking != 'menunggu_pembayaran') return;
 
-  final expiredAt = b.expiredAt;
-  if (expiredAt == null) return;
+    final expiredAt = b.expiredAt;
+    if (expiredAt == null) return;
 
-  remainingTime = expiredAt.difference(DateTime.now());
+    remainingTime = expiredAt.difference(DateTime.now());
 
-  if (remainingTime.isNegative || remainingTime.inSeconds <= 0) {
-    remainingTime = Duration.zero;
-    onStateChanged();
-    // ✅ Reload dulu, baru panggil onExpired
-    loadDetail().then((_) => onExpired());
-    return;
-  }
-
-  _countdownTimer?.cancel();
-  _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-    remainingTime -= const Duration(seconds: 1);
-    onStateChanged();
-    if (remainingTime.inSeconds <= 0) {
+    if (remainingTime.isNegative || remainingTime.inSeconds <= 0) {
       remainingTime = Duration.zero;
-      _countdownTimer?.cancel();
+      onStateChanged();
       // ✅ Reload dulu, baru panggil onExpired
       loadDetail().then((_) => onExpired());
+      return;
     }
-  });
-}
+
+    _countdownTimer?.cancel();
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      remainingTime -= const Duration(seconds: 1);
+      onStateChanged();
+      if (remainingTime.inSeconds <= 0) {
+        remainingTime = Duration.zero;
+        _countdownTimer?.cancel();
+        // ✅ Reload dulu, baru panggil onExpired
+        loadDetail().then((_) => onExpired());
+      }
+    });
+  }
 
   void stopCountdown() => _countdownTimer?.cancel();
 
@@ -124,13 +124,14 @@ class DetailKamarkuController {
   }
 
   Color get countdownColor {
-    if (isExpired || remainingTime.inSeconds < 60) return const Color(0xFFE74C3C);
-    if (remainingTime.inMinutes < 5)               return const Color(0xFFF39C12);
+    if (isExpired || remainingTime.inSeconds < 60)
+      return const Color(0xFFE74C3C);
+    if (remainingTime.inMinutes < 5) return const Color(0xFFF39C12);
     return const Color(0xFF2ECC71);
   }
 
   // ── Batalkan booking ───────────────────────────────────────
-Future<void> batalBooking(BuildContext context) async {
+  Future<void> batalBooking(BuildContext context) async {
     final konfirmasi = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -168,7 +169,7 @@ Future<void> batalBooking(BuildContext context) async {
     if (konfirmasi != true) return;
 
     try {
-      final headers  = await ApiHelper.authHeaders;
+      final headers = await ApiHelper.authHeaders;
       final response = await http.put(
         Uri.parse('${ApiConstants.baseUrl}booking/$bookingId/batal'),
         headers: headers,
@@ -177,11 +178,13 @@ Future<void> batalBooking(BuildContext context) async {
       if (!context.mounted) return;
 
       if (response.statusCode == 200 && data['success'] == true) {
-        _snack(context, 'Booking berhasil dibatalkan.', const Color(0xFF2ECC71));
+        _snack(
+            context, 'Booking berhasil dibatalkan.', const Color(0xFF2ECC71));
         KamarService.invalidateCache(); // ✅ Paksa refresh dashboard
         Navigator.pop(context, true);
       } else {
-        _snack(context, data['message'] ?? 'Gagal membatalkan booking.', Colors.red);
+        _snack(context, data['message'] ?? 'Gagal membatalkan booking.',
+            Colors.red);
       }
     } catch (e) {
       if (context.mounted) _snack(context, 'Terjadi kesalahan: $e', Colors.red);
@@ -208,12 +211,13 @@ Future<void> batalBooking(BuildContext context) async {
     if (!context.mounted) return;
 
     if (furniturTersedia.isEmpty) {
-      _snack(context, 'Tidak ada furnitur yang tersedia saat ini.', Colors.orange);
+      _snack(
+          context, 'Tidak ada furnitur yang tersedia saat ini.', Colors.orange);
       return;
     }
 
     await showModalBottomSheet(
-      context           : context,
+      context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -238,7 +242,7 @@ Future<void> batalBooking(BuildContext context) async {
     try {
       final result = await BookingService.tambahFurnitur(
         idBooking: bookingId,
-        furnitur : furnitur,
+        furnitur: furnitur,
       );
 
       if (!context.mounted) return;
@@ -280,8 +284,8 @@ Future<void> batalBooking(BuildContext context) async {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Tidak',
-                style: TextStyle(color: Color(0xFF9E9E9E))),
+            child:
+                const Text('Tidak', style: TextStyle(color: Color(0xFF9E9E9E))),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -345,23 +349,35 @@ Future<void> batalBooking(BuildContext context) async {
 
   String statusLabel(String status) {
     switch (status) {
-      case 'menunggu_pembayaran': return 'Menunggu Pembayaran';
-      case 'aktif':               return 'Aktif';
-      case 'selesai':             return 'Selesai';
-      case 'batal':               return 'Dibatalkan';
-      case 'expired':             return 'Kadaluarsa';
-      default:                    return status;
+      case 'menunggu_pembayaran':
+        return 'Menunggu Pembayaran';
+      case 'aktif':
+        return 'Aktif';
+      case 'selesai':
+        return 'Selesai';
+      case 'batal':
+        return 'Dibatalkan';
+      case 'expired':
+        return 'Kadaluarsa';
+      default:
+        return status;
     }
   }
 
   Color statusColor(String status) {
     switch (status) {
-      case 'menunggu_pembayaran': return const Color(0xFFF39C12);
-      case 'aktif':               return const Color(0xFF2ECC71);
-      case 'selesai':             return const Color(0xFF3498DB);
-      case 'batal':               return const Color(0xFFE74C3C);
-      case 'expired':             return const Color(0xFF9E9E9E);
-      default:                    return const Color(0xFF9E9E9E);
+      case 'menunggu_pembayaran':
+        return const Color(0xFFF39C12);
+      case 'aktif':
+        return const Color(0xFF2ECC71);
+      case 'selesai':
+        return const Color(0xFF3498DB);
+      case 'batal':
+        return const Color(0xFFE74C3C);
+      case 'expired':
+        return const Color(0xFF9E9E9E);
+      default:
+        return const Color(0xFF9E9E9E);
     }
   }
 
@@ -369,73 +385,72 @@ Future<void> batalBooking(BuildContext context) async {
 // Hapus _showPilihMetode dari controller
 // Ubah goToPayment jadi terima parameter onNeedMethod
 
-void goToPayment(
-  BuildContext context, {
-  required int idTagihan,
-  required double totalBayar,
-  required String namaKamar,
-  required Future<PaymentMethodType?> Function() onNeedMethod, // ← tambah ini
-}) async {
-  isSubmitting = true;
-  onStateChanged();
-
-  try {
-    PaymentResult paymentResult;
+  void goToPayment(
+    BuildContext context, {
+    required int idTagihan,
+    required double totalBayar,
+    required String namaKamar,
+    required Future<PaymentMethodType?> Function() onNeedMethod, // ← tambah ini
+  }) async {
+    isSubmitting = true;
+    onStateChanged();
 
     try {
-      paymentResult = await PaymentService.getExistingPayment(idTagihan);
-    } on ApiException catch (e) {
-      if (e.message == 'no_previous_method') {
-        isSubmitting = false;
-        onStateChanged();
+      PaymentResult paymentResult;
 
-        final method = await onNeedMethod(); // ← panggil dari page
-        if (method == null || !context.mounted) return;
+      try {
+        paymentResult = await PaymentService.getExistingPayment(idTagihan);
+      } on ApiException catch (e) {
+        if (e.message == 'no_previous_method') {
+          isSubmitting = false;
+          onStateChanged();
 
-        isSubmitting = true;
-        onStateChanged();
+          final method = await onNeedMethod(); // ← panggil dari page
+          if (method == null || !context.mounted) return;
 
-        paymentResult = await PaymentService.createPayment(
-          idTagihan: idTagihan,
-          method   : method,
-        );
-      } else {
-        rethrow;
+          isSubmitting = true;
+          onStateChanged();
+
+          paymentResult = await PaymentService.createPayment(
+            idTagihan: idTagihan,
+            method: method,
+          );
+        } else {
+          rethrow;
+        }
       }
-    }
 
-    if (!context.mounted) return;
+      if (!context.mounted) return;
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => PaymentInstructionPage(
-          result    : paymentResult,
-          idTagihan : idTagihan,
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PaymentInstructionPage(
+            result: paymentResult,
+            idTagihan: idTagihan,
+          ),
         ),
-      ),
-    ).then((_) async {
-      await loadDetail();
-    });
-  } on ApiException catch (e) {
-    if (context.mounted) _snack(context, e.message, Colors.red);
-  } catch (e) {
-    if (context.mounted) _snack(context, 'Gagal memuat pembayaran: $e', Colors.red);
-  } finally {
-    isSubmitting = false;
-    onStateChanged();
+      ).then((_) async {
+        await loadDetail();
+      });
+    } on ApiException catch (e) {
+      if (context.mounted) _snack(context, e.message, Colors.red);
+    } catch (e) {
+      if (context.mounted)
+        _snack(context, 'Gagal memuat pembayaran: $e', Colors.red);
+    } finally {
+      isSubmitting = false;
+      onStateChanged();
+    }
   }
-}
-
-
 
   void _snack(BuildContext ctx, String msg, Color color) {
     ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-      content        : Text(msg),
+      content: Text(msg),
       backgroundColor: color,
-      behavior       : SnackBarBehavior.floating,
+      behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin         : const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(16),
     ));
   }
 
@@ -475,26 +490,26 @@ class _TambahFurniturSheetState extends State<_TambahFurniturSheet> {
     return t;
   }
 
-  String _fmt(double v) => NumberFormat.currency(
-          locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0)
-      .format(v);
+  String _fmt(double v) =>
+      NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.', decimalDigits: 0)
+          .format(v);
 
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
-      maxChildSize    : 0.95,
-      minChildSize    : 0.4,
-      expand          : false,
+      maxChildSize: 0.95,
+      minChildSize: 0.4,
+      expand: false,
       builder: (_, scrollController) => Column(
         children: [
           // ── Handle bar ─────────────────────────────────────
           Container(
             margin: const EdgeInsets.only(top: 10, bottom: 4),
-            width : 40,
+            width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color       : const Color(0xFFE0E0E0),
+              color: const Color(0xFFE0E0E0),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -504,14 +519,14 @@ class _TambahFurniturSheetState extends State<_TambahFurniturSheet> {
               children: [
                 const Text('Tambah Furnitur',
                     style: TextStyle(
-                        fontSize  : 16,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color     : Color(0xFF1A1A2E))),
+                        color: Color(0xFF1A1A2E))),
                 const Spacer(),
                 IconButton(
-                  icon     : const Icon(Icons.close),
+                  icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
-                  color    : const Color(0xFF9E9E9E),
+                  color: const Color(0xFF9E9E9E),
                 ),
               ],
             ),
@@ -522,21 +537,21 @@ class _TambahFurniturSheetState extends State<_TambahFurniturSheet> {
           Expanded(
             child: ListView.builder(
               controller: scrollController,
-              padding   : const EdgeInsets.all(16),
-              itemCount : widget.furniturList.length,
+              padding: const EdgeInsets.all(16),
+              itemCount: widget.furniturList.length,
               itemBuilder: (_, i) {
-                final f      = widget.furniturList[i];
-                final qty    = _selected[f.idFurnitur] ?? 0;
-                final stok   = f.jumlah; // stok tersedia
-                final habis  = stok <= 0;
+                final f = widget.furniturList[i];
+                final qty = _selected[f.idFurnitur] ?? 0;
+                final stok = f.jumlah; // stok tersedia
+                final habis = stok <= 0;
 
                 return Opacity(
                   opacity: habis ? 0.5 : 1.0,
                   child: Container(
-                    margin   : const EdgeInsets.only(bottom: 10),
-                    padding  : const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color       : Colors.white,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: qty > 0
@@ -545,19 +560,19 @@ class _TambahFurniturSheetState extends State<_TambahFurniturSheet> {
                       ),
                       boxShadow: const [
                         BoxShadow(
-                            color     : Color(0x08000000),
+                            color: Color(0x08000000),
                             blurRadius: 4,
-                            offset    : Offset(0, 2)),
+                            offset: Offset(0, 2)),
                       ],
                     ),
                     child: Row(
                       children: [
                         // ── Icon furnitur ──────────────────────
                         Container(
-                          width : 42,
+                          width: 42,
                           height: 42,
                           decoration: BoxDecoration(
-                            color       : habis
+                            color: habis
                                 ? const Color(0xFFF5F5F5)
                                 : const Color(0xFFE8F5E9),
                             borderRadius: BorderRadius.circular(10),
@@ -577,14 +592,13 @@ class _TambahFurniturSheetState extends State<_TambahFurniturSheet> {
                             children: [
                               Text(f.namaFurnitur,
                                   style: const TextStyle(
-                                      fontSize  : 13,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color     : Color(0xFF1A1A2E))),
+                                      color: Color(0xFF1A1A2E))),
                               const SizedBox(height: 2),
                               Text('${_fmt(f.hargaSewaTambahan)}/bln',
                                   style: const TextStyle(
-                                      fontSize: 12,
-                                      color   : Color(0xFF9E9E9E))),
+                                      fontSize: 12, color: Color(0xFF9E9E9E))),
                               const SizedBox(height: 2),
                               // ── Info stok tersedia ─────────────
                               Row(
@@ -593,19 +607,17 @@ class _TambahFurniturSheetState extends State<_TambahFurniturSheet> {
                                     habis
                                         ? Icons.do_not_disturb_alt_outlined
                                         : Icons.inventory_2_outlined,
-                                    size : 11,
+                                    size: 11,
                                     color: habis
                                         ? const Color(0xFFE74C3C)
                                         : const Color(0xFF2ECC71),
                                   ),
                                   const SizedBox(width: 3),
                                   Text(
-                                    habis
-                                        ? 'Stok habis'
-                                        : 'Tersedia: $stok',
+                                    habis ? 'Stok habis' : 'Tersedia: $stok',
                                     style: TextStyle(
                                       fontSize: 11,
-                                      color   : habis
+                                      color: habis
                                           ? const Color(0xFFE74C3C)
                                           : const Color(0xFF2ECC71),
                                       fontWeight: FontWeight.w500,
@@ -638,8 +650,7 @@ class _TambahFurniturSheetState extends State<_TambahFurniturSheet> {
                                 qty.toString(),
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                    fontSize  : 14,
-                                    fontWeight: FontWeight.bold),
+                                    fontSize: 14, fontWeight: FontWeight.bold),
                               ),
                             ),
                             _QtyBtn(
@@ -664,18 +675,18 @@ class _TambahFurniturSheetState extends State<_TambahFurniturSheet> {
           // ── Bottom bar total + tombol konfirmasi ────────────
           Container(
             padding: EdgeInsets.only(
-              left  : 16,
-              right : 16,
-              top   : 12,
+              left: 16,
+              right: 16,
+              top: 12,
               bottom: MediaQuery.of(context).padding.bottom + 12,
             ),
             decoration: const BoxDecoration(
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                    color     : Color(0x15000000),
+                    color: Color(0x15000000),
                     blurRadius: 8,
-                    offset    : Offset(0, -3)),
+                    offset: Offset(0, -3)),
               ],
             ),
             child: Row(
@@ -683,16 +694,16 @@ class _TambahFurniturSheetState extends State<_TambahFurniturSheet> {
                 if (_total > 0) ...[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize      : MainAxisSize.min,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const Text('Tambahan/bln:',
                           style: TextStyle(
                               fontSize: 11, color: Color(0xFF9E9E9E))),
                       Text(_fmt(_total),
                           style: const TextStyle(
-                              fontSize  : 14,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color     : Color(0xFF1A1A2E))),
+                              color: Color(0xFF1A1A2E))),
                     ],
                   ),
                   const SizedBox(width: 12),
@@ -705,17 +716,16 @@ class _TambahFurniturSheetState extends State<_TambahFurniturSheet> {
                           ? null
                           : () => widget.onKonfirmasi(_selected),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor        : const Color(0xFF2ECC71),
+                        backgroundColor: const Color(0xFF2ECC71),
                         disabledBackgroundColor: const Color(0xFFBDBDBD),
-                        foregroundColor        : Colors.white,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                         elevation: 0,
                       ),
                       child: const Text('Tambahkan',
                           style: TextStyle(
-                              fontSize  : 15,
-                              fontWeight: FontWeight.w600)),
+                              fontSize: 15, fontWeight: FontWeight.w600)),
                     ),
                   ),
                 ),
@@ -729,26 +739,26 @@ class _TambahFurniturSheetState extends State<_TambahFurniturSheet> {
 }
 
 class _QtyBtn extends StatelessWidget {
-  final IconData      icon;
+  final IconData icon;
   final VoidCallback? onPressed;
   const _QtyBtn({required this.icon, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap       : onPressed,
+      onTap: onPressed,
       borderRadius: BorderRadius.circular(6),
       child: Container(
-        width : 28,
+        width: 28,
         height: 28,
         decoration: BoxDecoration(
-          color       : onPressed != null
+          color: onPressed != null
               ? const Color(0xFFE8F5E9)
               : const Color(0xFFF5F5F5),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Icon(icon,
-            size : 16,
+            size: 16,
             color: onPressed != null
                 ? const Color(0xFF2ECC71)
                 : const Color(0xFFBDBDBD)),
@@ -801,9 +811,9 @@ class CheckoutController {
             idFurnitur: 0, namaFurnitur: '-', jumlah: 0, hargaSewaTambahan: 0),
       );
       return _FurniturCheckoutItem(
-        nama    : f.namaFurnitur,
-        jumlah  : entry.value,
-        harga   : f.hargaSewaTambahan,
+        nama: f.namaFurnitur,
+        jumlah: entry.value,
+        harga: f.hargaSewaTambahan,
         subtotal: f.hargaSewaTambahan * entry.value * durasiSewa,
       );
     }).toList();
@@ -815,22 +825,22 @@ class CheckoutController {
 
     try {
       final result = await BookingService.createBooking(
-        idKamar         : kamar.idKamar,
-        tglMulaiSewa    : tglMulaiSewa,
-        durasiSewaBulan : durasiSewa,
+        idKamar: kamar.idKamar,
+        tglMulaiSewa: tglMulaiSewa,
+        durasiSewaBulan: durasiSewa,
         selectedFurnitur: selectedFurnitur,
       );
 
       if (!context.mounted) return;
 
       if (result['success'] == true) {
-        final idBooking  = result['data']['id_booking'] as int?;
-        final idTagihan  = result['data']['id_tagihan'] as int;
+        final idBooking = result['data']['id_booking'] as int?;
+        final idTagihan = result['data']['id_tagihan'] as int;
         final totalBayar = (result['data']['total_biaya'] as num).toDouble();
-        final namaKamar  = 'Kos ${_cap(kamar.tipeKamar)} ${kamar.nomorKamar}';
+        final namaKamar = 'Kos ${_cap(kamar.tipeKamar)} ${kamar.nomorKamar}';
 
         final expiredAtRaw = result['data']['expired_at'] as String?;
-        final expiredAtDt  = expiredAtRaw != null
+        final expiredAtDt = expiredAtRaw != null
             ? DateTime.tryParse(expiredAtRaw)?.toLocal()
             : null;
 
@@ -840,11 +850,11 @@ class CheckoutController {
           context,
           '/pembayaran',
           arguments: {
-            'id_booking' : idBooking,
-            'id_tagihan' : idTagihan,
+            'id_booking': idBooking,
+            'id_tagihan': idTagihan,
             'total_biaya': totalBayar,
-            'nama_kamar' : namaKamar,
-            'expired_at' : expiredAtDt,
+            'nama_kamar': namaKamar,
+            'expired_at': expiredAtDt,
           },
         );
       } else {
@@ -886,29 +896,27 @@ class CheckoutController {
     }
   }
 
-  String _cap(String s) =>
-      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+  String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 
   void goBack(BuildContext context) => Navigator.pop(context);
 
   void _showSuccess(BuildContext ctx, String msg) =>
       _snack(ctx, msg, const Color(0xFF2ECC71));
-  void _showError(BuildContext ctx, String msg) =>
-      _snack(ctx, msg, Colors.red);
+  void _showError(BuildContext ctx, String msg) => _snack(ctx, msg, Colors.red);
   void _snack(BuildContext ctx, String msg, Color color) {
     ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-      content        : Text(msg),
+      content: Text(msg),
       backgroundColor: color,
-      behavior       : SnackBarBehavior.floating,
+      behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin         : const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(16),
     ));
   }
 }
 
 class _FurniturCheckoutItem {
   final String nama;
-  final int    jumlah;
+  final int jumlah;
   final double harga;
   final double subtotal;
   const _FurniturCheckoutItem({

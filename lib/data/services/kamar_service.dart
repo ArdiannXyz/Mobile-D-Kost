@@ -12,18 +12,19 @@ import 'cache_service.dart';
 
 class KamarService {
   KamarService._();
-  
+
   // ── Invalidate Cache ────────────────────────────────────────
   static void invalidateCache() {
     CacheService.invalidate(CacheService.keyKamarList);
-    // Invalidate detail cache juga bisa dilakukan jika perlu, 
+    // Invalidate detail cache juga bisa dilakukan jika perlu,
     // tapi list yang paling krusial untuk dashboard.
     CacheService.invalidatePrefix('kamar_detail_');
   }
 
   // ── GET: List semua kamar ──────────────────────────────────
   // forceRefresh: true → abaikan cache, ambil dari API
-  static Future<List<KamarModel>> getKamarList({bool forceRefresh = false}) async {
+  static Future<List<KamarModel>> getKamarList(
+      {bool forceRefresh = false}) async {
     const cacheKey = CacheService.keyKamarList;
 
     // Cek cache dulu (skip jika forceRefresh)
@@ -35,10 +36,10 @@ class KamarService {
     // Cache miss / expired / forceRefresh → fetch dari API
     try {
       final headers = await ApiHelper.authHeaders;
-      final url = forceRefresh 
+      final url = forceRefresh
           ? '${ApiConstants.kamarList}?_t=${DateTime.now().millisecondsSinceEpoch}'
           : ApiConstants.kamarList;
-          
+
       final response = await http.get(
         Uri.parse(url),
         headers: headers,
@@ -57,12 +58,14 @@ class KamarService {
     } on ApiException {
       rethrow;
     } catch (e) {
-      throw ApiException(message: 'Gagal memuat daftar kamar.', statusCode: 500);
+      throw ApiException(
+          message: 'Gagal memuat daftar kamar.', statusCode: 500);
     }
   }
 
   // ── GET: Detail kamar ──────────────────────────────────────
-  static Future<KamarModel?> getKamarDetail(int id, {bool forceRefresh = false}) async {
+  static Future<KamarModel?> getKamarDetail(int id,
+      {bool forceRefresh = false}) async {
     final cacheKey = 'kamar_detail_$id';
 
     if (!forceRefresh) {
@@ -93,7 +96,8 @@ class KamarService {
     } on ApiException {
       rethrow;
     } catch (e) {
-      throw ApiException(message: 'Gagal memuat detail kamar.', statusCode: 500);
+      throw ApiException(
+          message: 'Gagal memuat detail kamar.', statusCode: 500);
     }
   }
 }

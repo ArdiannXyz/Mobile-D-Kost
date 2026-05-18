@@ -21,9 +21,8 @@ class FurniturModel {
       idFurnitur: json['id_furnitur'],
       namaFurnitur: json['nama_furnitur'],
       jumlah: json['jumlah'] ?? 0,
-      hargaSewaTambahan: double.tryParse(
-              json['harga_sewa_tambahan'].toString()) ??
-          0,
+      hargaSewaTambahan:
+          double.tryParse(json['harga_sewa_tambahan'].toString()) ?? 0,
     );
   }
 }

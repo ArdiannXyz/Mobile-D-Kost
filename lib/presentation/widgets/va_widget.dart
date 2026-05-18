@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../data/models/payment_model.dart';
 
-
 class VaWidget extends StatelessWidget {
   final VaPaymentResult result;
 
@@ -17,11 +16,16 @@ class VaWidget extends StatelessWidget {
   // ── Warna per bank ─────────────────────────────────────────
   Color get _bankColor {
     switch (result.bank.toLowerCase()) {
-      case 'bca':     return const Color(0xFF0066AE);
-      case 'bni':     return const Color(0xFFFF6600);
-      case 'bri':     return const Color(0xFF1A7ECB);
-      case 'permata': return const Color(0xFF0066AE); 
-      default:        return const Color(0xFF2563EB);
+      case 'bca':
+        return const Color(0xFF0066AE);
+      case 'bni':
+        return const Color(0xFFFF6600);
+      case 'bri':
+        return const Color(0xFF1A7ECB);
+      case 'permata':
+        return const Color(0xFF0066AE);
+      default:
+        return const Color(0xFF2563EB);
     }
   }
 
@@ -91,7 +95,8 @@ class VaWidget extends StatelessWidget {
             children: [
               // Logo bank (atau text fallback)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: _bankColor.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(8),
@@ -118,22 +123,22 @@ class VaWidget extends StatelessWidget {
               const SizedBox(height: 8),
 
               // VA Number + tombol salin
-                Column(
-                  children: [
-                    Text(
-                      result.vaNumber,
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: _bankColor,
-                        letterSpacing: 2,
-                      ),
-                      textAlign: TextAlign.center,
+              Column(
+                children: [
+                  Text(
+                    result.vaNumber,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: _bankColor,
+                      letterSpacing: 2,
                     ),
-                    const SizedBox(height: 8),
-                    _CopyButton(text: result.vaNumber),
-                  ],
-                ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  _CopyButton(text: result.vaNumber),
+                ],
+              ),
               const SizedBox(height: 16),
 
               // Total bayar
@@ -193,10 +198,7 @@ class VaWidget extends StatelessWidget {
   }
 
   String _formatRupiah(double amount) {
-    final formatted = amount
-        .toInt()
-        .toString()
-        .replaceAllMapped(
+    final formatted = amount.toInt().toString().replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (m) => '${m[1]}.',
         );
@@ -216,9 +218,8 @@ class _CopyButton extends StatefulWidget {
 class _CopyButtonState extends State<_CopyButton> {
   bool _copied = false;
   // Hapus: Future<void> _copy() async { ... } yang lama
-  
 
-    Future<void> _copy() async {
+  Future<void> _copy() async {
     await Clipboard.setData(ClipboardData(text: widget.text));
     if (!mounted) return;
     setState(() => _copied = true);

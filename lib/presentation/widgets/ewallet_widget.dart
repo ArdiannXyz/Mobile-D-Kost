@@ -21,14 +21,16 @@ class EwalletWidget extends StatefulWidget {
 class _EwalletWidgetState extends State<EwalletWidget> {
   final ScreenshotController _screenshotController = ScreenshotController();
   bool _isSaving = false;
- 
+
   bool get _isGopay => widget.result.methodType == PaymentMethodType.gopay;
 
-  Color get _color => _isGopay ? const Color(0xFF00AED6) : const Color(0xFFEE4D2D);
+  Color get _color =>
+      _isGopay ? const Color(0xFF00AED6) : const Color(0xFFEE4D2D);
 
   String get _appName => _isGopay ? 'GoPay' : 'ShopeePay';
 
-  String get _logoPath => _isGopay ? 'assets/payment/gopay.png' : 'assets/payment/shopeepay.png';
+  String get _logoPath =>
+      _isGopay ? 'assets/payment/gopay.png' : 'assets/payment/shopeepay.png';
 
   Future<void> _openApp() async {
     final url = widget.result.deeplinkUrl;
@@ -37,10 +39,12 @@ class _EwalletWidgetState extends State<EwalletWidget> {
     try {
       final uri = Uri.parse(url);
       // Mode externalApplication lebih paksa untuk buka app luar
-      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-      
+      final launched =
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+
       if (!launched && mounted) {
-        _showError('Tidak dapat membuka aplikasi $_appName. Pastikan aplikasi sudah terinstal.');
+        _showError(
+            'Tidak dapat membuka aplikasi $_appName. Pastikan aplikasi sudah terinstal.');
       }
     } catch (e) {
       if (mounted) _showError('Gagal membuka $_appName: $e');
@@ -49,7 +53,7 @@ class _EwalletWidgetState extends State<EwalletWidget> {
 
   Future<void> _downloadQr() async {
     if (widget.result.qrCodeUrl.isEmpty) return;
-    
+
     setState(() => _isSaving = true);
     try {
       final imageBytes = await _screenshotController.capture(
@@ -80,7 +84,7 @@ class _EwalletWidgetState extends State<EwalletWidget> {
       SnackBar(content: Text(msg), backgroundColor: Colors.red),
     );
   }
- 
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -115,7 +119,7 @@ class _EwalletWidgetState extends State<EwalletWidget> {
                 ),
               ),
               const SizedBox(height: 20),
- 
+
               // Total
               Text(
                 _formatRupiah(widget.result.grossAmount),
@@ -130,7 +134,7 @@ class _EwalletWidgetState extends State<EwalletWidget> {
                 style: const TextStyle(fontSize: 12, color: Colors.black38),
               ),
               const SizedBox(height: 20),
- 
+
               // Tombol buka app
               if (widget.result.deeplinkUrl.isNotEmpty)
                 SizedBox(
@@ -149,7 +153,7 @@ class _EwalletWidgetState extends State<EwalletWidget> {
                     ),
                   ),
                 ),
- 
+
               // Atau via QR (jika ada)
               if (widget.result.qrCodeUrl.isNotEmpty) ...[
                 const SizedBox(height: 16),
@@ -159,7 +163,8 @@ class _EwalletWidgetState extends State<EwalletWidget> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 12),
                       child: Text('atau scan QR',
-                          style: TextStyle(fontSize: 12, color: Colors.black38)),
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.black38)),
                     ),
                     Expanded(child: Divider()),
                   ],
@@ -179,8 +184,8 @@ class _EwalletWidgetState extends State<EwalletWidget> {
                       width: 160,
                       height: 160,
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) =>
-                          const Icon(Icons.qr_code, size: 80, color: Colors.grey),
+                      errorBuilder: (_, __, ___) => const Icon(Icons.qr_code,
+                          size: 80, color: Colors.grey),
                     ),
                   ),
                 ),
@@ -203,16 +208,17 @@ class _EwalletWidgetState extends State<EwalletWidget> {
                     padding: EdgeInsets.zero,
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    textStyle: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
             ],
           ),
         ),
- 
+
         const SizedBox(height: 16),
- 
+
         // ── Instruksi ──────────────────────────────────────
         Container(
           padding: const EdgeInsets.all(16),
@@ -248,7 +254,7 @@ class _EwalletWidgetState extends State<EwalletWidget> {
       ],
     );
   }
- 
+
   Widget _buildStep(String num, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -284,12 +290,9 @@ class _EwalletWidgetState extends State<EwalletWidget> {
       ),
     );
   }
- 
+
   String _formatRupiah(double amount) {
-    final formatted = amount
-        .toInt()
-        .toString()
-        .replaceAllMapped(
+    final formatted = amount.toInt().toString().replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (m) => '${m[1]}.',
         );

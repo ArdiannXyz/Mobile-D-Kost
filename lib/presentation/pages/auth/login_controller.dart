@@ -9,12 +9,11 @@ import '../home/home_page.dart';
 import '../../../data/services/notifikasi_service.dart';
 import '../../../data/services/onesignal_setup.dart';
 
-
 class LoginController {
   bool isLoading = false;
   bool obscurePassword = true;
 
-  final TextEditingController emailController    = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final VoidCallback onStateChanged;
 
@@ -31,7 +30,8 @@ class LoginController {
   }
 
   String? validate() {
-    if (emailController.text.trim().isEmpty || passwordController.text.isEmpty) {
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.isEmpty) {
       return 'Email dan password harus diisi!';
     }
     if (!RegExp(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
@@ -54,7 +54,7 @@ class LoginController {
 
     try {
       final data = await UserService.login(
-        email   : emailController.text.trim(),
+        email: emailController.text.trim(),
         password: passwordController.text,
       );
 
@@ -68,33 +68,32 @@ class LoginController {
         }
 
         // 🔥 AMBIL TOKEN DARI LOGIN (SUMBER UTAMA)
-      final token = data['token'];
+        final token = data['token'];
 
-      if (token == null || token.isEmpty) {
-        _showErrorSnackbar(context, 'Token tidak valid');
-        return;
-      }
+        if (token == null || token.isEmpty) {
+          _showErrorSnackbar(context, 'Token tidak valid');
+          return;
+        }
 
-      // 🔥 SIMPAN SESSION DI SINI
+        // 🔥 SIMPAN SESSION DI SINI
         await ApiHelper.saveSession(
-        userId: data['user']['id_user'],
-        role: role,
-        token: token,
-      );
+          userId: data['user']['id_user'],
+          role: role,
+          token: token,
+        );
 
-      // 🔥 pakai token ke service lain
+        // 🔥 pakai token ke service lain
         MidtransService.setToken(token);
         NotifikasiService.authToken = token;
-        await OneSignalSetup.kirimPlayerIdKeBackend(); // ← kirim player ID ke backend
+        await OneSignalSetup
+            .kirimPlayerIdKeBackend(); // ← kirim player ID ke backend
         debugPrint('Token dipakai: $token');
-      
+
         if (!context.mounted) return;
         _showSuccessDialog(context);
-
       } else if (data['need_verification'] == true) {
         // ← Email belum diverifikasi (user lama sebelum fitur ini)
         _showNeedVerificationSnackbar(context, data['email'] ?? '');
-
       } else {
         _showErrorSnackbar(context, data['message'] ?? 'Login gagal.');
       }
@@ -132,7 +131,6 @@ class LoginController {
 
         if (!context.mounted) return;
         _showSuccessDialog(context);
-
       } else {
         _showErrorSnackbar(
           context,
@@ -198,7 +196,8 @@ class LoginController {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 72, height: 72,
+                width: 72,
+                height: 72,
                 decoration: BoxDecoration(
                   color: Colors.red.shade50,
                   shape: BoxShape.circle,
@@ -208,7 +207,9 @@ class LoginController {
               ),
               const SizedBox(height: 20),
               const Text('Akses Ditolak',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,
+                  style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
                       color: Color(0xFF1A1A2E))),
               const SizedBox(height: 10),
               const Text(
@@ -230,8 +231,8 @@ class LoginController {
                     elevation: 0,
                   ),
                   child: const Text('Mengerti',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600)),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
@@ -295,14 +296,17 @@ class _LoginSuccessDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 72, height: 72,
+              width: 72,
+              height: 72,
               decoration: const BoxDecoration(
-                color: Color(0xFF1BBA8A), shape: BoxShape.circle),
+                  color: Color(0xFF1BBA8A), shape: BoxShape.circle),
               child: const Icon(Icons.check, color: Colors.white, size: 40),
             ),
             const SizedBox(height: 20),
             const Text('Login Berhasil!',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
                     color: Color(0xFF1A1A2E))),
             const SizedBox(height: 10),
             const Text(
@@ -324,8 +328,8 @@ class _LoginSuccessDialog extends StatelessWidget {
                   elevation: 0,
                 ),
                 child: const Text('Lanjutkan',
-                    style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w600)),
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               ),
             ),
           ],

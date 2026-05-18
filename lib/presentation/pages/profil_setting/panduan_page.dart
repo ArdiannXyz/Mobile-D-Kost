@@ -73,8 +73,8 @@ class _PanduanPageState extends State<PanduanPage> {
       backgroundColor: const Color(0xFF1BBA8A),
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new,
-            color: Colors.white, size: 18),
+        icon:
+            const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
         onPressed: () => _controller.goBack(context),
       ),
       centerTitle: true,
@@ -88,8 +88,8 @@ class _PanduanPageState extends State<PanduanPage> {
               color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.support_agent,
-                color: Colors.white, size: 18),
+            child:
+                const Icon(Icons.support_agent, color: Colors.white, size: 18),
           ),
           const SizedBox(width: 8),
           const Text(
@@ -121,8 +121,8 @@ class _PanduanPageState extends State<PanduanPage> {
             child: GestureDetector(
               onTap: () => _controller.sendMessage(reply),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFFE8F5E9),
                   borderRadius: BorderRadius.circular(20),
@@ -173,15 +173,13 @@ class _PanduanPageState extends State<PanduanPage> {
               ),
               child: TextField(
                 controller: _controller.messageController,
-                style: const TextStyle(
-                    fontSize: 14, color: Color(0xFF1A1A2E)),
+                style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A2E)),
                 decoration: const InputDecoration(
                   hintText: 'Ketik pesan atau pilih topik...',
-                  hintStyle:
-                      TextStyle(color: Color(0xFFB0B0C3), fontSize: 13),
+                  hintStyle: TextStyle(color: Color(0xFFB0B0C3), fontSize: 13),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 10),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 ),
                 onSubmitted: _controller.sendMessage,
                 textInputAction: TextInputAction.send,
@@ -200,8 +198,8 @@ class _PanduanPageState extends State<PanduanPage> {
                 color: Color(0xFF1BBA8A),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.send_rounded,
-                  color: Colors.white, size: 18),
+              child:
+                  const Icon(Icons.send_rounded, color: Colors.white, size: 18),
             ),
           ),
         ],
@@ -269,9 +267,8 @@ class _ChatBubble extends StatelessWidget {
                     data.text,
                     style: TextStyle(
                       fontSize: 14,
-                      color: data.isBot
-                          ? const Color(0xFF1A1A2E)
-                          : Colors.white,
+                      color:
+                          data.isBot ? const Color(0xFF1A1A2E) : Colors.white,
                       height: 1.4,
                     ),
                   ),
@@ -310,8 +307,7 @@ class _ChatBubble extends StatelessWidget {
                             .asMap()
                             .entries
                             .map((e) => Padding(
-                                  padding:
-                                      const EdgeInsets.only(bottom: 6),
+                                  padding: const EdgeInsets.only(bottom: 6),
                                   child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -355,8 +351,7 @@ class _ChatBubble extends StatelessWidget {
                   ],
 
                   // Kontak list
-                  if (data.contacts != null &&
-                      data.contacts!.isNotEmpty) ...[
+                  if (data.contacts != null && data.contacts!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     ...data.contacts!.map((c) => Container(
                           width: double.infinity,
@@ -365,8 +360,7 @@ class _ChatBubble extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                                color: const Color(0xFFE0E0E0)),
+                            border: Border.all(color: const Color(0xFFE0E0E0)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,15 +372,12 @@ class _ChatBubble extends StatelessWidget {
                                       color: Color(0xFF1A1A2E))),
                               const SizedBox(height: 6),
                               if (c['phone'] != null)
-                                _contactRow(
-                                    Icons.phone_outlined, c['phone']),
+                                _contactRow(Icons.phone_outlined, c['phone']),
                               if (c['email'] != null)
-                                _contactRow(
-                                    Icons.email_outlined, c['email']),
+                                _contactRow(Icons.email_outlined, c['email']),
                               if (c['hours'] != null)
                                 _contactRow(
-                                    Icons.access_time_outlined,
-                                    c['hours']),
+                                    Icons.access_time_outlined, c['hours']),
                             ],
                           ),
                         )),
@@ -406,8 +397,8 @@ class _ChatBubble extends StatelessWidget {
                 color: const Color(0xFF1BBA8A).withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.person,
-                  color: Color(0xFF1BBA8A), size: 18),
+              child:
+                  const Icon(Icons.person, color: Color(0xFF1BBA8A), size: 18),
             ),
           ],
         ],
@@ -424,8 +415,7 @@ class _ChatBubble extends StatelessWidget {
           const SizedBox(width: 6),
           Expanded(
             child: Text(text,
-                style: const TextStyle(
-                    fontSize: 12, color: Color(0xFF555555))),
+                style: const TextStyle(fontSize: 12, color: Color(0xFF555555))),
           ),
         ],
       ),
@@ -470,15 +460,14 @@ class _TypingIndicatorState extends State<_TypingIndicator>
             animation: _anim,
             builder: (_, __) {
               final phase = (_anim.value * 3 - i).clamp(0.0, 1.0);
-              final opacity = (phase < 0.5 ? phase * 2 : (1 - phase) * 2)
-                  .clamp(0.3, 1.0);
+              final opacity =
+                  (phase < 0.5 ? phase * 2 : (1 - phase) * 2).clamp(0.3, 1.0);
               return Container(
                 width: 8,
                 height: 8,
                 margin: const EdgeInsets.only(right: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1BBA8A)
-                      .withOpacity(opacity),
+                  color: const Color(0xFF1BBA8A).withOpacity(opacity),
                   shape: BoxShape.circle,
                 ),
               );

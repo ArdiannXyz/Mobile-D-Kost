@@ -136,8 +136,7 @@ class _KamarkuPageState extends State<KamarkuPage> {
             booking: booking,
             controller: _controller,
             // Seluruh card mengarah ke detail
-            onTap: () =>
-                _controller.goToDetail(context, booking.idBooking),
+            onTap: () => _controller.goToDetail(context, booking.idBooking),
           );
         },
       ),
@@ -303,11 +302,9 @@ class _BookingCard extends StatelessWidget {
         color: const Color(0xFFE8F5E9),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: const Icon(Icons.bed_outlined,
-          color: Color(0xFF1BBA8A), size: 32),
+      child: const Icon(Icons.bed_outlined, color: Color(0xFF1BBA8A), size: 32),
     );
   }
 
-  String _cap(String s) =>
-      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+  String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }

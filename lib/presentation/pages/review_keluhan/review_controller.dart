@@ -103,13 +103,12 @@ class TulisReviewController {
       bookingAktifList = await BookingService.getBookingAktif(userId);
 
       // Hanya booking aktif untuk kamar yang sedang dilihat
-      final bookingKamarIni = bookingAktifList
-          .where((b) => b.idKamar == kamarId)
-          .toList();
+      final bookingKamarIni =
+          bookingAktifList.where((b) => b.idKamar == kamarId).toList();
 
       if (bookingKamarIni.isNotEmpty) {
         bookingAktif = bookingKamarIni.first;
-        pageState    = ReviewPageState.hasBooking;
+        pageState = ReviewPageState.hasBooking;
       } else {
         pageState = ReviewPageState.noBooking;
       }
@@ -154,10 +153,9 @@ class TulisReviewController {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF9E9E9E)),
-            child: const Text('Batalkan',
-                style: TextStyle(fontSize: 13)),
+            style:
+                TextButton.styleFrom(foregroundColor: const Color(0xFF9E9E9E)),
+            child: const Text('Batalkan', style: TextStyle(fontSize: 13)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -165,14 +163,12 @@ class TulisReviewController {
               backgroundColor: const Color(0xFF1BBA8A),
               foregroundColor: Colors.white,
               elevation: 0,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
             ),
             child: const Text('Posting',
-                style:
-                    TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -222,19 +218,17 @@ class TulisReviewController {
       ..clearSnackBars()
       ..showSnackBar(SnackBar(
         content: Row(children: [
-          const Icon(Icons.check_circle_rounded,
-              color: Colors.white, size: 20),
+          const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(msg,
-                style: const TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w500)),
+                style:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
           ),
         ]),
         backgroundColor: const Color(0xFF1BBA8A),
         behavior: SnackBarBehavior.floating,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         duration: const Duration(seconds: 3),
         elevation: 0,
@@ -250,14 +244,13 @@ class TulisReviewController {
           const SizedBox(width: 10),
           Expanded(
             child: Text(msg,
-                style: const TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w500)),
+                style:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
           ),
         ]),
         backgroundColor: const Color(0xFFE24B4A),
         behavior: SnackBarBehavior.floating,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         duration: const Duration(seconds: 4),
         elevation: 0,
@@ -308,83 +301,89 @@ class EditReviewController {
     return null;
   }
 
-Future<void> handleBackPressed(BuildContext context) async {
-  if (!hasChanges) {
-    Navigator.pop(context);
-    return;
-  }
+  Future<void> handleBackPressed(BuildContext context) async {
+    if (!hasChanges) {
+      Navigator.pop(context);
+      return;
+    }
 
-  final result = await showDialog<String>(
-    context: context,
-    barrierColor: Colors.black45,
-    builder: (_) => Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Hapus Draf?',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A2E),
+    final result = await showDialog<String>(
+      context: context,
+      barrierColor: Colors.black45,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Hapus Draf?',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A1A2E),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Perubahan yang belum disimpan akan hilang.',
-              style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'hapus'),
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.red.shade400,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              const SizedBox(height: 8),
+              const Text(
+                'Perubahan yang belum disimpan akan hilang.',
+                style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'hapus'),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.red.shade400,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text('Hapus',
+                        style: TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w500)),
                   ),
-                  child: const Text('Hapus',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                ),
-                const SizedBox(width: 10),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'simpan'),
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF1BBA8A),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  const SizedBox(width: 10),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'simpan'),
+                    style: TextButton.styleFrom(
+                      backgroundColor: const Color(0xFF1BBA8A),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text('Simpan',
+                        style: TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w500)),
                   ),
-                  child: const Text('Simpan',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
 
-  if (!context.mounted) return;
+    if (!context.mounted) return;
 
-  if (result == 'hapus') {
-    Navigator.pop(context);
-  } else if (result == 'simpan') {
-    await simpan(context);
+    if (result == 'hapus') {
+      Navigator.pop(context);
+    } else if (result == 'simpan') {
+      await simpan(context);
+    }
   }
-}
 
   Future<void> simpan(BuildContext context) async {
     final err = validate();
@@ -397,8 +396,7 @@ Future<void> handleBackPressed(BuildContext context) async {
       context: context,
       barrierColor: Colors.black45,
       builder: (_) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Simpan perubahan?',
             style: TextStyle(
                 fontSize: 15,
@@ -412,8 +410,8 @@ Future<void> handleBackPressed(BuildContext context) async {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF9E9E9E)),
+            style:
+                TextButton.styleFrom(foregroundColor: const Color(0xFF9E9E9E)),
             child: const Text('Batal', style: TextStyle(fontSize: 13)),
           ),
           ElevatedButton(
@@ -422,14 +420,12 @@ Future<void> handleBackPressed(BuildContext context) async {
               backgroundColor: const Color(0xFF2ECC71),
               foregroundColor: Colors.white,
               elevation: 0,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
             ),
             child: const Text('Simpan',
-                style:
-                    TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -468,8 +464,7 @@ Future<void> handleBackPressed(BuildContext context) async {
       context: context,
       barrierColor: Colors.black45,
       builder: (_) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Hapus ulasan?',
             style: TextStyle(
                 fontSize: 15,
@@ -483,8 +478,8 @@ Future<void> handleBackPressed(BuildContext context) async {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF9E9E9E)),
+            style:
+                TextButton.styleFrom(foregroundColor: const Color(0xFF9E9E9E)),
             child: const Text('Batal', style: TextStyle(fontSize: 13)),
           ),
           ElevatedButton(
@@ -493,14 +488,12 @@ Future<void> handleBackPressed(BuildContext context) async {
               backgroundColor: const Color(0xFFE24B4A),
               foregroundColor: Colors.white,
               elevation: 0,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
             ),
             child: const Text('Ya, Hapus',
-                style:
-                    TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -541,7 +534,8 @@ Future<void> handleBackPressed(BuildContext context) async {
           const SizedBox(width: 10),
           Expanded(
             child: Text(msg,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                style:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
           ),
         ]),
         backgroundColor: const Color(0xFF1DB954),
@@ -562,7 +556,8 @@ Future<void> handleBackPressed(BuildContext context) async {
           const SizedBox(width: 10),
           Expanded(
             child: Text(msg,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                style:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
           ),
         ]),
         backgroundColor: const Color(0xFFE24B4A),

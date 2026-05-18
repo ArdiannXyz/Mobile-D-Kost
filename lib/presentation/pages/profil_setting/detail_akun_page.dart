@@ -44,8 +44,8 @@ class _DetailAkunPageState extends State<DetailAkunPage> {
       backgroundColor: const Color(0xFF1BBA8A),
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new,
-            color: Colors.white, size: 18),
+        icon:
+            const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
         onPressed: () => _controller.goBack(context),
       ),
       centerTitle: true,
@@ -169,28 +169,28 @@ class _DetailAkunPageState extends State<DetailAkunPage> {
     );
   }
 
-          Widget _buildInfoCard({
-          required IconData icon,
-          required String value,
-        }) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 8), // ← gap antar card
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12), // ← rounded per card
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x0A000000),
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: _buildInfoRow(icon: icon, value: value),
-          );
-        }
+  Widget _buildInfoCard({
+    required IconData icon,
+    required String value,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8), // ← gap antar card
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12), // ← rounded per card
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: _buildInfoRow(icon: icon, value: value),
+    );
+  }
 
   // ── Avatar ────────────────────────────────────────────────
   Widget _buildAvatar() {
@@ -200,7 +200,6 @@ class _DetailAkunPageState extends State<DetailAkunPage> {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: const Color(0xFFE8F5E9),
-        
       ),
       child: CircleAvatar(
         child: Image.asset(
@@ -249,5 +248,4 @@ class _DetailAkunPageState extends State<DetailAkunPage> {
       ),
     );
   }
-
 }

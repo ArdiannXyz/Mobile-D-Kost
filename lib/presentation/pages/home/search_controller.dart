@@ -127,7 +127,8 @@ class SearchController {
 
     final suggestions = allKamar
         .where((k) {
-          final namaLengkap = 'kos ${k.tipeKamar} ${k.nomorKamar}'.toLowerCase();
+          final namaLengkap =
+              'kos ${k.tipeKamar} ${k.nomorKamar}'.toLowerCase();
           return namaLengkap.contains(query.toLowerCase()) ||
               k.nomorKamar.toLowerCase().contains(query.toLowerCase()) ||
               k.tipeKamar.toLowerCase().contains(query.toLowerCase());
@@ -144,30 +145,26 @@ class SearchController {
   void performSearch(String query) {
     currentQuery = query.trim();
     if (currentQuery.isEmpty) return;
-    
+
     _saveToHistory(currentQuery);
     final q = currentQuery.toLowerCase();
 
     // Pencarian berdasarkan harga dibawah 400rb
     if (q.contains('dibawah 400rb') || q.contains('dibawah 400')) {
-      searchResults = allKamar
-          .where((k) => k.hargaPerBulan < 400000)
-          .toList()
+      searchResults = allKamar.where((k) => k.hargaPerBulan < 400000).toList()
         ..sort((a, b) => a.hargaPerBulan.compareTo(b.hargaPerBulan));
       _finishSearch();
       return;
     }
-    
+
     // Pencarian berdasarkan harga dibawah 700rb
     if (q.contains('dibawah 700rb') || q.contains('dibawah 700')) {
-      searchResults = allKamar
-          .where((k) => k.hargaPerBulan < 700000)
-          .toList()
+      searchResults = allKamar.where((k) => k.hargaPerBulan < 700000).toList()
         ..sort((a, b) => a.hargaPerBulan.compareTo(b.hargaPerBulan));
       _finishSearch();
       return;
     }
-    
+
     // Pencarian berdasarkan harga 400rb - 700rb
     if ((q.contains('400') && q.contains('700') && q.contains('sampai')) ||
         (q.contains('400rb') && q.contains('700rb'))) {
@@ -178,7 +175,7 @@ class SearchController {
       _finishSearch();
       return;
     }
-    
+
     // Pencarian berdasarkan harga 700rb - 1jt
     if ((q.contains('700') && q.contains('1jt') && q.contains('sampai')) ||
         (q.contains('700rb') && q.contains('1jt'))) {
@@ -189,12 +186,12 @@ class SearchController {
       _finishSearch();
       return;
     }
-    
+
     // Pencarian berdasarkan harga diatas 1jt
-    if (q.contains('diatas 1jt') || q.contains('diatas 1.000.000') || q.contains('> 1jt')) {
-      searchResults = allKamar
-          .where((k) => k.hargaPerBulan > 1000000)
-          .toList()
+    if (q.contains('diatas 1jt') ||
+        q.contains('diatas 1.000.000') ||
+        q.contains('> 1jt')) {
+      searchResults = allKamar.where((k) => k.hargaPerBulan > 1000000).toList()
         ..sort((a, b) => a.hargaPerBulan.compareTo(b.hargaPerBulan));
       _finishSearch();
       return;
@@ -203,24 +200,26 @@ class SearchController {
     // Pencarian kamar termurah
     if (q.contains('termurah') || q.contains('paling murah')) {
       if (allKamar.isNotEmpty) {
-        final minHarga = allKamar.map((k) => k.hargaPerBulan).reduce((a, b) => a < b ? a : b);
-        searchResults = allKamar
-            .where((k) => k.hargaPerBulan == minHarga)
-            .toList();
+        final minHarga = allKamar
+            .map((k) => k.hargaPerBulan)
+            .reduce((a, b) => a < b ? a : b);
+        searchResults =
+            allKamar.where((k) => k.hargaPerBulan == minHarga).toList();
       } else {
         searchResults = [];
       }
       _finishSearch();
       return;
     }
-    
+
     // Pencarian kamar termahal
     if (q.contains('termahal') || q.contains('paling mahal')) {
       if (allKamar.isNotEmpty) {
-        final maxHarga = allKamar.map((k) => k.hargaPerBulan).reduce((a, b) => a > b ? a : b);
-        searchResults = allKamar
-            .where((k) => k.hargaPerBulan == maxHarga)
-            .toList();
+        final maxHarga = allKamar
+            .map((k) => k.hargaPerBulan)
+            .reduce((a, b) => a > b ? a : b);
+        searchResults =
+            allKamar.where((k) => k.hargaPerBulan == maxHarga).toList();
       } else {
         searchResults = [];
       }
@@ -233,7 +232,9 @@ class SearchController {
       if (allKamar.isEmpty) {
         searchResults = [];
       } else {
-        final avgHarga = allKamar.map((k) => k.hargaPerBulan).reduce((a, b) => a + b) / allKamar.length;
+        final avgHarga =
+            allKamar.map((k) => k.hargaPerBulan).reduce((a, b) => a + b) /
+                allKamar.length;
         searchResults = allKamar
             .where((k) => k.hargaPerBulan <= avgHarga)
             .toList()
@@ -255,9 +256,8 @@ class SearchController {
 
     // Keyword tersedia
     if (q.contains('tersedia')) {
-      searchResults = allKamar
-          .where((k) => k.statusKamar == 'tersedia')
-          .toList();
+      searchResults =
+          allKamar.where((k) => k.statusKamar == 'tersedia').toList();
       _finishSearch();
       return;
     }
@@ -271,7 +271,7 @@ class SearchController {
           k.deskripsi.toLowerCase().contains(q) ||
           'kos ${k.tipeKamar}'.toLowerCase().contains(q);
     }).toList();
-    
+
     _finishSearch();
   }
 

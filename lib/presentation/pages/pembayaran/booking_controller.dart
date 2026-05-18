@@ -33,7 +33,7 @@ class BookingController {
 
   // ── Getters dari args ──────────────────────────────────────
   int get kamarId => args['kamar_id'] as int;
-  int get durasi   => args['durasi'] as int;
+  int get durasi => args['durasi'] as int;
 
   String get tglMulaiIso => args['tgl_mulai'] as String? ?? '';
   String get tglAkhirIso => args['tgl_akhir'] as String? ?? '';
@@ -50,8 +50,21 @@ class BookingController {
   String _formatTanggal(String iso) {
     try {
       final dt = DateTime.parse(iso);
-      const bln = ['','Jan','Feb','Mar','Apr','Mei','Jun',
-                    'Jul','Agu','Sep','Okt','Nov','Des'];
+      const bln = [
+        '',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'Mei',
+        'Jun',
+        'Jul',
+        'Agu',
+        'Sep',
+        'Okt',
+        'Nov',
+        'Des'
+      ];
       return '${dt.day} ${bln[dt.month]} ${dt.year}';
     } catch (_) {
       return iso;
@@ -102,8 +115,8 @@ class BookingController {
       );
       if (f.idFurnitur != 0) {
         list.add({
-          'nama'    : f.namaFurnitur,
-          'qty'     : entry.value,
+          'nama': f.namaFurnitur,
+          'qty': entry.value,
           'subtotal': f.hargaSewaTambahan * entry.value * durasi,
         });
       }
@@ -120,7 +133,8 @@ class BookingController {
         _loadKamar(),
         _loadFurnitur(),
       ]);
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       isLoading = false;
       onStateChanged();
     }
@@ -145,29 +159,29 @@ class BookingController {
       final tglMulaiDate = _toDateString(tglMulaiIso);
 
       final result = await BookingService.createBooking(
-        idKamar         : kamarId,
-        tglMulaiSewa    : tglMulaiDate,
-        durasiSewaBulan : durasi,
+        idKamar: kamarId,
+        tglMulaiSewa: tglMulaiDate,
+        durasiSewaBulan: durasi,
         selectedFurnitur: selectedFurnitur,
       );
 
       if (!context.mounted) return;
 
       if (result['success'] == true) {
-        final idBooking  = result['data']['id_booking'];
-        final idTagihan  = result['data']['id_tagihan'];
+        final idBooking = result['data']['id_booking'];
+        final idTagihan = result['data']['id_tagihan'];
         final totalBayar = (result['data']['total_biaya'] as num).toDouble();
-        
+
         KamarService.invalidateCache(); // ✅ Invalidate dashboard
 
         Navigator.pushReplacementNamed(
           context,
           '/pembayaran',
           arguments: {
-            'id_booking' : idBooking,
-            'id_tagihan' : idTagihan,
+            'id_booking': idBooking,
+            'id_tagihan': idTagihan,
             'total_biaya': totalBayar,
-            'nama_kamar' : namaKamar,
+            'nama_kamar': namaKamar,
           },
         );
       } else {
@@ -193,9 +207,9 @@ class BookingController {
       final tglMulaiDate = _toDateString(tglMulaiIso);
 
       final result = await BookingService.createBooking(
-        idKamar         : kamarId,
-        tglMulaiSewa    : tglMulaiDate,
-        durasiSewaBulan : durasi,
+        idKamar: kamarId,
+        tglMulaiSewa: tglMulaiDate,
+        durasiSewaBulan: durasi,
         selectedFurnitur: selectedFurnitur,
       );
 
@@ -203,9 +217,9 @@ class BookingController {
         // Ambil id_tagihan dari response backend
         // Pastikan Laravel return: { "success": true, "data": { "id_tagihan": 1, ... } }
         final idTagihan = result['data']['id_tagihan'];
-        
+
         KamarService.invalidateCache(); // ✅ Invalidate dashboard
-        
+
         if (idTagihan == null) {
           if (context.mounted) {
             _showError(context, 'id_tagihan tidak ditemukan di response.');

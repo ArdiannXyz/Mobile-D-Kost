@@ -36,21 +36,21 @@ class CacheService {
   static final Map<String, _CacheEntry<dynamic>> _store = {};
 
   // ── TTL default per kategori data ──────────────────────────
-  static const Duration ttlKamar       = Duration(minutes: 5);
-  static const Duration ttlFurnitur    = Duration(minutes: 5);
-  static const Duration ttlBooking     = Duration(minutes: 2);
-  static const Duration ttlUser        = Duration(minutes: 10);
-  static const Duration ttlNotifikasi  = Duration(seconds: 30);
-  static const Duration ttlReview      = Duration(minutes: 3);
+  static const Duration ttlKamar = Duration(minutes: 5);
+  static const Duration ttlFurnitur = Duration(minutes: 5);
+  static const Duration ttlBooking = Duration(minutes: 2);
+  static const Duration ttlUser = Duration(minutes: 10);
+  static const Duration ttlNotifikasi = Duration(seconds: 30);
+  static const Duration ttlReview = Duration(minutes: 3);
 
   // ── Key constants ──────────────────────────────────────────
-  static const String keyKamarList     = 'kamar_list';
-  static const String keyFurniturList  = 'furnitur_list';
-  static const String keyUserPrefix    = 'user_';       // + userId
-  static const String keyBookingPrefix = 'booking_';    // + userId
+  static const String keyKamarList = 'kamar_list';
+  static const String keyFurniturList = 'furnitur_list';
+  static const String keyUserPrefix = 'user_'; // + userId
+  static const String keyBookingPrefix = 'booking_'; // + userId
   static const String keyBookingAktifPrefix = 'booking_aktif_'; // + userId
-  static const String keyReviewPrefix  = 'review_';    // + kamarId
-  static const String keyNotifPrefix   = 'notif_';     // + userId
+  static const String keyReviewPrefix = 'review_'; // + kamarId
+  static const String keyNotifPrefix = 'notif_'; // + userId
 
   // ── SET: Simpan data ke cache ──────────────────────────────
   static void set<T>(String key, T data, {required Duration ttl}) {

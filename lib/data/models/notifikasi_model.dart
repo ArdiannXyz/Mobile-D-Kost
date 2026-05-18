@@ -23,15 +23,15 @@ class NotifikasiModel {
 
   factory NotifikasiModel.fromJson(Map<String, dynamic> json) {
     return NotifikasiModel(
-      id          : json['id'],
-      userId      : json['user_id'],
-      judul       : json['judul'],
-      pesan       : json['pesan'],
-      tipe        : json['tipe'],
-      sudahDibaca : json['sudah_dibaca'] == true || json['sudah_dibaca'] == 1,
-      dibacaAt    : json['dibaca_at'],
-      createdAt   : json['created_at'],
-      updatedAt   : json['updated_at'],
+      id: json['id'],
+      userId: json['user_id'],
+      judul: json['judul'],
+      pesan: json['pesan'],
+      tipe: json['tipe'],
+      sudahDibaca: json['sudah_dibaca'] == true || json['sudah_dibaca'] == 1,
+      dibacaAt: json['dibaca_at'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
     );
   }
 }

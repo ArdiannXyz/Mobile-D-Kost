@@ -23,8 +23,7 @@ class PaymentInstructionPage extends StatefulWidget {
   });
 
   @override
-  State<PaymentInstructionPage> createState() =>
-      _PaymentInstructionPageState();
+  State<PaymentInstructionPage> createState() => _PaymentInstructionPageState();
 }
 
 class _PaymentInstructionPageState extends State<PaymentInstructionPage> {
@@ -134,8 +133,9 @@ class _PaymentInstructionPageState extends State<PaymentInstructionPage> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop();          // tutup dialog
-                Navigator.of(context).pop('success'); // kembali ke halaman tagihan
+                Navigator.of(context).pop(); // tutup dialog
+                Navigator.of(context)
+                    .pop('success'); // kembali ke halaman tagihan
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1BBA8A),
@@ -143,7 +143,8 @@ class _PaymentInstructionPageState extends State<PaymentInstructionPage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text('Selesai', style: TextStyle(color: Colors.white)),
+              child:
+                  const Text('Selesai', style: TextStyle(color: Colors.white)),
             ),
           ),
         ],
@@ -164,7 +165,8 @@ class _PaymentInstructionPageState extends State<PaymentInstructionPage> {
       body: Column(
         children: [
           // ── Status bar ─────────────────────────────────────
-          if (_paymentStatus == 'expire' || _paymentStatus == 'cancel' ||
+          if (_paymentStatus == 'expire' ||
+              _paymentStatus == 'cancel' ||
               _paymentStatus == 'deny')
             _StatusBanner(status: _paymentStatus)
           else if (_paymentStatus == 'settlement')
@@ -180,9 +182,9 @@ class _PaymentInstructionPageState extends State<PaymentInstructionPage> {
 
           // ── Footer: countdown + tombol cek status ──────────
           _PaymentFooter(
-            timeRemaining    : _timeRemaining,
-            isCheckingStatus : _isCheckingStatus,
-            onCekStatus      : _checkStatus,
+            timeRemaining: _timeRemaining,
+            isCheckingStatus: _isCheckingStatus,
+            onCekStatus: _checkStatus,
           ),
         ],
       ),
@@ -218,18 +220,18 @@ class _StatusBanner extends StatelessWidget {
 
     switch (status) {
       case 'settlement':
-        color   = const Color(0xFF1BBA8A);
-        icon    = Icons.check_circle;
+        color = const Color(0xFF1BBA8A);
+        icon = Icons.check_circle;
         message = 'Pembayaran berhasil!';
         break;
       case 'expire':
-        color   = Colors.orange;
-        icon    = Icons.timer_off;
+        color = Colors.orange;
+        icon = Icons.timer_off;
         message = 'Waktu pembayaran habis.';
         break;
       default:
-        color   = Colors.red;
-        icon    = Icons.cancel;
+        color = Colors.red;
+        icon = Icons.cancel;
         message = 'Pembayaran dibatalkan.';
     }
 
@@ -241,7 +243,8 @@ class _StatusBanner extends StatelessWidget {
         children: [
           Icon(icon, color: color, size: 20),
           const SizedBox(width: 8),
-          Text(message, style: TextStyle(color: color, fontWeight: FontWeight.w600)),
+          Text(message,
+              style: TextStyle(color: color, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -261,9 +264,9 @@ class _PaymentFooter extends StatelessWidget {
   });
 
   String _formatDuration(Duration d) {
-    final h  = d.inHours.toString().padLeft(2, '0');
-    final m  = (d.inMinutes % 60).toString().padLeft(2, '0');
-    final s  = (d.inSeconds % 60).toString().padLeft(2, '0');
+    final h = d.inHours.toString().padLeft(2, '0');
+    final m = (d.inMinutes % 60).toString().padLeft(2, '0');
+    final s = (d.inSeconds % 60).toString().padLeft(2, '0');
     return '$h:$m:$s';
   }
 

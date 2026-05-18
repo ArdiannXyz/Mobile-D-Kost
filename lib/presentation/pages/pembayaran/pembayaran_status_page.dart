@@ -10,13 +10,13 @@ class PembayaranStatusPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments
-        as Map<String, dynamic>;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
-    final status    = args['status'] as String? ?? 'unknown';
-    final orderId   = args['order_id'] as String? ?? '-';
+    final status = args['status'] as String? ?? 'unknown';
+    final orderId = args['order_id'] as String? ?? '-';
     final namaKamar = args['nama_kamar'] as String? ?? 'Kamar Kost';
-    final total     = (args['total'] as num?)?.toDouble() ?? 0;
+    final total = (args['total'] as num?)?.toDouble() ?? 0;
 
     final isSuccess = status == 'settlement' || status == 'capture';
     final isPending = status == 'pending';
@@ -88,9 +88,7 @@ class PembayaranStatusPage extends StatelessWidget {
                         ? 'Selesaikan pembayaran sesuai\ninstruksi yang diberikan.'
                         : 'Pembayaran tidak berhasil diproses.\nSilakan coba lagi.',
                 style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF9E9E9E),
-                    height: 1.5),
+                    fontSize: 14, color: Color(0xFF9E9E9E), height: 1.5),
                 textAlign: TextAlign.center,
               ),
 
@@ -184,8 +182,8 @@ class PembayaranStatusPage extends StatelessWidget {
                     ),
                     child: const Text(
                       'Coba Bayar Lagi',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
@@ -204,8 +202,7 @@ class PembayaranStatusPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label,
-            style: const TextStyle(
-                fontSize: 13, color: Color(0xFF9E9E9E))),
+            style: const TextStyle(fontSize: 13, color: Color(0xFF9E9E9E))),
         Flexible(
           child: Text(
             value,

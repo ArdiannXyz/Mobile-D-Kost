@@ -28,12 +28,12 @@ class EditProfilController {
   EditProfilController({
     required User user,
     required this.onStateChanged,
-  })  : _initialNama   = user.nama,
-        _initialNoHp   = user.noHp,
+  })  : _initialNama = user.nama,
+        _initialNoHp = user.noHp,
         _initialAlamat = user.alamat ?? '' {
-    namaController   = TextEditingController(text: user.nama);
-    emailController  = TextEditingController(text: user.email);
-    noHpController   = TextEditingController(text: user.noHp);
+    namaController = TextEditingController(text: user.nama);
+    emailController = TextEditingController(text: user.email);
+    noHpController = TextEditingController(text: user.noHp);
     alamatController = TextEditingController(text: user.alamat ?? '');
   }
 
@@ -47,8 +47,8 @@ class EditProfilController {
 
   // ── Deteksi perubahan (untuk dialog Hapus Draft) ───────────
   bool get hasChanges =>
-      namaController.text   != _initialNama   ||
-      noHpController.text   != _initialNoHp   ||
+      namaController.text != _initialNama ||
+      noHpController.text != _initialNoHp ||
       alamatController.text != _initialAlamat;
 
   // ── Validasi ───────────────────────────────────────────────
@@ -91,15 +91,16 @@ class EditProfilController {
     try {
       final userId = await ApiHelper.getUserId();
       if (userId == null) {
-        _showErrorSnackbar(context, 'Sesi tidak ditemukan. Silakan login ulang.');
+        _showErrorSnackbar(
+            context, 'Sesi tidak ditemukan. Silakan login ulang.');
         return;
       }
 
       final success = await UserService.updateUser(
-        id    : userId,
-        nama  : namaController.text.trim(),
-        email : emailController.text.trim(),
-        noHp  : noHpController.text.trim(),
+        id: userId,
+        nama: namaController.text.trim(),
+        email: emailController.text.trim(),
+        noHp: noHpController.text.trim(),
         alamat: alamatController.text.trim(),
       );
 
@@ -208,16 +209,16 @@ class _HapusDraftDialog extends StatelessWidget {
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.red.shade400,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8)),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: const Text('Hapus',
-                      style: TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.w500)),
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                 ),
                 const SizedBox(width: 10),
                 TextButton(
@@ -225,16 +226,16 @@ class _HapusDraftDialog extends StatelessWidget {
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF1BBA8A),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8)),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: const Text('Simpan',
-                      style: TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.w500)),
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                 ),
               ],
             ),

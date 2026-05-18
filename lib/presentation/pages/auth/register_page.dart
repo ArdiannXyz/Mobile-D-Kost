@@ -308,8 +308,8 @@ class _RegisterPageState extends State<RegisterPage> {
           disabledBackgroundColor:
               const Color(0xFF1BBA8A).withValues(alpha: 0.5),
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           padding: const EdgeInsets.symmetric(vertical: 16),
           elevation: 0,
         ),
@@ -322,8 +322,7 @@ class _RegisterPageState extends State<RegisterPage> {
               )
             : const Text(
                 'Daftar',
-                style: TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
       ),
     );
@@ -364,17 +363,14 @@ class _RegisterPageState extends State<RegisterPage> {
       // Counter disembunyikan — batas tetap aktif via maxLength
       counterText: '',
       border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none),
+          borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
       enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: Color(0xFFE8E8E8))),
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide:
-              const BorderSide(color: Color(0xFF1BBA8A), width: 1.5)),
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          borderSide: const BorderSide(color: Color(0xFF1BBA8A), width: 1.5)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 }

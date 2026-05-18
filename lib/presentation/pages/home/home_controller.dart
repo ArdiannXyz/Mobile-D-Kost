@@ -25,8 +25,12 @@ class HomeController {
 
   // Filter chips sesuai ERD tipe_kamar
   static const List<String> filterOptions = [
-    'Semua', 'Tersedia', 'Terisi',
-    '>400rb', '>600rb', '>800rb',
+    'Semua',
+    'Tersedia',
+    'Terisi',
+    '>400rb',
+    '>600rb',
+    '>800rb',
   ];
 
   static const Map<String, String?> filterToStatus = {
@@ -115,37 +119,36 @@ class HomeController {
     final double? minHarga = filterToHarga[selectedFilter];
 
     if (status != null) {
+      filteredKamar = semuaKamar.where((k) => k.statusKamar == status).toList();
+    } else if (minHarga != null) {
       filteredKamar =
-          semuaKamar.where((k) => k.statusKamar == status).toList();
-  } else if (minHarga != null) {
-    filteredKamar =
-        semuaKamar.where((k) => k.hargaPerBulan >= minHarga).toList();
-  } else {
+          semuaKamar.where((k) => k.hargaPerBulan >= minHarga).toList();
+    } else {
       filteredKamar = List.from(semuaKamar); // 'Semua'
     }
   }
 
   // ── Search Kamar ───────────────────────────────────────────
   void searchKamar(String query) {
-  if (query.isEmpty) {
-    _applyCurrentFilter();
+    if (query.isEmpty) {
+      _applyCurrentFilter();
+      onStateChanged();
+      return;
+    }
+
+    final status = filterToStatus[selectedFilter];
+    final minHarga = filterToHarga[selectedFilter];
+
+    filteredKamar = semuaKamar.where((k) {
+      final matchQuery =
+          k.nomorKamar.toLowerCase().contains(query.toLowerCase()) ||
+              k.tipeKamar.toLowerCase().contains(query.toLowerCase());
+      final matchStatus = status == null || k.statusKamar == status;
+      final matchHarga = minHarga == null || k.hargaPerBulan >= minHarga;
+      return matchQuery && matchStatus && matchHarga;
+    }).toList();
     onStateChanged();
-    return;
   }
-
-  final status = filterToStatus[selectedFilter];
-  final minHarga = filterToHarga[selectedFilter];
-
-  filteredKamar = semuaKamar.where((k) {
-    final matchQuery =
-        k.nomorKamar.toLowerCase().contains(query.toLowerCase()) ||
-        k.tipeKamar.toLowerCase().contains(query.toLowerCase());
-    final matchStatus = status == null || k.statusKamar == status;
-    final matchHarga = minHarga == null || k.hargaPerBulan >= minHarga;
-    return matchQuery && matchStatus && matchHarga;
-  }).toList();
-  onStateChanged();
-}
 
   // ── Exit Dialog ────────────────────────────────────────────
   Future<bool> showExitDialog(BuildContext context) async {
@@ -164,8 +167,8 @@ class HomeController {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Batal',
-                style: TextStyle(color: Color(0xFF9E9E9E))),
+            child:
+                const Text('Batal', style: TextStyle(color: Color(0xFF9E9E9E))),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),

@@ -29,13 +29,16 @@ class NotifikasiService {
       if (response.statusCode == 200) {
         final List data = body['data'] ?? [];
         return {
-          'error'             : false,
-          'data'              : data.map((e) => NotifikasiModel.fromJson(e)).toList(),
-          'jumlah_belum_baca' : body['jumlah_belum_baca'] ?? 0,
+          'error': false,
+          'data': data.map((e) => NotifikasiModel.fromJson(e)).toList(),
+          'jumlah_belum_baca': body['jumlah_belum_baca'] ?? 0,
         };
       }
 
-      return {'error': true, 'message': body['message'] ?? 'Gagal memuat notifikasi'};
+      return {
+        'error': true,
+        'message': body['message'] ?? 'Gagal memuat notifikasi'
+      };
     } catch (e) {
       debugPrint('NotifikasiService.getNotifikasi error: $e');
       return {'error': true, 'message': 'Terjadi kesalahan koneksi'};

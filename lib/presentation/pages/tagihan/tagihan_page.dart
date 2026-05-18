@@ -148,16 +148,14 @@ class TagihanController {
 
       case 'Batal':
         filteredTagihan = allTagihan
-            .where((t) => 
-                t.statusBooking == 'batal' || 
-                t.statusBooking == 'expired')
+            .where((t) =>
+                t.statusBooking == 'batal' || t.statusBooking == 'expired')
             .toList();
         break;
 
       case 'Selesai':
-        filteredTagihan = allTagihan
-            .where((t) => t.statusBooking == 'selesai')
-            .toList();
+        filteredTagihan =
+            allTagihan.where((t) => t.statusBooking == 'selesai').toList();
         break;
 
       default:
@@ -211,8 +209,8 @@ class TagihanController {
                   borderRadius: BorderRadius.circular(8)),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
             ),
-            child: const Text('OK',
-                style: TextStyle(fontWeight: FontWeight.w600)),
+            child:
+                const Text('OK', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -332,8 +330,8 @@ class _TagihanPageState extends State<TagihanPage> with RouteAware {
                 onTap: () => _controller.filterTagihan(label),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: isSelected ? color : Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -347,7 +345,8 @@ class _TagihanPageState extends State<TagihanPage> with RouteAware {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: isSelected ? Colors.white : const Color(0xFF555555),
+                      color:
+                          isSelected ? Colors.white : const Color(0xFF555555),
                     ),
                   ),
                 ),
@@ -454,8 +453,10 @@ class _TagihanCard extends StatelessWidget {
     final isExpired = tagihan.statusBooking == 'expired';
     final isSelesai = tagihan.statusBooking == 'selesai';
     final isLunas = tagihan.statusTagihan == 'lunas';
-    final isBelumBayar = tagihan.statusTagihan == 'belum_bayar' && 
-                         !isBatal && !isExpired && !isSelesai;
+    final isBelumBayar = tagihan.statusTagihan == 'belum_bayar' &&
+        !isBatal &&
+        !isExpired &&
+        !isSelesai;
 
     return GestureDetector(
       onTap: () => controller.goToDetail(context, tagihan),
@@ -475,31 +476,36 @@ class _TagihanCard extends StatelessWidget {
         child: Column(
           children: [
             // Banner berdasarkan status
-            if (isBatal) _buildBanner(
-              color: const Color(0xFF9E9E9E),
-              icon: Icons.cancel_outlined,
-              text: 'Booking telah dibatalkan',
-            ),
-            if (isExpired) _buildBanner(
-              color: const Color(0xFFE74C3C),
-              icon: Icons.timer_off_outlined,
-              text: 'Waktu pembayaran telah kadaluarsa',
-            ),
-            if (isSelesai) _buildBanner(
-              color: const Color(0xFF3498DB),
-              icon: Icons.check_circle_outline,
-              text: 'Masa sewa telah selesai',
-            ),
-            if (isLunas && !isBatal && !isExpired && !isSelesai) _buildBanner(
-              color: const Color(0xFF1BBA8A),
-              icon: Icons.check_circle_outline,
-              text: 'Tagihan telah lunas',
-            ),
-            if (isBelumBayar) _buildBanner(
-              color: const Color(0xFFF39C12),
-              icon: Icons.access_time_outlined,
-              text: 'Menunggu pembayaran',
-            ),
+            if (isBatal)
+              _buildBanner(
+                color: const Color(0xFF9E9E9E),
+                icon: Icons.cancel_outlined,
+                text: 'Booking telah dibatalkan',
+              ),
+            if (isExpired)
+              _buildBanner(
+                color: const Color(0xFFE74C3C),
+                icon: Icons.timer_off_outlined,
+                text: 'Waktu pembayaran telah kadaluarsa',
+              ),
+            if (isSelesai)
+              _buildBanner(
+                color: const Color(0xFF3498DB),
+                icon: Icons.check_circle_outline,
+                text: 'Masa sewa telah selesai',
+              ),
+            if (isLunas && !isBatal && !isExpired && !isSelesai)
+              _buildBanner(
+                color: const Color(0xFF1BBA8A),
+                icon: Icons.check_circle_outline,
+                text: 'Tagihan telah lunas',
+              ),
+            if (isBelumBayar)
+              _buildBanner(
+                color: const Color(0xFFF39C12),
+                icon: Icons.access_time_outlined,
+                text: 'Menunggu pembayaran',
+              ),
 
             // Konten kartu
             Padding(
@@ -572,8 +578,7 @@ class _TagihanCard extends StatelessWidget {
         color: const Color(0xFFE8F5E9),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: const Icon(Icons.bed_outlined,
-          color: Color(0xFF1BBA8A), size: 28),
+      child: const Icon(Icons.bed_outlined, color: Color(0xFF1BBA8A), size: 28),
     );
   }
 

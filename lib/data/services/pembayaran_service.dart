@@ -17,8 +17,9 @@ class PembayaranService {
         body: jsonEncode({'id_tagihan': idTagihan}),
       );
       return ApiHelper.handleResponse(response);
-    } on ApiException { rethrow; }
-    catch (_) {
+    } on ApiException {
+      rethrow;
+    } catch (_) {
       throw ApiException(message: 'Gagal membuat pembayaran.', statusCode: 500);
     }
   }
@@ -32,8 +33,9 @@ class PembayaranService {
         headers: headers,
       );
       return ApiHelper.handleResponse(response);
-    } on ApiException { rethrow; }
-    catch (_) {
+    } on ApiException {
+      rethrow;
+    } catch (_) {
       throw ApiException(message: 'Gagal cek status.', statusCode: 500);
     }
   }

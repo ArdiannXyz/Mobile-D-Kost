@@ -71,7 +71,8 @@ class _VerifikasiEmailPageState extends State<VerifikasiEmailPage> {
     } on ApiException catch (e) {
       if (mounted) _showSnackbar(e.message, isError: true);
     } catch (_) {
-      if (mounted) _showSnackbar('Terjadi kesalahan. Coba lagi.', isError: true);
+      if (mounted)
+        _showSnackbar('Terjadi kesalahan. Coba lagi.', isError: true);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -90,7 +91,8 @@ class _VerifikasiEmailPageState extends State<VerifikasiEmailPage> {
         for (final c in _otpControllers) c.clear();
         _focusNodes[0].requestFocus();
       } else {
-        _showSnackbar(data['message'] ?? 'Gagal mengirim ulang.', isError: true);
+        _showSnackbar(data['message'] ?? 'Gagal mengirim ulang.',
+            isError: true);
       }
     } on ApiException catch (e) {
       if (mounted) _showSnackbar(e.message, isError: true);
@@ -114,7 +116,8 @@ class _VerifikasiEmailPageState extends State<VerifikasiEmailPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 72, height: 72,
+                width: 72,
+                height: 72,
                 decoration: const BoxDecoration(
                     color: Color(0xFF1BBA8A), shape: BoxShape.circle),
                 child: const Icon(Icons.mark_email_read_outlined,
@@ -122,7 +125,9 @@ class _VerifikasiEmailPageState extends State<VerifikasiEmailPage> {
               ),
               const SizedBox(height: 20),
               const Text('Email Terverifikasi!',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,
+                  style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
                       color: Color(0xFF1A1A2E))),
               const SizedBox(height: 10),
               const Text(
@@ -151,7 +156,8 @@ class _VerifikasiEmailPageState extends State<VerifikasiEmailPage> {
                     elevation: 0,
                   ),
                   child: const Text('Login Sekarang',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
@@ -196,7 +202,9 @@ class _VerifikasiEmailPageState extends State<VerifikasiEmailPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Verifikasi Email',
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold,
+                  style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
                       color: Color(0xFF1A1A2E))),
               const SizedBox(height: 8),
               Text(
@@ -214,7 +222,8 @@ class _VerifikasiEmailPageState extends State<VerifikasiEmailPage> {
               Center(
                 child: _isResending
                     ? const SizedBox(
-                        height: 20, width: 20,
+                        height: 20,
+                        width: 20,
                         child: CircularProgressIndicator(
                             color: Color(0xFF1BBA8A), strokeWidth: 2))
                     : _countdown > 0
@@ -256,7 +265,8 @@ class _VerifikasiEmailPageState extends State<VerifikasiEmailPage> {
                   ),
                   child: _isLoading
                       ? const SizedBox(
-                          height: 20, width: 20,
+                          height: 20,
+                          width: 20,
                           child: CircularProgressIndicator(
                               color: Colors.white, strokeWidth: 2))
                       : const Text('Verifikasi',
@@ -283,7 +293,8 @@ class _VerifikasiEmailPageState extends State<VerifikasiEmailPage> {
         maxLength: 1,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         style: const TextStyle(
-            fontSize: 22, fontWeight: FontWeight.bold,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
             color: Color(0xFF1A1A2E)),
         decoration: InputDecoration(
           counterText: '',

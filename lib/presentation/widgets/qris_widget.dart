@@ -3,16 +3,16 @@
 // Widget instruksi QRIS — QR generate lokal pakai qr_flutter
 // Letakkan di: lib/presentation/payment/widgets/qris_widget.dart
 // ============================================================
- 
+
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:gal/gal.dart';
 import '../../../data/models/payment_model.dart';
- 
+
 class QrisWidget extends StatefulWidget {
   final QrisPaymentResult result;
- 
+
   const QrisWidget({super.key, required this.result});
 
   @override
@@ -59,7 +59,7 @@ class _QrisWidgetState extends State<QrisWidget> {
       if (mounted) setState(() => _isSaving = false);
     }
   }
- 
+
   @override
   Widget build(BuildContext context) {
     final result = widget.result;
@@ -95,7 +95,7 @@ class _QrisWidgetState extends State<QrisWidget> {
                 ),
               ),
               const SizedBox(height: 16),
- 
+
               // ── QR Code ────────────────────────────────────
               Screenshot(
                 controller: _screenshotController,
@@ -149,7 +149,7 @@ class _QrisWidgetState extends State<QrisWidget> {
                 ),
               ),
               const SizedBox(height: 8),
- 
+
               Text(
                 'Scan QR di atas menggunakan\naplikasi e-wallet atau m-banking apapun',
                 textAlign: TextAlign.center,
@@ -160,7 +160,7 @@ class _QrisWidgetState extends State<QrisWidget> {
                 ),
               ),
               const SizedBox(height: 16),
- 
+
               // Total
               Container(
                 width: double.infinity,
@@ -189,9 +189,9 @@ class _QrisWidgetState extends State<QrisWidget> {
             ],
           ),
         ),
- 
+
         const SizedBox(height: 16),
- 
+
         // ── Cara penggunaan ────────────────────────────────
         Container(
           padding: const EdgeInsets.all(16),
@@ -236,32 +236,32 @@ class _QrisWidgetState extends State<QrisWidget> {
       ],
     );
   }
- 
+
   // ── Generate QR dari qrString (lokal, tidak butuh internet) ─
   Widget _buildQrCode(String qrString) {
     // Prioritas: qrString (generate lokal) → fallback placeholder
     if (qrString.isNotEmpty) {
       return QrImageView(
-        data           : qrString,
-        version        : QrVersions.auto,
-        size           : 200,
-        eyeStyle       : const QrEyeStyle(
-          eyeShape : QrEyeShape.square,
-          color    : Colors.black,
+        data: qrString,
+        version: QrVersions.auto,
+        size: 200,
+        eyeStyle: const QrEyeStyle(
+          eyeShape: QrEyeShape.square,
+          color: Colors.black,
         ),
         dataModuleStyle: const QrDataModuleStyle(
           dataModuleShape: QrDataModuleShape.square,
-          color          : Colors.black,
+          color: Colors.black,
         ),
         errorCorrectionLevel: QrErrorCorrectLevel.M,
       );
     }
- 
+
     // Fallback jika qrString kosong
     return const SizedBox(
-      width : 200,
+      width: 200,
       height: 200,
-      child : Center(
+      child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -276,7 +276,7 @@ class _QrisWidgetState extends State<QrisWidget> {
       ),
     );
   }
- 
+
   Widget _buildStep(String num, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -284,7 +284,7 @@ class _QrisWidgetState extends State<QrisWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width : 20,
+            width: 20,
             height: 20,
             decoration: const BoxDecoration(
               color: Color(0xFF2563EB),
@@ -294,8 +294,8 @@ class _QrisWidgetState extends State<QrisWidget> {
               child: Text(
                 num,
                 style: const TextStyle(
-                  color     : Colors.white,
-                  fontSize  : 10,
+                  color: Colors.white,
+                  fontSize: 10,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -312,12 +312,9 @@ class _QrisWidgetState extends State<QrisWidget> {
       ),
     );
   }
- 
+
   String _formatRupiah(double amount) {
-    final formatted = amount
-        .toInt()
-        .toString()
-        .replaceAllMapped(
+    final formatted = amount.toInt().toString().replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (m) => '${m[1]}.',
         );

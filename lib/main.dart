@@ -35,9 +35,8 @@ import 'presentation/pages/review_keluhan/edit_review_page.dart';
 import 'presentation/pages/profil_setting/setting_page.dart';
 import 'presentation/pages/profil_setting/detail_akun_page.dart';
 import 'presentation/pages/profil_setting/edit_akun_page.dart';
-import 'presentation/pages/profil_setting/panduan_page.dart' ;
+import 'presentation/pages/profil_setting/panduan_page.dart';
 import 'presentation/pages/chatbot/chatbot_page.dart';
-
 
 // ── Model ──────────────────────────────────────────────────────
 import '../../../data/models/kamar_models.dart';
@@ -57,9 +56,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  await initializeDateFormatting('id_ID', null); 
+  await initializeDateFormatting('id_ID', null);
   await OneSignalSetup.init();
-  
+
   // // Inisialisasi Firebase
   // await Firebase.initializeApp(
   //   options: DefaultFirebaseOptions.currentPlatform,
@@ -126,28 +125,29 @@ class DKostApp extends StatelessWidget {
   // ── Static routes (tanpa argument) ───────────────────────────
   Map<String, WidgetBuilder> _buildRoutes() {
     return {
-      '/welcome':        (_) => const WelcomeScreen(),
-      '/login':          (_) => const LoginPage(),
-      '/register':       (_) => const RegisterPage(),
-      '/lupa-password':  (_) => const LupaPasswordPage(),
-      '/masuk-otp':      (_) => const MasukOtpPage(),
+      '/welcome': (_) => const WelcomeScreen(),
+      '/login': (_) => const LoginPage(),
+      '/register': (_) => const RegisterPage(),
+      '/lupa-password': (_) => const LupaPasswordPage(),
+      '/masuk-otp': (_) => const MasukOtpPage(),
       '/ganti-password': (_) => const GantiPasswordPage(),
-      '/home':           (_) => const HomePage(),
-      '/kamar-search':   (_) => const SearchPage(),
-      '/keluhan-list':   (_) => const KeluhanListPage(),
-      '/lapor-keluhan':  (_) => const LaporKeluhanPage(),
-      '/setting':        (_) => const SettingPage(),
-      '/chatbot':        (_) => const ChatbotPage(),
-      '/detail-akun':    (_) => const DetailAkunPage(),
-      '/panduan':        (_) => const PanduanPage(),
-      '/kamarku':        (_) => const KamarkuPage(),
-      '/booking-form' : (_) => const BookingFormPage(),
-      '/pembayaran'        : (_) => const PaymentPage(),
-      '/pembayaran-status' : (_) => const PembayaranStatusPage(),
+      '/home': (_) => const HomePage(),
+      '/kamar-search': (_) => const SearchPage(),
+      '/keluhan-list': (_) => const KeluhanListPage(),
+      '/lapor-keluhan': (_) => const LaporKeluhanPage(),
+      '/setting': (_) => const SettingPage(),
+      '/chatbot': (_) => const ChatbotPage(),
+      '/detail-akun': (_) => const DetailAkunPage(),
+      '/panduan': (_) => const PanduanPage(),
+      '/kamarku': (_) => const KamarkuPage(),
+      '/booking-form': (_) => const BookingFormPage(),
+      '/pembayaran': (_) => const PaymentPage(),
+      '/pembayaran-status': (_) => const PembayaranStatusPage(),
       '/edit-keluhan': (context) {
-  final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-  return EditKeluhanPage(keluhan: args['keluhan']);
-},
+        final args =
+            ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+        return EditKeluhanPage(keluhan: args['keluhan']);
+      },
     };
   }
 
@@ -156,7 +156,6 @@ class DKostApp extends StatelessWidget {
     final args = settings.arguments as Map<String, dynamic>?;
 
     switch (settings.name) {
-
       // Kamar Detail
       case '/kamar-detail':
         final kamarId = args?['id'] as int? ?? 0;
@@ -169,11 +168,12 @@ class DKostApp extends StatelessWidget {
 
       // Booking — Checkout
       case '/checkout':
-        final kamar      = args?['kamar'] as KamarModel;
-        final durasi     = args?['durasi'] as int? ?? 1;
-        final furnitur   = args?['furnitur'] as Map<int, int>? ?? {};
-        final listFurnitur = args?['furnitur_list'] as List<FurniturModel>? ?? [];
-        final tglMulai   = args?['tgl_mulai'] as String? ?? '';
+        final kamar = args?['kamar'] as KamarModel;
+        final durasi = args?['durasi'] as int? ?? 1;
+        final furnitur = args?['furnitur'] as Map<int, int>? ?? {};
+        final listFurnitur =
+            args?['furnitur_list'] as List<FurniturModel>? ?? [];
+        final tglMulai = args?['tgl_mulai'] as String? ?? '';
         return _route(
           CheckoutPage(
             kamar: kamar,

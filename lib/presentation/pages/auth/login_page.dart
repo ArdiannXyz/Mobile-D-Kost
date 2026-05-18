@@ -35,7 +35,8 @@ class _LoginPageState extends State<LoginPage> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -202,12 +203,12 @@ class _LoginPageState extends State<LoginPage> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _controller.isLoading
-            ? null
-            : () => _controller.loginUser(context),
+        onPressed:
+            _controller.isLoading ? null : () => _controller.loginUser(context),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF1BBA8A),
-          disabledBackgroundColor: const Color(0xFF1BBA8A).withValues(alpha: 0.5),
+          disabledBackgroundColor:
+              const Color(0xFF1BBA8A).withValues(alpha: 0.5),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

@@ -12,7 +12,8 @@ import 'cache_service.dart';
 class FurniturService {
   FurniturService._();
 
-  static Future<List<FurniturModel>> getFurniturList({bool forceRefresh = false}) async {
+  static Future<List<FurniturModel>> getFurniturList(
+      {bool forceRefresh = false}) async {
     const cacheKey = CacheService.keyFurniturList;
 
     // Cek cache dulu
@@ -41,7 +42,8 @@ class FurniturService {
     } on ApiException {
       rethrow;
     } catch (_) {
-      throw ApiException(message: 'Gagal memuat daftar furnitur.', statusCode: 500);
+      throw ApiException(
+          message: 'Gagal memuat daftar furnitur.', statusCode: 500);
     }
   }
 }
