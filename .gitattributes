@@ -1,5 +1,4 @@
-# Buat .gitattributes
-echo '* text=auto
+* text=auto
 *.dart text eol=lf
 *.yaml text eol=lf
 *.json text eol=lf
@@ -19,8 +18,3 @@ echo '* text=auto
 *.ttf binary
 *.otf binary
 *.apk binary
-' > .gitattributes
-
-git add .gitattributes
-git commit -m "chore: add .gitattributes for consistent line endings"
-git push
