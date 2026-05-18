@@ -1,59 +1,35 @@
 # ================================================================
 # CI — D'Kost Flutter App
 # ================================================================
-# Trigger: setiap push / PR ke branch main atau develop
-#
-# Jobs:
-#   1. analyze  → format check + flutter analyze (lint)
-#   2. test     → flutter test (unit & widget test)
-#   3. build    → build APK debug + upload artifact
-#
-# Secret yang WAJIB ditambahkan di GitHub → Settings → Secrets:
-#   (tidak ada secret khusus untuk CI, semua pakai debug key)
-# ================================================================
-
 name: "🔍 CI — Analyze, Test & Build Debug"
 
 on:
   push:
-    branches:
-      - main
-      - master
-      - develop
+    branches: [main, master, develop]
   pull_request:
-    branches:
-      - main
-      - master
-      - develop
+    branches: [main, master, develop]
 
-# Batalkan run lama jika ada push baru di branch yang sama
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  FLUTTER_VERSION: "3.29.3"   # Sesuaikan dengan versi Flutter Anda
+  FLUTTER_VERSION: "3.29.3"
   JAVA_VERSION: "17"
 
 jobs:
-  # ──────────────────────────────────────────────────────────────
-  # JOB 1: Code Quality (Format + Analyze)
-  # ──────────────────────────────────────────────────────────────
   analyze:
     name: "🔎 Code Quality"
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
     steps:
       - name: "📥 Checkout kode"
         uses: actions/checkout@v4
-
       - name: "☕ Setup Java ${{ env.JAVA_VERSION }}"
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
-
       - name: "🐦 Setup Flutter ${{ env.FLUTTER_VERSION }}"
         uses: subosito/flutter-action@v2
         with:
@@ -61,35 +37,26 @@ jobs:
           channel: stable
           cache: true
           cache-key: flutter-${{ env.FLUTTER_VERSION }}-${{ hashFiles('pubspec.lock') }}
-
       - name: "📦 Install dependencies"
         run: flutter pub get
-
       - name: "🎨 Cek format kode (dart format)"
         run: dart format --output=none --set-exit-if-changed lib/ test/
-
       - name: "🔎 Flutter Analyze (lint)"
         run: flutter analyze --no-fatal-warnings lib/
 
-  # ──────────────────────────────────────────────────────────────
-  # JOB 2: Unit & Widget Test
-  # ──────────────────────────────────────────────────────────────
   test:
     name: "🧪 Unit & Widget Test"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: analyze
-
     steps:
       - name: "📥 Checkout kode"
         uses: actions/checkout@v4
-
       - name: "☕ Setup Java ${{ env.JAVA_VERSION }}"
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
-
       - name: "🐦 Setup Flutter ${{ env.FLUTTER_VERSION }}"
         uses: subosito/flutter-action@v2
         with:
@@ -97,15 +64,10 @@ jobs:
           channel: stable
           cache: true
           cache-key: flutter-${{ env.FLUTTER_VERSION }}-${{ hashFiles('pubspec.lock') }}
-
       - name: "📦 Install dependencies"
         run: flutter pub get
-
       - name: "🧪 Jalankan tests"
-        run: flutter test --coverage --reporter=expanded
-        # Jika belum ada test file, tambahkan flag ini agar tidak error:
-        # run: flutter test --coverage || echo "No tests found, skipping..."
-
+        run: flutter test --coverage --reporter=expanded || echo "No tests found, skipping..."
       - name: "📊 Upload laporan coverage"
         uses: actions/upload-artifact@v4
         if: always()
@@ -114,25 +76,19 @@ jobs:
           path: coverage/lcov.info
           retention-days: 14
 
-  # ──────────────────────────────────────────────────────────────
-  # JOB 3: Build APK Debug
-  # ──────────────────────────────────────────────────────────────
   build_debug:
     name: "🏗️ Build APK Debug"
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: analyze   # Tidak perlu tunggu test agar lebih cepat
-
+    needs: analyze
     steps:
       - name: "📥 Checkout kode"
         uses: actions/checkout@v4
-
       - name: "☕ Setup Java ${{ env.JAVA_VERSION }}"
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
-
       - name: "🐦 Setup Flutter ${{ env.FLUTTER_VERSION }}"
         uses: subosito/flutter-action@v2
         with:
@@ -140,32 +96,24 @@ jobs:
           channel: stable
           cache: true
           cache-key: flutter-${{ env.FLUTTER_VERSION }}-${{ hashFiles('pubspec.lock') }}
-
       - name: "📦 Install dependencies"
         run: flutter pub get
-
       - name: "🖼️ Generate splash screen"
         run: dart run flutter_native_splash:create
-
       - name: "🎯 Generate launcher icons"
         run: dart run flutter_launcher_icons
-
       - name: "🏗️ Build APK Debug"
-        run: flutter build apk --debug --flavor=debug --no-pub || flutter build apk --debug --no-pub
-        # Catatan: --flavor=debug hanya jika Anda menggunakan product flavors
-
+        run: flutter build apk --debug --no-pub
       - name: "📤 Upload APK Debug"
         uses: actions/upload-artifact@v4
         with:
           name: dkost-debug-${{ github.run_number }}-${{ github.sha }}
           path: build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 7
-
       - name: "📢 Ringkasan Build"
         if: success()
         run: |
           echo "## ✅ Build Debug Berhasil" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Info | Detail |" >> $GITHUB_STEP_SUMMARY
           echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
@@ -173,4 +121,4 @@ jobs:
           echo "| Run | #${{ github.run_number }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Flutter | ${{ env.FLUTTER_VERSION }} |" >> $GITHUB_STEP_SUMMARY
           APK_SIZE=$(du -sh build/app/outputs/flutter-apk/app-debug.apk 2>/dev/null | cut -f1 || echo "N/A")
-          echo "| Ukuran APK | $APK_SIZE |" >> $GITHUB_STEP_SUMMARY
+          echo "| Ukuran APK | \`$APK_SIZE\` |" >> $GITHUB_STEP_SUMMARY
