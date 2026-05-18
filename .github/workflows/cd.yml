@@ -113,6 +113,13 @@ jobs:
           KEYEOF
           echo "✅ key.properties berhasil dibuat"
 
+      - name: "🔐 Decode google-services.json"
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          echo "$GOOGLE_SERVICES_JSON" | base64 --decode > android/app/google-services.json
+          echo "✅ google-services.json berhasil dibuat"
+
       - name: "📱 Build APK Release"
         run: |
           flutter build apk --release \
