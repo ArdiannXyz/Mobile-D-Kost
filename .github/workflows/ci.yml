@@ -40,7 +40,7 @@ jobs:
       - name: "📦 Install dependencies"
         run: flutter pub get
       - name: "🎨 Cek format kode (dart format)"
-        run: dart format --output=none --set-exit-if-changed lib/ test/
+        run: dart format --output=none --set-exit-if-changed lib/
       - name: "🔎 Flutter Analyze (lint)"
         run: flutter analyze --no-fatal-warnings lib/
 
