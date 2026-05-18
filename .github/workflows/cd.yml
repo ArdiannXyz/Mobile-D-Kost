@@ -20,7 +20,7 @@ on:
         default: "Bug fixes and improvements"
 
 env:
-  FLUTTER_VERSION: "3.29.3"
+  FLUTTER_VERSION: "3.41.4"
   JAVA_VERSION: "17"
   APP_NAME: "DKost"
 
