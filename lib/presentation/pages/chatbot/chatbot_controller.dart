@@ -14,6 +14,7 @@ class ChatbotController {
   // ── State ──────────────────────────────────────────────────
   final List<ChatMessage> messages = [];
   bool isTyping = false;
+  final List<Map<String, String>> _history = []; // ← TAMBAH INI
 
   final VoidCallback onStateChanged;
 
@@ -71,58 +72,99 @@ class ChatbotController {
   }
 
   // ── Call Laravel API ───────────────────────────────────────
-  Future<Map<String, dynamic>> _callApi(String message) async {
-    final headers = await ApiHelper.authHeaders; // pakai token yang sudah login
+Future<Map<String, dynamic>> _callApi(String message) async {
+    final headers = await ApiHelper.authHeaders;
+    final url = '${ApiConstants.baseUrl}chatbot/chat';
+    
+    debugPrint('=== SINORA URL: $url ==='); // ← tambah ini
+    debugPrint('=== BODY: ${jsonEncode({'message': message, 'user_id': _userId})} ===');
 
-  final response = await http.post(
-    Uri.parse('${ApiConstants.baseUrl}chatbot/chat'), // ← pakai ApiConstants
-    headers: headers,
-    body: jsonEncode({
-      'message': message,
-      'user_id': _userId,
-    }),
-  ).timeout(const Duration(seconds: 15));
+    final response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: jsonEncode({
+        'message': message,
+        'user_id': _userId,
+        'history': _history,
+      }),
+    ).timeout(const Duration(seconds: 15));
 
-  return jsonDecode(response.body) as Map<String, dynamic>;
+    debugPrint('=== RESPONSE STATUS: ${response.statusCode} ==='); // ← tambah ini
+    debugPrint('=== RESPONSE BODY: ${response.body} ==='); // ← tambah ini
+
+    return jsonDecode(response.body) as Map<String, dynamic>;
+}
+  // ── Handle Response ────────────────────────────────────────
+// SESUDAH
+  void _handleResponse(Map<String, dynamic> res) {
+      messages.removeWhere((m) => m.isLoading);
+      isTyping = false;
+
+      // Handle rate limit
+      if (res['success'] == false && res['type'] == 'rate_limited') {
+        final seconds = res['retry_after'] ?? 60;
+        messages.add(ChatMessage(
+          text:   'Terlalu banyak pesan nih 😅 Tunggu $seconds detik ya!',
+          isUser: false,
+          type:   'rate_limited',
+        ));
+        onStateChanged();
+        return;
+      }
+
+      final rawData = res['data'];
+      final String? type = res['type'] as String?;
+      final String replyText = res['message'] ?? 'Maaf, ada kesalahan 🙏';
+
+      // ── FIX 1: Simpan ke history agar percakapan nyambung ──
+      // Ambil pesan user terakhir dari messages
+      final lastUserMsg = messages.lastWhere(
+        (m) => m.isUser,
+        orElse: () => ChatMessage(text: '', isUser: true),
+      );
+      _history.add({'role': 'user',  'text': lastUserMsg.text});
+      _history.add({'role': 'model', 'text': replyText});
+
+      // Batasi history maksimal 10 pesan (5 bolak-balik)
+      if (_history.length > 10) {
+        _history.removeRange(0, _history.length - 10);
+      }
+
+      // ── FIX 2: Card kamar muncul untuk semua intent yang punya data kamar ──
+      List<Map<String, dynamic>>? kamarList;
+      List<Map<String, dynamic>>? dataList;
+
+      // Intent yang menampilkan card kamar
+      const kamarIntents = {'cek_kamar_tersedia', 'cek_kamar_review'};
+
+      if (rawData is List && rawData.isNotEmpty) {
+        final parsed = rawData.whereType<Map<String, dynamic>>().toList();
+
+        // Cek apakah data mengandung field kamar
+        final isKamarData = parsed.first.containsKey('id_kamar') ||
+                            parsed.first.containsKey('nomor_kamar');
+
+        if (kamarIntents.contains(type) || isKamarData) {
+          kamarList = parsed; // tampilkan sebagai card
+        } else {
+          dataList = parsed;  // tampilkan sebagai list teks
+        }
+      }
+
+      messages.add(ChatMessage(
+        text:      replyText,
+        isUser:    false,
+        dataList:  dataList,
+        kamarList: kamarList,
+        type:      type,
+        fromCache: res['from_cache'] ?? false,
+      ));
+
+      onStateChanged();
   }
 
-  // ── Handle Response ────────────────────────────────────────
-  void _handleResponse(Map<String, dynamic> res) {
-    // Hapus loading bubble
-    messages.removeWhere((m) => m.isLoading);
-    isTyping = false;
-
-    if (res['success'] == false && res['type'] == 'rate_limited') {
-      // Rate limit kena
-      final seconds = res['retry_after'] ?? 60;
-      messages.add(ChatMessage(
-        text:   'Terlalu banyak pesan nih 😅 Tunggu $seconds detik ya!',
-        isUser: false,
-        type:   'rate_limited',
-      ));
-      onStateChanged();
-      return;
-    }
-
-    // Parse data list dari DB
-    List<Map<String, dynamic>>? dataList;
-    final rawData = res['data'];
-
-    if (rawData is List && rawData.isNotEmpty) {
-      dataList = rawData
-          .whereType<Map<String, dynamic>>()
-          .toList();
-    }
-
-    messages.add(ChatMessage(
-      text:      res['message'] ?? 'Maaf, ada kesalahan 🙏',
-      isUser:    false,
-      dataList:  dataList,
-      type:      res['type'],
-      fromCache: res['from_cache'] ?? false,
-    ));
-
-    onStateChanged();
+  void goToKamarDetail(BuildContext context, int kamarId) {
+    Navigator.pushNamed(context, '/kamar-detail', arguments: {'id': kamarId});
   }
 
   // ── Handle Error ───────────────────────────────────────────

@@ -81,7 +81,7 @@ class KamarCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Learn more',
+                        'Lebih lanjut',
                         style: TextStyle(
                           fontSize: 11,
                           color: Color(0xFF1BBA8A),
@@ -109,7 +109,7 @@ class KamarCard extends StatelessWidget {
                     ],
                   ),
 
-                  // Tombol "Detail Kamar" HANYA untuk mode horizontal (rekomendasi)
+                  
                   if (mode == KamarCardMode.grid) ...[
                     const SizedBox(height: 8),
                     SizedBox(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'ganti_password_controller.dart';
 
 class GantiPasswordPage extends StatefulWidget {
@@ -40,7 +41,7 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Back button pojok atas kiri
+            // ── Back button ──────────────────────────────────
             Padding(
               padding: const EdgeInsets.only(left: 24, top: 16),
               child: GestureDetector(
@@ -62,7 +63,7 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
               ),
             ),
 
-            // Konten tengah
+            // ── Konten ──────────────────────────────────────
             Expanded(
               child: Center(
                 child: SingleChildScrollView(
@@ -133,7 +134,7 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
 
                       const SizedBox(height: 32),
 
-                      // Password Baru
+                      // ── Password Baru: max 50 ──────────────
                       _buildPasswordField(
                         label: 'Password Baru',
                         hint: 'Masukkan password baru',
@@ -144,7 +145,7 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
 
                       const SizedBox(height: 16),
 
-                      // Konfirmasi Password
+                      // ── Konfirmasi Password: max 50 ────────
                       _buildPasswordField(
                         label: 'Konfirmasi Password',
                         hint: 'Ulangi password baru',
@@ -155,35 +156,12 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
 
                       const SizedBox(height: 12),
 
-                      // Password rules
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF5F7FA),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: const Color(0xFFE8E8E8)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Syarat password:',
-                              style: TextStyle(
-                                color: Color(0xFF555555),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            _buildRule('Minimal 6 karakter'),
-                            _buildRule('Password dan konfirmasi harus sama'),
-                          ],
-                        ),
-                      ),
+                      // ── Password Rules ─────────────────────
+                      _buildPasswordRules(),
 
                       const SizedBox(height: 28),
 
-                      // Submit button
+                      // ── Submit Button ──────────────────────
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -227,6 +205,38 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
     );
   }
 
+  // ── Password Rules Box ─────────────────────────────────────
+  Widget _buildPasswordRules() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F7FA),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFE8E8E8)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Syarat password:',
+            style: TextStyle(
+              color: Color(0xFF555555),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 6),
+          _buildRule('Minimal 8 karakter'),
+          _buildRule('Terdapat minimal 1 huruf kapital'),
+          _buildRule('Mengandung minimal 1 simbol (contoh: @, #, !, _)'),
+          _buildRule('Password dan konfirmasi harus sama'),
+          _buildRule('Tidak boleh sama dengan password lama'),
+        ],
+      ),
+    );
+  }
+
+  // ── Password Field ─────────────────────────────────────────
   Widget _buildPasswordField({
     required String label,
     required String hint,
@@ -249,13 +259,17 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
         TextField(
           controller: controller,
           obscureText: isObscure,
-          style: const TextStyle(color: Color(0xFF1A1A2E), fontSize: 14),
+          maxLength: 50,                          // ← batas 50 karakter
+          inputFormatters: const [],              // password bebas karakter
+          style: const TextStyle(
+              color: Color(0xFF1A1A2E), fontSize: 14),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle:
                 const TextStyle(color: Color(0xFFB0B0C3), fontSize: 14),
             filled: true,
             fillColor: const Color(0xFFF5F7FA),
+            counterText: '',                      // sembunyikan counter
             prefixIcon: const Icon(
               Icons.lock_outline,
               color: Color(0xFFB0B0C3),
@@ -281,17 +295,18 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide:
-                  const BorderSide(color: Color(0xFF2ECC71), width: 1.5),
+              borderSide: const BorderSide(
+                  color: Color(0xFF2ECC71), width: 1.5),
             ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16, vertical: 14),
           ),
         ),
       ],
     );
   }
 
+  // ── Rule Item ──────────────────────────────────────────────
   Widget _buildRule(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 4),
@@ -303,11 +318,13 @@ class _GantiPasswordPageState extends State<GantiPasswordPage> {
             size: 14,
           ),
           const SizedBox(width: 6),
-          Text(
-            text,
-            style: const TextStyle(
-              color: Color(0xFF9E9E9E),
-              fontSize: 12,
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Color(0xFF9E9E9E),
+                fontSize: 12,
+              ),
             ),
           ),
         ],

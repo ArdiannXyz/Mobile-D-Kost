@@ -1,10 +1,4 @@
-// ============================================================
-// BACKEND LAYER — masuk_otp_controller.dart
-// Bertanggung jawab atas: ambil argument email dari route,
-// validasi OTP, pemanggilan UserService.cekOtp, navigasi.
-// Tidak boleh ada Widget/UI di sini.
-// ============================================================
-
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../data/services/user_service.dart';
 import '../../../data/helper/api_exception.dart';
@@ -13,47 +7,62 @@ class MasukOtpController {
   // ── State ──────────────────────────────────────────────────
   bool isLoading = false;
 
+  // ── Cooldown Timer ─────────────────────────────────────────
+  int cooldownSeconds = 0;
+  Timer? _cooldownTimer;
+
   // ── Text Controller ────────────────────────────────────────
   final TextEditingController otpController = TextEditingController();
 
-  // Email diterima dari route arguments (dari lupa_password_page)
   String email = '';
 
-  // Callback untuk trigger setState di View
   final VoidCallback onStateChanged;
-
   MasukOtpController({required this.onStateChanged});
 
-  // ── Init: Ambil email dari route arguments ─────────────────
+  // ── Getter: apakah sedang cooldown ────────────────────────
+  bool get isCooldown => cooldownSeconds > 0;
+
+  // ── Init ───────────────────────────────────────────────────
   void init(BuildContext context) {
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args != null && args is Map<String, dynamic>) {
       email = args['email'] ?? '';
     }
+    // Langsung mulai cooldown 60 detik saat halaman dibuka,
+    // karena OTP sudah dikirim sebelum masuk halaman ini.
+    _startCooldown();
   }
 
   // ── Dispose ────────────────────────────────────────────────
   void dispose() {
     otpController.dispose();
+    _cooldownTimer?.cancel();
+  }
+
+  // ── Mulai countdown 60 detik ───────────────────────────────
+  void _startCooldown() {
+    cooldownSeconds = 60;
+    onStateChanged();
+
+    _cooldownTimer?.cancel();
+    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      cooldownSeconds--;
+      onStateChanged();
+      if (cooldownSeconds <= 0) {
+        timer.cancel();
+      }
+    });
   }
 
   // ── Validasi OTP ───────────────────────────────────────────
   String? validate() {
     final otp = otpController.text.trim();
-
-    if (otp.isEmpty) {
-      return 'Kode OTP harus diisi.';
-    }
-
-    if (otp.length != 6) {
-      return 'Kode OTP harus 6 digit.';
-    }
-
+    if (otp.isEmpty) return 'Kode OTP harus diisi.';
+    if (otp.length != 6) return 'Kode OTP harus 6 digit.';
     if (!RegExp(r'^\d{6}$').hasMatch(otp)) {
       return 'Kode OTP hanya boleh berisi angka.';
     }
-
-    return null; // null = valid
+    return null;
   }
 
   // ── Submit OTP ─────────────────────────────────────────────
@@ -77,7 +86,6 @@ class MasukOtpController {
       if (!context.mounted) return;
 
       if (result['error'] == false) {
-        // OTP valid → navigasi ke halaman ganti password
         Navigator.pushNamed(
           context,
           '/ganti-password',
@@ -108,19 +116,21 @@ class MasukOtpController {
 
   // ── Kirim Ulang OTP ────────────────────────────────────────
   Future<void> resendOtp(BuildContext context) async {
-    if (email.isEmpty) return;
+    if (email.isEmpty || isCooldown) return;
 
     try {
       final result = await UserService.lupaPassword(email);
       if (!context.mounted) return;
 
       if (result['error'] == false) {
+        _startCooldown();
         _showSuccessSnackbar(context, 'Kode OTP baru dikirim ke $email');
       } else {
         _showErrorSnackbar(
           context,
           result['message'] ?? 'Gagal mengirim ulang OTP.',
         );
+        if (!isCooldown) _startCooldown();
       }
     } catch (e) {
       if (context.mounted) {
@@ -130,21 +140,17 @@ class MasukOtpController {
   }
 
   // ── Navigasi Kembali ───────────────────────────────────────
-  void goBack(BuildContext context) {
-    Navigator.pop(context);
-  }
+  void goBack(BuildContext context) => Navigator.pop(context);
 
   // ── Helper Snackbar ────────────────────────────────────────
   void _showSuccessSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
-            const SizedBox(width: 10),
-            Expanded(child: Text(message)),
-          ],
-        ),
+        content: Row(children: [
+          const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+          const SizedBox(width: 10),
+          Expanded(child: Text(message)),
+        ]),
         backgroundColor: const Color(0xFF1BBA8A),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -156,13 +162,11 @@ class MasukOtpController {
   void _showErrorSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.error_outline, color: Colors.white, size: 20),
-            const SizedBox(width: 10),
-            Expanded(child: Text(message)),
-          ],
-        ),
+        content: Row(children: [
+          const Icon(Icons.error_outline, color: Colors.white, size: 20),
+          const SizedBox(width: 10),
+          Expanded(child: Text(message)),
+        ]),
         backgroundColor: Colors.red.shade600,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

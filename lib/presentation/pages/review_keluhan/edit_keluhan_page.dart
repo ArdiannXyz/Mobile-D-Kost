@@ -18,15 +18,18 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
   late final KeluhanController _controller;
 
   @override
-  void initState() {
-    super.initState();
-    _controller = KeluhanController(
-      onStateChanged: () {
-        if (mounted) setState(() {});
-      },
-    );
-    _controller.initEditForm(widget.keluhan);
-  }
+    void initState() {
+      super.initState();
+      _controller = KeluhanController(
+        onStateChanged: () {
+          if (mounted) setState(() {});
+        },
+      );
+      _controller.initEditForm(widget.keluhan);
+      _controller.saveOriginalValues(); // ← simpan nilai awal
+      _controller.onSimpanFromDialog =
+          (ctx) => _controller.editKeluhan(ctx, widget.keluhan.idKeluhan); // ← aksi simpan dari dialog
+    }
 
   @override
   void dispose() {
@@ -36,10 +39,17 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      appBar: _buildAppBar(),
-      body: _buildBody(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        await _controller.handleBackPressed(context);
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F7FA),
+        appBar: _buildAppBar(),
+        body: _buildBody(),
+      ),
     );
   }
 
@@ -48,9 +58,8 @@ class _EditKeluhanPageState extends State<EditKeluhanPage> {
       backgroundColor: const Color(0xFF1BBA8A),
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new,
-            color: Colors.white, size: 18),
-        onPressed: () => _controller.goBack(context),
+        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+        onPressed: () => _controller.handleBackPressed(context),
       ),
       centerTitle: true,
       title: const Text(

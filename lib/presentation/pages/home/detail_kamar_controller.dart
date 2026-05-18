@@ -1,5 +1,5 @@
 // ============================================================
-// BACKEND LAYER — kamarku_detail_controller.dart
+// BACKEND LAYER — detail_kamar_controller.dart
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -69,6 +69,28 @@ class KamarDetailController {
     return '${date.day} ${bulan[date.month]} ${date.year}';
   }
 
+  // ── Refresh status kamar saja (durasi & tanggal aman) ─────
+  Future<void> refreshStatusOnly() async {
+    try {
+      final updatedKamar =
+          await KamarService.getKamarDetail(kamarId, forceRefresh: true);
+      if (updatedKamar == null) return;
+
+      kamar = updatedKamar;
+      onStateChanged();
+    } catch (_) {
+      // silent fail — tidak ganggu UI
+    }
+  }
+
+  // ── Refresh semua (status + reviews) ──────────────────────
+  Future<void> refreshAll() async {
+    await Future.wait([
+      refreshStatusOnly(),
+      _loadReviews(),
+    ]);
+  }
+
   // ── Init ───────────────────────────────────────────────────
   Future<void> init() async {
     isLoading = true;
@@ -108,7 +130,9 @@ class KamarDetailController {
     onStateChanged();
     try {
       reviewList = await ReviewService.getReviewsByKamar(kamarId);
-      displayedReviews = reviewList.take(maxDisplayedReviews).toList();
+      displayedReviews = showAllReviews
+          ? reviewList
+          : reviewList.take(maxDisplayedReviews).toList();
 
       final userId = await ApiHelper.getUserId();
       if (userId != null) {
@@ -215,6 +239,9 @@ class KamarDetailController {
   }
 
   // ── Navigasi ───────────────────────────────────────────────
+
+  // Setelah kembali dari booking-form → refresh status kamar saja
+  // (durasi & tanggal tidak di-reset)
   void goToBookingForm(BuildContext context) {
     Navigator.pushNamed(
       context,
@@ -227,30 +254,33 @@ class KamarDetailController {
         'furnitur'  : selectedFurnitur,
         'total'     : totalBiaya,
       },
-    );
+    ).then((_) => refreshStatusOnly());
   }
 
+  // Setelah kembali dari semua-review → refresh status saja
   void goToSemuaReview(BuildContext context) {
     Navigator.pushNamed(
       context,
       '/semua-review',
       arguments: {'kamar_id': kamarId},
-    );
+    ).then((_) => refreshStatusOnly());
   }
 
+  // Setelah kembali dari tulis/edit review → reload reviews agar
+  // daftar ulasan & status sudahReview langsung terupdate
   void goToTulisReview(BuildContext context) {
     if (sudahReview && _myExistingReview != null) {
       Navigator.pushNamed(
         context,
         '/edit-review',
         arguments: {'review': _myExistingReview},
-      );
+      ).then((_) => _loadReviews());
     } else {
       Navigator.pushNamed(
         context,
         '/tulis-review',
         arguments: {'kamar_id': kamarId},
-      );
+      ).then((_) => _loadReviews());
     }
   }
 

@@ -24,6 +24,8 @@ class KeluhanController {
   List<KeluhanModel> keluhanList = [];
   String? errorList;
   bool isSubmitting = false;
+  String _originalDeskripsi = '';
+  XFile? _originalFotoXFile;
 
   KeluhanPageState pageState = KeluhanPageState.loading;
 
@@ -46,6 +48,98 @@ class KeluhanController {
     tanggalController.dispose();
     deskripsiController.dispose();
   }
+
+  void saveOriginalValues() {
+  _originalDeskripsi = deskripsiController.text;
+  _originalFotoXFile = fotoBuktiXFile;
+  }
+
+  bool get hasChanges =>
+    deskripsiController.text.trim() != _originalDeskripsi.trim() ||
+    fotoBuktiXFile != _originalFotoXFile;
+
+  Future<void> handleBackPressed(BuildContext context) async {
+  if (!hasChanges) {
+    Navigator.pop(context);
+    return;
+  }
+
+  final result = await showDialog<String>(
+    context: context,
+    barrierColor: Colors.black45,
+    builder: (_) => Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Hapus Draf?',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1A1A2E),
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Perubahan yang belum disimpan akan hilang.',
+              style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'hapus'),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.red.shade400,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text('Hapus',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                ),
+                const SizedBox(width: 10),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'simpan'),
+                  style: TextButton.styleFrom(
+                    backgroundColor: const Color(0xFF1BBA8A),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text('Simpan',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  if (!context.mounted) return;
+
+  if (result == 'hapus') {
+    Navigator.pop(context);
+  } else if (result == 'simpan') {
+    // Akan dipanggil dari page masing-masing
+    onSimpanFromDialog?.call(context);
+  }
+  // null → tetap di halaman
+}
+
+// Callback opsional untuk tombol Simpan di dialog
+Future<void> Function(BuildContext)? onSimpanFromDialog;
 
   // ── Load daftar keluhan ────────────────────────────────────
   Future<void> loadKeluhanList() async {

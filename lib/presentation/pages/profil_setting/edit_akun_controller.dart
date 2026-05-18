@@ -1,13 +1,5 @@
 // ============================================================
 // BACKEND LAYER — edit_profil_controller.dart
-// Bertanggung jawab atas: validasi, update user via service,
-// deteksi perubahan untuk dialog "Hapus Draft?", navigasi.
-//
-// Yang DIHAPUS dari versi lama:
-// - SharedPreferences inline di onPressed
-// - print('User ID tidak ditemukan')
-// - Field alamat belum ada → sekarang ditambahkan
-// - UserService.updateUser positional → sekarang named params
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -36,12 +28,12 @@ class EditProfilController {
   EditProfilController({
     required User user,
     required this.onStateChanged,
-  })  : _initialNama = user.nama,
-        _initialNoHp = user.noHp,
+  })  : _initialNama   = user.nama,
+        _initialNoHp   = user.noHp,
         _initialAlamat = user.alamat ?? '' {
-    namaController = TextEditingController(text: user.nama);
-    emailController = TextEditingController(text: user.email);
-    noHpController = TextEditingController(text: user.noHp);
+    namaController   = TextEditingController(text: user.nama);
+    emailController  = TextEditingController(text: user.email);
+    noHpController   = TextEditingController(text: user.noHp);
     alamatController = TextEditingController(text: user.alamat ?? '');
   }
 
@@ -55,18 +47,33 @@ class EditProfilController {
 
   // ── Deteksi perubahan (untuk dialog Hapus Draft) ───────────
   bool get hasChanges =>
-      namaController.text != _initialNama ||
-      noHpController.text != _initialNoHp ||
+      namaController.text   != _initialNama   ||
+      noHpController.text   != _initialNoHp   ||
       alamatController.text != _initialAlamat;
 
   // ── Validasi ───────────────────────────────────────────────
   String? validate() {
-    if (namaController.text.trim().isEmpty) {
+    final nama = namaController.text.trim();
+    final noHp = noHpController.text.trim();
+
+    if (nama.isEmpty) {
       return 'Nama tidak boleh kosong.';
     }
-    if (noHpController.text.trim().isEmpty) {
+
+    // Nama: hanya huruf & spasi
+    if (!RegExp(r'^[\p{L}\s]+$', unicode: true).hasMatch(nama)) {
+      return 'Nama hanya boleh berisi huruf dan spasi.';
+    }
+
+    if (noHp.isEmpty) {
       return 'No. Handphone tidak boleh kosong.';
     }
+
+    // No HP: hanya angka
+    if (!RegExp(r'^\d+$').hasMatch(noHp)) {
+      return 'No. Handphone hanya boleh berisi angka.';
+    }
+
     return null;
   }
 
@@ -89,10 +96,10 @@ class EditProfilController {
       }
 
       final success = await UserService.updateUser(
-        id: userId,
-        nama: namaController.text.trim(),
-        email: emailController.text.trim(),
-        noHp: noHpController.text.trim(),
+        id    : userId,
+        nama  : namaController.text.trim(),
+        email : emailController.text.trim(),
+        noHp  : noHpController.text.trim(),
         alamat: alamatController.text.trim(),
       );
 
@@ -125,12 +132,12 @@ class EditProfilController {
       builder: (_) => _HapusDraftDialog(),
     );
 
-    if (result == 'hapus') return true;   // buang draft, keluar
-    if (result == 'simpan') {             // simpan dulu baru keluar
+    if (result == 'batal') return true;
+    if (result == 'simpan') {
       await simpan(context);
-      return false; // simpan sudah handle pop
+      return false;
     }
-    return false; // batal, tetap di halaman
+    return false;
   }
 
   // ── Helper Snackbar ────────────────────────────────────────
@@ -180,7 +187,7 @@ class _HapusDraftDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Hapus Draf?',
+              'batalkan perubahan?',
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
@@ -196,7 +203,6 @@ class _HapusDraftDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                // Hapus (buang perubahan)
                 TextButton(
                   onPressed: () => Navigator.pop(context, 'hapus'),
                   style: TextButton.styleFrom(
@@ -210,10 +216,10 @@ class _HapusDraftDialog extends StatelessWidget {
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: const Text('Hapus',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                      style: TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w500)),
                 ),
                 const SizedBox(width: 10),
-                // Simpan (save dulu baru keluar)
                 TextButton(
                   onPressed: () => Navigator.pop(context, 'simpan'),
                   style: TextButton.styleFrom(
@@ -227,7 +233,8 @@ class _HapusDraftDialog extends StatelessWidget {
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: const Text('Simpan',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                      style: TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w500)),
                 ),
               ],
             ),

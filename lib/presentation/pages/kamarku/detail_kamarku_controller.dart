@@ -84,32 +84,34 @@ class DetailKamarkuController {
 
   // ── Timer countdown ────────────────────────────────────────
   void startCountdown(VoidCallback onExpired) {
-    final b = booking;
-    if (b == null || b.statusBooking != 'menunggu_pembayaran') return;
+  final b = booking;
+  if (b == null || b.statusBooking != 'menunggu_pembayaran') return;
 
-    final expiredAt = b.expiredAt;
-    if (expiredAt == null) return;
+  final expiredAt = b.expiredAt;
+  if (expiredAt == null) return;
 
-    remainingTime = expiredAt.difference(DateTime.now());
+  remainingTime = expiredAt.difference(DateTime.now());
 
-    if (remainingTime.isNegative || remainingTime.inSeconds <= 0) {
-      remainingTime = Duration.zero;
-      onStateChanged();
-      onExpired();
-      return;
-    }
-
-    _countdownTimer?.cancel();
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      remainingTime -= const Duration(seconds: 1);
-      onStateChanged();
-      if (remainingTime.inSeconds <= 0) {
-        remainingTime = Duration.zero;
-        _countdownTimer?.cancel();
-        onExpired();
-      }
-    });
+  if (remainingTime.isNegative || remainingTime.inSeconds <= 0) {
+    remainingTime = Duration.zero;
+    onStateChanged();
+    // ✅ Reload dulu, baru panggil onExpired
+    loadDetail().then((_) => onExpired());
+    return;
   }
+
+  _countdownTimer?.cancel();
+  _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+    remainingTime -= const Duration(seconds: 1);
+    onStateChanged();
+    if (remainingTime.inSeconds <= 0) {
+      remainingTime = Duration.zero;
+      _countdownTimer?.cancel();
+      // ✅ Reload dulu, baru panggil onExpired
+      loadDetail().then((_) => onExpired());
+    }
+  });
+}
 
   void stopCountdown() => _countdownTimer?.cancel();
 
@@ -176,6 +178,7 @@ Future<void> batalBooking(BuildContext context) async {
 
       if (response.statusCode == 200 && data['success'] == true) {
         _snack(context, 'Booking berhasil dibatalkan.', const Color(0xFF2ECC71));
+        KamarService.invalidateCache(); // ✅ Paksa refresh dashboard
         Navigator.pop(context, true);
       } else {
         _snack(context, data['message'] ?? 'Gagal membatalkan booking.', Colors.red);
@@ -306,6 +309,7 @@ Future<void> batalBooking(BuildContext context) async {
       if (!context.mounted) return;
       _snack(context, 'Sewa berhasil diakhiri. Kamar kembali tersedia.',
           const Color(0xFF2ECC71));
+      KamarService.invalidateCache(); // ✅ Paksa refresh dashboard
       Navigator.pop(context, 'selesai');
     } on ApiException catch (e) {
       if (context.mounted) _snack(context, e.message, Colors.red);

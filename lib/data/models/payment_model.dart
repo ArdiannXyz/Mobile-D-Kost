@@ -9,7 +9,7 @@ enum PaymentMethodType {
   bcaVa,
   bniVa,
   briVa,
-  mandiriVa,
+  permataVa,
   qris,
   gopay,
   shopeepay,
@@ -21,7 +21,7 @@ extension PaymentMethodTypeExt on PaymentMethodType {
       case PaymentMethodType.bcaVa:     return 'BCA Virtual Account';
       case PaymentMethodType.bniVa:     return 'BNI Virtual Account';
       case PaymentMethodType.briVa:     return 'BRI Virtual Account';
-      case PaymentMethodType.mandiriVa: return 'Mandiri Virtual Account';
+      case PaymentMethodType.permataVa: return 'Permata Virtual Account';
       case PaymentMethodType.qris:      return 'QRIS';
       case PaymentMethodType.gopay:     return 'GoPay';
       case PaymentMethodType.shopeepay: return 'ShopeePay';
@@ -33,7 +33,7 @@ extension PaymentMethodTypeExt on PaymentMethodType {
       case PaymentMethodType.bcaVa:
       case PaymentMethodType.bniVa:
       case PaymentMethodType.briVa:
-      case PaymentMethodType.mandiriVa:
+      case PaymentMethodType.permataVa:
         return 'bank_transfer';
       case PaymentMethodType.qris:
         return 'qris';
@@ -49,7 +49,7 @@ extension PaymentMethodTypeExt on PaymentMethodType {
       case PaymentMethodType.bcaVa:     return 'bca';
       case PaymentMethodType.bniVa:     return 'bni';
       case PaymentMethodType.briVa:     return 'bri';
-      case PaymentMethodType.mandiriVa: return 'mandiri';
+      case PaymentMethodType.permataVa: return 'permata';
       default:                          return null;
     }
   }
@@ -99,6 +99,8 @@ class VaPaymentResult extends PaymentResult {
   });
 
   factory VaPaymentResult.fromJson(Map<String, dynamic> json) {
+
+    // lihat isi va_numbers
     // Midtrans response untuk bank_transfer:
     //   BCA/BNI/BRI → va_numbers: [{ "bank": "bri", "va_number": "xxx" }]
     //   Mandiri      → bill_key + biller_code (tidak pakai va_numbers)
@@ -111,11 +113,16 @@ class VaPaymentResult extends PaymentResult {
       vaNumber = vaNumbers[0]['va_number']?.toString() ?? '';
     }
 
-    // Mandiri pakai bill_key + biller_code
-    if (bank.isEmpty && json['bill_key'] != null) {
-      bank     = 'mandiri';
-      vaNumber = '${json["biller_code"] ?? ""} ${json["bill_key"] ?? ""}'.trim();
+        // Permata pakai field sendiri
+    if (bank.isEmpty && json['permata_va_number'] != null) {
+      bank     = 'permata';
+      vaNumber = json['permata_va_number'].toString();
     }
+
+        print('=== VA fromJson ===');
+    print(json);
+    print('permata_va_number: ${json['permata_va_number']}');
+    print('va_numbers: ${json['va_numbers']}');
 
     // Fallback
     if (bank.isEmpty)     bank     = json['bank']?.toString() ?? '';
@@ -129,6 +136,8 @@ class VaPaymentResult extends PaymentResult {
       expiredAt   : _parseExpired(json),
       status      : json['transaction_status']?.toString() ?? 'pending',
       methodType  : _bankToMethodType(bank),
+
+      
     );
   }
 
@@ -137,7 +146,7 @@ class VaPaymentResult extends PaymentResult {
       case 'bca':     return PaymentMethodType.bcaVa;
       case 'bni':     return PaymentMethodType.bniVa;
       case 'bri':     return PaymentMethodType.briVa;
-      case 'mandiri': return PaymentMethodType.mandiriVa;
+      case 'permata': return PaymentMethodType.permataVa;
       default:        return PaymentMethodType.bcaVa;
     }
   }

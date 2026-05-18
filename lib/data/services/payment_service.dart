@@ -167,7 +167,7 @@ class PaymentService {
             case 'bca':     return PaymentMethodType.bcaVa;
             case 'bni':     return PaymentMethodType.bniVa;
             case 'bri':     return PaymentMethodType.briVa;
-            case 'mandiri': return PaymentMethodType.mandiriVa;
+            case 'permata': return PaymentMethodType.permataVa;
             default:        return PaymentMethodType.bcaVa;
           }
         case 'qris':      return PaymentMethodType.qris;

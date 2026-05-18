@@ -20,7 +20,7 @@ class VaWidget extends StatelessWidget {
       case 'bca':     return const Color(0xFF0066AE);
       case 'bni':     return const Color(0xFFFF6600);
       case 'bri':     return const Color(0xFF1A7ECB);
-      case 'mandiri': return const Color(0xFF003D79);
+      case 'permata': return const Color(0xFF0066AE); 
       default:        return const Color(0xFF2563EB);
     }
   }
@@ -54,13 +54,13 @@ class VaWidget extends StatelessWidget {
           'Masukkan nomor Virtual Account di atas',
           'Periksa informasi dan konfirmasi pembayaran',
         ];
-      case 'mandiri':
+      case 'permata':
         return [
-          'Masukkan kartu ATM dan PIN Mandiri kamu',
-          'Pilih menu "Bayar/Beli"',
-          'Pilih "Lainnya" → "Multi Payment"',
-          'Masukkan kode perusahaan dan nomor VA',
-          'Konfirmasi dan selesaikan pembayaran',
+          'Masukkan kartu ATM dan PIN Permata kamu',
+          'Pilih menu "Transaksi Lainnya"',
+          'Pilih "Pembayaran" → "Virtual Account"',
+          'Masukkan nomor Virtual Account di atas',
+          'Periksa detail tagihan dan konfirmasi pembayaran',
         ];
       default:
         return ['Lakukan transfer ke nomor Virtual Account di atas'];
@@ -250,7 +250,7 @@ class _CopyButtonState extends State<_CopyButton> {
               _copied ? 'Tersalin' : 'Salin',
               style: const TextStyle(
                 fontSize: 12,
-                color: Color(0xFF1BBA8A),
+                color: Color(0xFF2563EB),
                 fontWeight: FontWeight.w600,
               ),
             ),

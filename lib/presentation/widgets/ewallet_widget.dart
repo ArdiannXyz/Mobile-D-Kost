@@ -6,29 +6,79 @@
 import 'package:dkost/data/models/payment_model.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
- 
-class EwalletWidget extends StatelessWidget {
+import 'package:screenshot/screenshot.dart';
+import 'package:gal/gal.dart';
+
+class EwalletWidget extends StatefulWidget {
   final EwalletPaymentResult result;
- 
+
   const EwalletWidget({super.key, required this.result});
+
+  @override
+  State<EwalletWidget> createState() => _EwalletWidgetState();
+}
+
+class _EwalletWidgetState extends State<EwalletWidget> {
+  final ScreenshotController _screenshotController = ScreenshotController();
+  bool _isSaving = false;
  
-  bool get _isGopay => result.methodType == PaymentMethodType.gopay;
- 
-  Color get _color => _isGopay
-      ? const Color(0xFF00AED6)
-      : const Color(0xFFEE4D2D);
- 
+  bool get _isGopay => widget.result.methodType == PaymentMethodType.gopay;
+
+  Color get _color => _isGopay ? const Color(0xFF00AED6) : const Color(0xFFEE4D2D);
+
   String get _appName => _isGopay ? 'GoPay' : 'ShopeePay';
- 
-  String get _logoPath =>
-      _isGopay ? 'assets/payment/gopay.png' : 'assets/payment/shopeepay.png';
- 
+
+  String get _logoPath => _isGopay ? 'assets/payment/gopay.png' : 'assets/payment/shopeepay.png';
+
   Future<void> _openApp() async {
-    if (result.deeplinkUrl.isEmpty) return;
-    final uri = Uri.parse(result.deeplinkUrl);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final url = widget.result.deeplinkUrl;
+    if (url.isEmpty) return;
+
+    try {
+      final uri = Uri.parse(url);
+      // Mode externalApplication lebih paksa untuk buka app luar
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      
+      if (!launched && mounted) {
+        _showError('Tidak dapat membuka aplikasi $_appName. Pastikan aplikasi sudah terinstal.');
+      }
+    } catch (e) {
+      if (mounted) _showError('Gagal membuka $_appName: $e');
     }
+  }
+
+  Future<void> _downloadQr() async {
+    if (widget.result.qrCodeUrl.isEmpty) return;
+    
+    setState(() => _isSaving = true);
+    try {
+      final imageBytes = await _screenshotController.capture(
+        delay: const Duration(milliseconds: 10),
+      );
+
+      if (imageBytes != null) {
+        await Gal.putImageBytes(imageBytes);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('QR Code berhasil disimpan ke galeri'),
+              backgroundColor: Color(0xFF1BBA8A),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) _showError('Gagal menyimpan QR Code: $e');
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), backgroundColor: Colors.red),
+    );
   }
  
   @override
@@ -68,7 +118,7 @@ class EwalletWidget extends StatelessWidget {
  
               // Total
               Text(
-                _formatRupiah(result.grossAmount),
+                _formatRupiah(widget.result.grossAmount),
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -76,13 +126,13 @@ class EwalletWidget extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Order: ${result.orderId}',
+                'Order: ${widget.result.orderId}',
                 style: const TextStyle(fontSize: 12, color: Colors.black38),
               ),
               const SizedBox(height: 20),
  
               // Tombol buka app
-              if (result.deeplinkUrl.isNotEmpty)
+              if (widget.result.deeplinkUrl.isNotEmpty)
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -101,32 +151,59 @@ class EwalletWidget extends StatelessWidget {
                 ),
  
               // Atau via QR (jika ada)
-              if (result.qrCodeUrl.isNotEmpty) ...[
+              if (widget.result.qrCodeUrl.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 const Row(
                   children: [
                     Expanded(child: Divider()),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text('atau scan QR', style: TextStyle(fontSize: 12, color: Colors.black38)),
+                      child: Text('atau scan QR',
+                          style: TextStyle(fontSize: 12, color: Colors.black38)),
                     ),
                     Expanded(child: Divider()),
                   ],
                 ),
                 const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[200]!),
-                    borderRadius: BorderRadius.circular(12),
+                Screenshot(
+                  controller: _screenshotController,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey[200]!),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Image.network(
+                      widget.result.qrCodeUrl,
+                      width: 160,
+                      height: 160,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.qr_code, size: 80, color: Colors.grey),
+                    ),
                   ),
-                  child: Image.network(
-                    result.qrCodeUrl,
-                    width: 160,
-                    height: 160,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) =>
-                        const Icon(Icons.qr_code, size: 80, color: Colors.grey),
+                ),
+                const SizedBox(height: 10),
+                TextButton.icon(
+                  onPressed: _isSaving ? null : _downloadQr,
+                  icon: _isSaving
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Color(0xFF2563EB),
+                          ),
+                        )
+                      : const Icon(Icons.download_rounded, size: 18),
+                  label: Text(_isSaving ? 'Menyimpan...' : 'Download QR'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF2563EB),
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],

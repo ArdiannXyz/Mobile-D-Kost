@@ -5,6 +5,8 @@
 import 'package:flutter/material.dart';
 import 'chatbot_controller.dart';
 import '../../../data/models/chatbot_model.dart';
+import '../../widgets/kamar_card.dart';
+import '../../../data/models/kamar_models.dart';
 
 class ChatbotPage extends StatefulWidget {
   const ChatbotPage({super.key});
@@ -54,6 +56,27 @@ class _ChatbotPageState extends State<ChatbotPage> {
     );
   }
 
+Widget _buildKamarCards(List<Map<String, dynamic>> kamarList) {
+  return GridView.count(
+    crossAxisCount: 2,        // ← 2 kolom
+    crossAxisSpacing: 8,
+    mainAxisSpacing: 8,
+    childAspectRatio: 0.60,   // ← sesuaikan tinggi card
+    shrinkWrap: true,          // ← penting! biar muat di dalam Column
+    physics: const NeverScrollableScrollPhysics(), // ← scroll dari ListView parent
+    children: kamarList.map((item) {
+      final kamar = KamarModel.fromJson(item);
+      return KamarCard(
+        kamar: kamar,
+        mode:  KamarCardMode.grid,
+        onTap: () => _controller.goToKamarDetail(context, kamar.idKamar),
+      );
+    }).toList(),
+  );
+}
+
+
+
   // ── Header ─────────────────────────────────────────────────
   Widget _buildHeader() {
     return Container(
@@ -78,7 +101,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
             child: const Icon(Icons.arrow_back_ios_new,
                 color: Color(0xFF1BBA8A), size: 20),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 1),
 
           // ── Avatar pakai sinora_icon.png ──────────────────
           Container(
@@ -239,9 +262,15 @@ class _ChatbotPageState extends State<ChatbotPage> {
           ),
         ),
         if (msg.dataList != null && msg.dataList!.isNotEmpty) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: 1),
           ...msg.dataList!.map((item) => _buildDataItem(item, isUser)),
         ],
+
+         if (msg.kamarList != null && msg.kamarList!.isNotEmpty) ...[
+        const SizedBox(height: 1),
+        _buildKamarCards(msg.kamarList!),
+         ],
+
         const SizedBox(height: 4),
         Align(
           alignment: Alignment.bottomRight,

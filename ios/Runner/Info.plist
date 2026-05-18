@@ -5,7 +5,7 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>Umkm Batik</string>
+		<string>Dkost</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>umkm_batik</string>
+		<string>dkost</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>
@@ -47,5 +47,14 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>gojek</string>
+			<string>shopeepay</string>
+		</array>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>Aplikasi membutuhkan akses ke galeri untuk menyimpan QR Code pembayaran.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Aplikasi membutuhkan akses ke galeri untuk menyimpan QR Code pembayaran.</string>
 	</dict>
 </plist>
