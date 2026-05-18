@@ -85,8 +85,7 @@ flutter:
     - assets/images/change-password-icon.png  # Icon ganti password
     - assets/images/logout.png                # Icon logout
     - assets/images/launcher.png
-    - assets/images/guidebook.png 
-    # - assets/images/notifikasi.png     
+    - assets/images/guidebook.png     
 
 # ── Splash Screen ───────────────────────────────────────────────
 flutter_native_splash:
