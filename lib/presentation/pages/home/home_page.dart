@@ -9,13 +9,12 @@ import 'package:flutter/services.dart';
 import '../../../main.dart'; // ✅ Import routeObserver
 
 // ── GlobalKey untuk akses refresh dari luar ──────────────────
-// ignore: library_private_types_in_public_api
-final GlobalKey<_KeluhanListPageRefreshState> keluhanRefreshKey =
-    GlobalKey<_KeluhanListPageRefreshState>();
+// Menggunakan public State class — tidak perlu wrapper tambahan
+final GlobalKey<KeluhanListPageState> keluhanPageKey =
+    GlobalKey<KeluhanListPageState>();
 
-// ignore: library_private_types_in_public_api
-final GlobalKey<_TagihanPageRefreshState> tagihanRefreshKey =
-    GlobalKey<_TagihanPageRefreshState>();
+final GlobalKey<TagihanPageState> tagihanPageKey =
+    GlobalKey<TagihanPageState>();
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,6 +29,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
 
   int _currentNavIndex = 0;
   final Set<int> _visitedTabs = {0};
+  DateTime? _lastHomeRefresh; // throttle: cegah double refresh
 
   @override
   void initState() {
@@ -48,7 +48,8 @@ class _HomePageState extends State<HomePage> with RouteAware {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Daftarkan halaman ini ke routeObserver
-    routeObserver.subscribe(this, ModalRoute.of(context)! as PageRoute);
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) routeObserver.subscribe(this, route);
   }
 
   @override
@@ -59,9 +60,19 @@ class _HomePageState extends State<HomePage> with RouteAware {
 
   @override
   void didPopNext() {
-    // Dipanggil saat user kembali ke halaman ini (misal dari detail kamar)
+    // Dipanggil saat user kembali ke halaman ini dari route lain
     if (_currentNavIndex == 0) {
-      debugPrint("Kembali ke Beranda -> Auto Refresh Dashboard");
+      _throttledHomeRefresh();
+    }
+  }
+
+  // Throttle refresh: minimal 30 detik antar refresh untuk cegah double API call
+  void _throttledHomeRefresh() {
+    final now = DateTime.now();
+    if (_lastHomeRefresh == null ||
+        now.difference(_lastHomeRefresh!) > const Duration(seconds: 30)) {
+      debugPrint('Kembali ke Beranda -> Auto Refresh Dashboard');
+      _lastHomeRefresh = now;
       _controller.loadData(forceRefresh: true);
     }
   }
@@ -73,12 +84,13 @@ class _HomePageState extends State<HomePage> with RouteAware {
     });
 
     if (index == 0) {
-      // ✅ Refresh data saat tab Beranda ditekan
-      _controller.loadData(forceRefresh: true);
+      // Pakai throttle agar tidak double-refresh dengan didPopNext
+      _throttledHomeRefresh();
     } else if (index == 1) {
-      keluhanRefreshKey.currentState?.refresh();
+      // Panggil refresh langsung ke State tanpa rebuild widget
+      keluhanPageKey.currentState?.refreshData();
     } else if (index == 2) {
-      tagihanRefreshKey.currentState?.refresh();
+      tagihanPageKey.currentState?.refreshData();
     }
   }
 
@@ -107,11 +119,12 @@ class _HomePageState extends State<HomePage> with RouteAware {
             _DashboardTab(
               controller: _controller,
             ),
+            // Gunakan key langsung ke public State — tidak perlu wrapper
             _visitedTabs.contains(1)
-                ? _KeluhanListPageRefresh(key: keluhanRefreshKey)
+                ? KeluhanListPage(key: keluhanPageKey)
                 : const SizedBox.shrink(),
             _visitedTabs.contains(2)
-                ? _TagihanPageRefresh(key: tagihanRefreshKey)
+                ? TagihanPage(key: tagihanPageKey)
                 : const SizedBox.shrink(),
             _visitedTabs.contains(3)
                 ? const SettingPage()
@@ -247,54 +260,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
   }
 }
 
-// ── Wrapper Keluhan dengan refresh ────────────────────────────
-class _KeluhanListPageRefresh extends StatefulWidget {
-  const _KeluhanListPageRefresh({super.key});
-
-  @override
-  State<_KeluhanListPageRefresh> createState() =>
-      _KeluhanListPageRefreshState();
-}
-
-class _KeluhanListPageRefreshState extends State<_KeluhanListPageRefresh> {
-  int _refreshKey = 0;
-
-  void refresh() {
-    if (mounted) setState(() => _refreshKey++);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return KeyedSubtree(
-      key: ValueKey(_refreshKey),
-      child: const KeluhanListPage(),
-    );
-  }
-}
-
-// ── Wrapper Tagihan dengan refresh ────────────────────────────
-class _TagihanPageRefresh extends StatefulWidget {
-  const _TagihanPageRefresh({super.key});
-
-  @override
-  State<_TagihanPageRefresh> createState() => _TagihanPageRefreshState();
-}
-
-class _TagihanPageRefreshState extends State<_TagihanPageRefresh> {
-  int _refreshKey = 0;
-
-  void refresh() {
-    if (mounted) setState(() => _refreshKey++);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return KeyedSubtree(
-      key: ValueKey(_refreshKey),
-      child: const TagihanPage(),
-    );
-  }
-}
+// Wrapper class dihapus — refresh kini dipanggil langsung via public State method
 
 // ══════════════════════════════════════════════════════════════
 // DASHBOARD TAB

@@ -160,16 +160,12 @@ class KeluhanController {
         return;
       }
 
-      final token = await ApiHelper.getToken();
       final url = ApiConstants.keluhanList(userId);
+      final headers = await ApiHelper.authHeaders;
 
       final response = await http.get(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          if (token != null) 'Authorization': 'Bearer $token',
-        },
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
@@ -582,84 +578,39 @@ class KeluhanController {
     final konfirmasi = await showDialog<bool>(
       context: context,
       barrierColor: Colors.black45,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        insetPadding: const EdgeInsets.symmetric(horizontal: 40),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 28),
-            Container(
-              width: 60,
-              height: 60,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFEECEC),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.delete_outline_rounded,
-                  color: Color(0xFFE24B4A), size: 28),
-            ),
-            const SizedBox(height: 14),
-            const Text(
-              'Hapus keluhan?',
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1A1A2E)),
-            ),
-            const SizedBox(height: 6),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
-              child: Text(
-                'Keluhan ini akan dihapus secara permanen dan tidak bisa dikembalikan.',
-                style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Divider(
-                height: 0.5, thickness: 0.5, color: Color(0xFFE0E0E0)),
-            IntrinsicHeight(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFF9E9E9E),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(20)),
-                        ),
-                      ),
-                      child:
-                          const Text('Batal', style: TextStyle(fontSize: 14)),
-                    ),
-                  ),
-                  const VerticalDivider(
-                      width: 0.5, thickness: 0.5, color: Color(0xFFE0E0E0)),
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFFE24B4A),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                              bottomRight: Radius.circular(20)),
-                        ),
-                      ),
-                      child: const Text('Hapus',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w600)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Hapus keluhan?',
+            style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A1A2E))),
+        content: const Text(
+          'Keluhan ini akan dihapus secara permanen dan tidak bisa dikembalikan.',
+          style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
         ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            style:
+                TextButton.styleFrom(foregroundColor: const Color(0xFF9E9E9E)),
+            child: const Text('Batal', style: TextStyle(fontSize: 13)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE24B4A),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('Ya, Hapus',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+          ),
+        ],
       ),
     );
 
@@ -777,3 +728,4 @@ class KeluhanController {
       ));
   }
 }
+

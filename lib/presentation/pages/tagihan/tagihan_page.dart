@@ -237,10 +237,11 @@ class TagihanPage extends StatefulWidget {
   const TagihanPage({super.key});
 
   @override
-  State<TagihanPage> createState() => _TagihanPageState();
+  State<TagihanPage> createState() => TagihanPageState();
 }
 
-class _TagihanPageState extends State<TagihanPage> with RouteAware {
+// State dibuat public agar bisa diakses melalui GlobalKey dari home_page
+class TagihanPageState extends State<TagihanPage> with RouteAware {
   late final TagihanController _controller;
 
   @override
@@ -257,7 +258,9 @@ class _TagihanPageState extends State<TagihanPage> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context)!);
+    // Safe cast: hanya subscribe jika ini memang PageRoute
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) routeObserver.subscribe(this, route);
   }
 
   @override
@@ -268,6 +271,11 @@ class _TagihanPageState extends State<TagihanPage> with RouteAware {
 
   @override
   void didPopNext() {
+    _controller.loadTagihan();
+  }
+
+  // Method publik untuk dipanggil dari GlobalKey (home_page)
+  void refreshData() {
     _controller.loadTagihan();
   }
 
