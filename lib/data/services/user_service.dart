@@ -139,8 +139,6 @@ class UserService {
     }
   }
 
-
-
   // ── POST: Logout ───────────────────────────────────────────
   static Future<void> logout() async {
     try {
