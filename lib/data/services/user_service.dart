@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user_models.dart';
 import '../helper/api_constants.dart';
 import '../helper/api_helper.dart';
@@ -8,11 +7,6 @@ import '../helper/api_exception.dart';
 
 class UserService {
   UserService._();
-
-  // ── Google Sign-In instance ────────────────────────────────
-  static final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: ['email', 'profile'],
-  );
 
   // ── GET: Detail User ───────────────────────────────────────
   static Future<User?> fetchUser(int id) async {
@@ -145,73 +139,9 @@ class UserService {
     }
   }
 
-  // ── POST: Google Login (BARU) ──────────────────────────────
-  // Flow:
-  // 1. Trigger popup Google Sign-In di device
-  // 2. Ambil idToken dari Google
-  // 3. Kirim idToken ke Laravel untuk diverifikasi
-  // 4. Laravel return Sanctum token jika valid
-  static Future<Map<String, dynamic>> loginWithGoogle() async {
-    try {
-      // Step 1 — Trigger Google Sign-In popup
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        // User menekan tombol back / cancel
-        throw ApiException(message: 'Login Google dibatalkan.', statusCode: 0);
-      }
 
-      // Step 2 — Ambil idToken
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final String? idToken = googleAuth.idToken;
-
-      if (idToken == null) {
-        throw ApiException(
-            message: 'Gagal mendapatkan token Google. Coba lagi.',
-            statusCode: 0);
-      }
-
-      // Step 3 — Kirim idToken ke Laravel
-      final response = await http.post(
-        Uri.parse(ApiConstants.googleLogin),
-        headers: ApiHelper.publicHeaders,
-        body: jsonEncode({'id_token': idToken}),
-      );
-
-      final data = ApiHelper.handleResponse(response);
-
-      // Step 4 — Simpan session jika berhasil
-      if (data['error'] == false && data['user'] != null) {
-        await ApiHelper.saveSession(
-          userId: data['user']['id_user'],
-          role: data['user']['role'],
-          token: data['token'] ?? '',
-        );
-      }
-
-      return data;
-    } on ApiException {
-      rethrow;
-    } catch (e) {
-      throw ApiException(
-          message: 'Login Google gagal. Coba lagi nanti.', statusCode: 500);
-    }
-  }
-
-  // ── POST: Sign Out Google (BARU) ───────────────────────────
-  // Dipanggil bersamaan saat logout biasa jika user login via Google.
-  static Future<void> signOutGoogle() async {
-    try {
-      if (await _googleSignIn.isSignedIn()) {
-        await _googleSignIn.signOut();
-      }
-    } catch (_) {
-      // Abaikan error sign out Google, tetap lanjut clear session
-    }
-  }
 
   // ── POST: Logout ───────────────────────────────────────────
-  // MODIFIKASI: tambah signOutGoogle() agar Google session juga dibersihkan
   static Future<void> logout() async {
     try {
       final headers = await ApiHelper.authHeaders;
@@ -219,8 +149,7 @@ class UserService {
     } catch (_) {
       // Tetap clear session meskipun request gagal
     } finally {
-      await signOutGoogle(); // ← baru: clear Google session
-      await ApiHelper.clearSession(); // clear Sanctum token & prefs
+      await ApiHelper.clearSession();
     }
   }
 

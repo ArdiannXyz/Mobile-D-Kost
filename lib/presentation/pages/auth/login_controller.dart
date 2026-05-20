@@ -110,48 +110,6 @@ class LoginController {
     }
   }
 
-  // ── Login dengan Google (BARU) ─────────────────────────────
-  Future<void> loginWithGoogle(BuildContext context) async {
-    isLoading = true;
-    onStateChanged();
-
-    try {
-      final data = await UserService.loginWithGoogle();
-
-      if (!context.mounted) return;
-
-      if (data['error'] == false) {
-        final String role = data['user']?['role'] ?? '';
-        if (role == 'admin') {
-          _showAdminDeniedDialog(context);
-          return;
-        }
-
-        final token = await ApiHelper.getToken();
-        if (token != null) MidtransService.setToken(token);
-
-        if (!context.mounted) return;
-        _showSuccessDialog(context);
-      } else {
-        _showErrorSnackbar(
-          context,
-          data['message'] ?? 'Login Google gagal.',
-        );
-      }
-    } on ApiException catch (e) {
-      // Jika user cancel Google Sign-In popup, tidak perlu tampilkan error
-      if (e.statusCode == 0) return;
-      if (context.mounted) _showErrorSnackbar(context, e.message);
-    } catch (_) {
-      if (context.mounted) {
-        _showErrorSnackbar(context, 'Login Google gagal. Coba lagi nanti.');
-      }
-    } finally {
-      isLoading = false;
-      onStateChanged();
-    }
-  }
-
   // ── Navigasi ───────────────────────────────────────────────
 
   void goToRegister(BuildContext context) => Navigator.push(

@@ -3,6 +3,7 @@
 // ============================================================
 
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'keluhan_controller.dart';
 import 'package:dkost/main.dart';
@@ -11,10 +12,11 @@ class KeluhanListPage extends StatefulWidget {
   const KeluhanListPage({super.key});
 
   @override
-  State<KeluhanListPage> createState() => _KeluhanListPageState();
+  State<KeluhanListPage> createState() => KeluhanListPageState();
 }
 
-class _KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
+// State dibuat public agar bisa diakses melalui GlobalKey dari home_page
+class KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
   late final KeluhanController _controller;
 
   @override
@@ -31,7 +33,9 @@ class _KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context)!);
+    // Safe cast: hanya subscribe jika ini memang PageRoute
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) routeObserver.subscribe(this, route);
   }
 
   @override
@@ -43,6 +47,11 @@ class _KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
   @override
   void didPopNext() {
     _controller.loadKeluhanList(); // refresh saat kembali ke halaman ini
+  }
+
+  // Method publik untuk dipanggil dari GlobalKey (home_page)
+  void refreshData() {
+    _controller.loadKeluhanList();
   }
 
   @override
@@ -218,23 +227,49 @@ class _KeluhanListPageState extends State<KeluhanListPage> with RouteAware {
   }
 }
 
-class _KeluhanCard extends StatelessWidget {
+// _KeluhanCard dibuat StatefulWidget agar bisa cache base64 decode
+// (base64Decode adalah CPU-intensive, tidak boleh diulang setiap rebuild)
+class _KeluhanCard extends StatefulWidget {
   final dynamic keluhan;
   final String statusLabel;
   final Color statusColor;
-  final VoidCallback? onTap; // ← tambah
+  final VoidCallback? onTap;
 
   const _KeluhanCard({
     required this.keluhan,
     required this.statusLabel,
     required this.statusColor,
-    this.onTap, // ← tambah
+    this.onTap,
   });
+
+  @override
+  State<_KeluhanCard> createState() => _KeluhanCardState();
+}
+
+class _KeluhanCardState extends State<_KeluhanCard> {
+  // Cache hasil decode base64 — hanya dihitung sekali saat foto berubah
+  Uint8List? _cachedBytes;
+  String? _cachedFotoKey;
+
+  Uint8List? _getPhotoBytes(String? foto) {
+    if (foto == null || foto.isEmpty) return null;
+    if (!foto.startsWith('data:image')) return null;
+    // Gunakan cache jika foto sama
+    if (_cachedFotoKey == foto) return _cachedBytes;
+    try {
+      final base64Str = foto.split(',').last;
+      _cachedBytes = base64Decode(base64Str);
+      _cachedFotoKey = foto;
+      return _cachedBytes;
+    } catch (_) {
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
@@ -259,7 +294,7 @@ class _KeluhanCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    keluhan.deskripsiMasalah,
+                    widget.keluhan.deskripsiMasalah,
                     style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -269,7 +304,7 @@ class _KeluhanCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Tanggal Lapor : ${_formatTanggal(keluhan.tglLapor)}',
+                    'Tanggal Lapor : ${_formatTanggal(widget.keluhan.tglLapor)}',
                     style:
                         const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
                   ),
@@ -281,11 +316,11 @@ class _KeluhanCard extends StatelessWidget {
                               fontSize: 12,
                               color: Color(0xFF555555),
                               fontWeight: FontWeight.w500)),
-                      Text(statusLabel,
+                      Text(widget.statusLabel,
                           style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: statusColor)),
+                              color: widget.statusColor)),
                     ],
                   ),
                 ],
@@ -298,23 +333,20 @@ class _KeluhanCard extends StatelessWidget {
   }
 
   Widget _buildFoto() {
-    final foto = keluhan.fotoBukti;
+    final foto = widget.keluhan.fotoBukti;
     if (foto == null || foto.isEmpty) return _placeholder();
 
-    if (foto.startsWith('data:image')) {
-      try {
-        final base64Str = foto.split(',').last;
-        final bytes = base64Decode(base64Str);
-        return Image.memory(bytes,
-            width: 80,
-            height: 80,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => _placeholder());
-      } catch (_) {
-        return _placeholder();
-      }
+    // Cek cache base64 — tidak decode ulang jika foto sama
+    final bytes = _getPhotoBytes(foto);
+    if (bytes != null) {
+      return Image.memory(bytes,
+          width: 80,
+          height: 80,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _placeholder());
     }
 
+    // URL biasa (bukan base64)
     return Image.network(foto,
         width: 80,
         height: 80,
